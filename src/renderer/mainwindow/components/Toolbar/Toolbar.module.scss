@@ -1,0 +1,76 @@
+.toolBar {
+    display: flex;
+    flex-direction: row;
+
+    flex: 0 0 75px;
+
+    background-color: #1c1c1c8c;
+    box-shadow: 0px 2px 4px #111111a1;
+    -webkit-app-region: drag;
+}
+
+.logo {
+    flex: 0 0 75px;
+    height: 75px;
+    padding: 8px;
+    filter: drop-shadow(1px 1px 2px #1a1a1a);
+}
+
+.accountGroup {
+    flex: 0 0 200px;
+}
+
+.profilePicker {
+    flex: 1 1;
+    flex-direction: row;
+    border-left-width: 2px;
+    border-left-style: solid;
+    border-right-width: 2px;
+    border-right-style: solid;
+    border-color: #0d161f;
+}
+
+.closeButtonGroup {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 75px;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.closeButton {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 50px;
+    width: 50px;
+
+    justify-content: center;
+    align-items: center;
+
+    background-color: #c24242;
+    border: none;
+    border-radius: 25px;
+    filter: drop-shadow(2px 2px 2px #1a1a1a);
+    border-color: transparent;
+    transition: filter 0.1s, transform 0.1s;
+    cursor: pointer;
+    -webkit-app-region: none;
+}
+
+.closeButton:hover {
+    filter: drop-shadow(2px 2px 6px #1a1a1a);
+    transform: scale(1.05);
+}
+
+.closeButton:active {
+    filter: drop-shadow(2px 2px 1px #1a1a1a);
+    transform: scale(0.95);
+}
+
+.closeButtonIcon {
+    color: #bdbdbd;
+    font-size: 42px;
+}

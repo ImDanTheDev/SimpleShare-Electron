@@ -1,0 +1,121 @@
+.accountGroup {
+    flex: 0 0 200px;
+    border-right-style: solid;
+    border-right-width: 1px;
+    display: flex;
+    flex-direction: column;
+    -webkit-app-region: none;
+}
+
+.picker {
+    flex: 1 1;
+    margin: 8px;
+
+    filter: drop-shadow(0px 2px 2px #1a1a1a);
+    transition: filter 0.1s, transform 0.1s;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.pickerContent {
+    background-color: #3e3a3e;
+    border-radius: 16px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    flex: 1 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+// .pickerContent:hover {
+//     border-bottom-left-radius: 0px;
+//     border-bottom-right-radius: 0px;
+//     border-bottom-style: none;
+//     filter: drop-shadow(0px 2px 4px #1a1a1a);
+// }
+
+.welcomeGroup {
+    color: #fff;
+    flex: 1 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 8px;
+}
+
+.welcomeText {
+    color: #fff;
+    font-size: 14px;
+}
+
+.displayName {
+    color: #fff;
+    font-size: 18px;
+}
+
+.arrow {
+    color: #fff;
+    font-size: 32px;
+    display: flex;
+    justify-content: center;
+    transition: transform linear 0.05s;
+}
+
+.dropdown {
+    display: none;
+    color: #fff;
+    position: absolute;
+    margin-top: -10px;
+    padding-top: 10px;
+    left: 0;
+    right: 0;
+    background-color: #5e595e;
+    border-radius: 16px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    border-top-width: 0px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top-style: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.picker:hover .arrow {
+    //transform: rotate(180deg);
+    transform: translateY(4px);
+}
+
+.picker:hover .dropdown {
+    display: block;
+}
+
+.picker:hover .pickerContent {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    //border-bottom-style: none;
+    border-bottom-color: transparent;
+    filter: drop-shadow(0px 2px 2px #1a1a1a);
+}
+
+.dropdown:hover {
+    display: block;
+}
+
+.dropdownItem {
+    color: #fff;
+    padding: 8px;
+    transition: padding linear 0.1s;
+}
+
+.dropdownItem:hover {
+    padding-left: 12px;
+    background-color: #3e3a3e75;
+}

@@ -1,0 +1,66 @@
+.item {
+    display: flex;
+    flex-direction: row;
+
+    flex: 0 0 64px;
+
+    padding: 4px;
+    background-color: #0d161f;
+    border-radius: 16px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+}
+
+.profilePicture {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0 64px;
+    height: 64px;
+
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #303f4e;
+    border-radius: 16px;
+    margin: 4px;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1 1;
+
+    margin: 4px;
+    color: #fff;
+}
+
+.to {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0;
+
+    color: #aaa;
+    font-size: 12px;
+}
+
+.fileName {
+    display: flex;
+    flex-direction: column;
+
+    flex: 0 0;
+
+    color: #aaa;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1 1;
+
+    color: #fff;
+}

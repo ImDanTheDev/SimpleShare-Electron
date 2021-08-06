@@ -1,0 +1,157 @@
+.frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-app-region: drag;
+}
+
+.banner {
+    flex: 0 0 128px;
+    display: flex;
+    flex-direction: row;
+    border-bottom-width: 1px;
+    border-bottom-color: #0d161f;
+    border-bottom-style: solid;
+}
+
+.logo {
+    flex: 0 0;
+    width: 128px;
+    height: 128px;
+    margin-left: -8px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-right: -28px;
+}
+
+.title {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    color: white;
+    font-size: 38px;
+}
+
+.body {
+    flex: 1;
+    display: flex;
+    border-top-width: 1px;
+    border-top-color: #0d161f;
+    border-top-style: solid;
+    flex-direction: column;
+    padding: 0px 16px 16px 16px;
+}
+
+.prompt {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 24px;
+}
+
+.signInMethods {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    color: white;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.signInMethod {
+    color: white;
+    background-color: #0d161f;
+    height: 64px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: 16px;
+    font-size: 24px;
+    -webkit-app-region: none;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    filter: drop-shadow(2px 2px 2px #22222286);
+    transition: border-radius 0.1s, filter 0.1s, transform 0.1s;
+}
+
+.signInMethod:hover {
+    border-width: 2px;
+    border-radius: 8px;
+    filter: drop-shadow(2px 2px 6px #22222286);
+}
+
+.signInMethod:active {
+    filter: drop-shadow(2px 2px 1px #22222286);
+    transform: scale(0.98);
+}
+
+.footer {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    color: #fff;
+}
+
+.link {
+    flex: 1;
+    color: #bdbdbd;
+    font-size: 14px;
+}
+
+.closeButtonGroup {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.closeButton {
+    background-color: #c24242;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+    filter: drop-shadow(2px 2px 2px #22222286);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    -webkit-app-region: none;
+    border-color: transparent;
+    transition: border-radius 0.1s, filter 0.1s, border-color 0.1s,
+        transform 0.1s;
+}
+
+.closeButton:hover {
+    border-radius: 8px;
+    filter: drop-shadow(2px 2px 6px #22222286);
+}
+
+.closeButton:active {
+    // border-radius: 8px;
+    // border-width: 2px;
+    // border-style: solid;
+    // border-color: #F4A2617F;
+    filter: drop-shadow(2px 2px 1px #22222286);
+    transform: scale(0.95);
+}
+
+.closeButtonIcon {
+    color: #bdbdbd;
+    font-size: 42px;
+}
