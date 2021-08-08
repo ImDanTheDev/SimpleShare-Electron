@@ -15,19 +15,33 @@ import {
 } from 'redux-persist';
 import electronStorage from './electron-storage';
 import authReducer, { AuthState } from './auth-slice';
+import userReducer, {
+    AccountInfoState as AccountInfoState,
+} from './account-slice';
+import profilesReducer, { ProfilesState } from './profiles-slice';
+import sharesReducer, { SharesState } from './shares-slice';
+import outboxReducer, { OutboxState } from './outbox-slice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
+    user: userReducer,
+    profiles: profilesReducer,
+    shares: sharesReducer,
+    outbox: outboxReducer,
 });
 
 const persistConfig: PersistConfig<
     CombinedState<{
         auth: AuthState;
+        user: AccountInfoState;
+        profiles: ProfilesState;
+        shares: SharesState;
+        outbox: OutboxState;
     }>
 > = {
     key: 'root',
     storage: electronStorage(),
-    //blacklist: ['auth'],
+    blacklist: ['user', 'auth', 'profiles', 'shares', 'toaster'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
