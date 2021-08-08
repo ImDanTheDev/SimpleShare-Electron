@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { contextBridge, ipcRenderer } from 'electron';
-import { IPCArgs, IPC_ARG_TEMPLATES } from '../../shared/types/ipc';
+import { IPCArgs, IPC_ARG_TEMPLATES } from '../../common/ipc-types';
 
 const callIpcRenderer = (method: string, channel: string, ...args: any[]) => {
     if (!channel.startsWith('APP_')) {

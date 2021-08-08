@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import WindowFrame from '../../../shared/WindowFrame/WindowFrame';
+import { authService, initService } from '../../../common/services/api';
+import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import SignInScreen from '../SignInScreen/SignInScreen';
 import SplashScreen from '../SplashScreen/SplashScreen';
 
@@ -30,6 +31,11 @@ export const StartupWindow: React.FC = () => {
     );
     const [opacityAnimInterval, setOpacityAnimInterval] =
         useState<NodeJS.Timer>();
+
+    useEffect(() => {
+        initService.initialize();
+        authService.initialize();
+    }, []);
 
     useEffect(() => {
         setOpacityAnimFrame(0);
@@ -81,8 +87,16 @@ export const StartupWindow: React.FC = () => {
         );
     };
 
-    const handleSignIn = () => {
-        window.api.send('APP_SHOW_MAIN_WINDOW', {});
+    const handleSignIn = async () => {
+        //window.api.send('APP_SHOW_MAIN_WINDOW', {});
+        const user = await authService.googleSignIn();
+        if (user) {
+            console.log(`Signed in as: ${user.displayName}`);
+            window.api.send('APP_SHOW_MAIN_WINDOW', {});
+        } else {
+            // TODO: Resolve error or should feedback to user.
+            console.log('An error occurred while signing in.');
+        }
     };
 
     const renderScreen = () => {

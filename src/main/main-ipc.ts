@@ -1,10 +1,14 @@
 import { BrowserWindow, ipcMain } from 'electron';
-import { IPCArgs, IPC_ARG_TEMPLATES } from '../shared/types/ipc';
+import { IPCArgs, IPC_ARG_TEMPLATES } from '../common/ipc-types';
 
-export default class IPC {
-    readonly window: BrowserWindow;
+export default class MainIPC {
+    private window: BrowserWindow;
 
     constructor(window: BrowserWindow) {
+        this.window = window;
+    }
+
+    setWindow(window: BrowserWindow): void {
         this.window = window;
     }
 
@@ -24,14 +28,8 @@ export default class IPC {
 
     handle<T extends keyof IPCArgs, R extends typeof IPC_ARG_TEMPLATES[T]>(
         channel: T,
-        listener: (args: R) => never
+        listener: (args: R) => unknown
     ): void {
         ipcMain.handle(channel, (_event, args) => listener(args));
-    }
-
-    clearListeners(): void {
-        ipcMain.eventNames().forEach((channel) => {
-            ipcMain.removeAllListeners(channel as string);
-        });
     }
 }

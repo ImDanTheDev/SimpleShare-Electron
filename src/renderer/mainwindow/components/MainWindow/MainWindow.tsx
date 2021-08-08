@@ -1,5 +1,5 @@
 import React from 'react';
-import WindowFrame from '../../../shared/WindowFrame/WindowFrame';
+import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { HomeScreen } from '../HomeScreen/HomeScreen';
 
 const MainWindow: React.FC = () => {

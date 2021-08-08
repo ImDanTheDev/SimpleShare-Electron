@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { StartupWindow } from './components/StartupWindow/StartupWindow';
-import './index.css';
+import EnhancedComponent from '../common/EnhancedComponent/EnhancedComponent';
 
 ReactDOM.render(
-    <React.StrictMode>
+    <EnhancedComponent>
         <StartupWindow />
-    </React.StrictMode>,
+    </EnhancedComponent>,
     document.getElementById('root')
 );

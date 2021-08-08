@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import IUser from '../services/auth/IUser';
 
 export interface AuthState {
-    user: string | undefined;
+    user: IUser | undefined;
 }
 
 const initialState: AuthState = {
@@ -12,7 +13,7 @@ export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
-        setUser: (state, action: PayloadAction<string | undefined>) => {
+        setUser: (state, action: PayloadAction<IUser | undefined>) => {
             state.user = action.payload;
         },
     },

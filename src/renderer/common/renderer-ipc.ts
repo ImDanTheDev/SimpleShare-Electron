@@ -1,4 +1,4 @@
-import { IPCArgs, IPC_ARG_TEMPLATES } from './ipc';
+import { IPCArgs, IPC_ARG_TEMPLATES } from '../../common/ipc-types';
 
 declare global {
     interface Window {

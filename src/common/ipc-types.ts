@@ -27,6 +27,17 @@ export interface IPCArgs {
     APP_SHOW_MAIN_WINDOW: Record<string, unknown>;
     APP_SHOW_STARTUP_WINDOW: Record<string, unknown>;
     APP_QUIT: Record<string, unknown>;
+
+    APP_SET_ITEM: {
+        key: string;
+        item: string;
+    };
+    APP_GET_ITEM: {
+        key: string;
+    };
+    APP_REMOVE_ITEM: {
+        key: string;
+    };
 }
 
 export const IPC_ARG_TEMPLATES: IPCArgs = {
@@ -53,9 +64,18 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
         height: 0,
         animate: false,
         aroundCenter: false,
-        //resizable: false,
     },
     APP_SHOW_MAIN_WINDOW: {},
     APP_SHOW_STARTUP_WINDOW: {},
     APP_QUIT: {},
+    APP_GET_ITEM: {
+        key: '',
+    },
+    APP_REMOVE_ITEM: {
+        key: '',
+    },
+    APP_SET_ITEM: {
+        key: '',
+        item: '',
+    },
 };
