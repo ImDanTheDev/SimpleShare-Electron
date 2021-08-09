@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import IProfile from '../services/auth/IProfile';
+import IProfile from '../services/IProfile';
 
 export interface ProfilesState {
     profiles: IProfile[];

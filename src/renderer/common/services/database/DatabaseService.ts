@@ -5,10 +5,10 @@ import {
 import { setProfiles } from '../../redux/profiles-slice';
 import { addShare, deleteShare, updateShare } from '../../redux/shares-slice';
 import { store } from '../../redux/store';
-import IAccountInfo from '../auth/IAccountInfo';
-import IProfile from '../auth/IProfile';
-import IPublicGeneralInfo from '../auth/IPublicGeneralInfo';
-import IShare from '../auth/IShare';
+import IAccountInfo from '../IAccountInfo';
+import IProfile from '../IProfile';
+import IPublicGeneralInfo from '../IPublicGeneralInfo';
+import IShare from '../IShare';
 import FirestoreDatabaseProvider from './FirebaseDatabaseProvider';
 import IDatabaseProvider from './IDatabaseProvider';
 
@@ -17,10 +17,20 @@ export enum DatabaseProviderType {
 }
 
 export default class DatabaseService {
-    private readonly databaseProvider: IDatabaseProvider;
+    private readonly databaseProviderType: DatabaseProviderType;
+    private databaseProvider: IDatabaseProvider | undefined;
 
     constructor(databaseProviderType: DatabaseProviderType) {
-        switch (databaseProviderType) {
+        this.databaseProviderType = databaseProviderType;
+    }
+
+    initialize = (): void => {
+        if (this.databaseProvider) {
+            console.log('Database Service is already initialized');
+            return;
+        }
+
+        switch (this.databaseProviderType) {
             case DatabaseProviderType.Firestore:
                 this.databaseProvider = new FirestoreDatabaseProvider(
                     (share: IShare) => {
@@ -39,9 +49,14 @@ export default class DatabaseService {
                 );
                 break;
         }
-    }
+    };
 
     getAccountInfo = async (uid: string): Promise<IAccountInfo | undefined> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         const accountInfo = await this.databaseProvider.getAccountInfo(uid);
         store.dispatch(setAccountInfo(accountInfo));
 
@@ -49,6 +64,11 @@ export default class DatabaseService {
     };
 
     doesAccountExist = async (uid: string): Promise<boolean> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return false;
+        }
+
         return await this.databaseProvider.doesAccountExist(uid);
     };
 
@@ -57,6 +77,11 @@ export default class DatabaseService {
         accountInfo: IAccountInfo,
         publicGeneralInfo: IPublicGeneralInfo
     ): Promise<boolean> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return false;
+        }
+
         const success = await this.databaseProvider.initializeAccount(
             uid,
             accountInfo,
@@ -73,6 +98,11 @@ export default class DatabaseService {
         uid: string,
         accountInfo: IAccountInfo
     ): Promise<boolean> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return false;
+        }
+
         const success = await this.databaseProvider.setAccountInfo(
             uid,
             accountInfo
@@ -86,6 +116,11 @@ export default class DatabaseService {
     getUidByPhoneNumber = async (
         phoneNumber: string
     ): Promise<string | undefined> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         const uid = await this.databaseProvider.getUidByPhoneNumber(
             phoneNumber
         );
@@ -95,6 +130,11 @@ export default class DatabaseService {
     getPublicGeneralInfo = async (
         uid: string
     ): Promise<IPublicGeneralInfo | undefined> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         const publicGeneralInfo =
             await this.databaseProvider.getPublicGeneralInfo(uid);
         store.dispatch(setPublicGeneralInfo(publicGeneralInfo));
@@ -105,15 +145,30 @@ export default class DatabaseService {
         uid: string,
         info: IPublicGeneralInfo
     ): Promise<void> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         await this.databaseProvider.setPublicGeneralInfo(uid, info);
         store.dispatch(setPublicGeneralInfo(info));
     };
 
     createDefaultProfile = async (uid: string): Promise<boolean> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return false;
+        }
+
         return await this.databaseProvider.createDefaultProfile(uid);
     };
 
     createProfile = async (uid: string, profile: IProfile): Promise<void> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         try {
             await this.databaseProvider.createProfile(uid, profile);
 
@@ -127,6 +182,11 @@ export default class DatabaseService {
     };
 
     getAllProfiles = async (uid: string): Promise<IProfile[]> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return [];
+        }
+
         const profiles = await this.databaseProvider.getAllProfiles(uid);
 
         store.dispatch(setProfiles(profiles || []));
@@ -138,6 +198,11 @@ export default class DatabaseService {
         uid: string,
         profileId: string
     ): Promise<IProfile | undefined> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         const profile = await this.databaseProvider.getProfile(uid, profileId);
         return profile;
     };
@@ -146,6 +211,11 @@ export default class DatabaseService {
         uid: string,
         name: string
     ): Promise<string | undefined> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         const profileId = await this.databaseProvider.getProfileIdByName(
             uid,
             name
@@ -157,6 +227,11 @@ export default class DatabaseService {
         uid: string,
         profileId: string
     ): Promise<boolean> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return false;
+        }
+
         const success = await this.databaseProvider.deleteProfile(
             uid,
             profileId
@@ -169,10 +244,20 @@ export default class DatabaseService {
     };
 
     createShare = async (share: IShare): Promise<void> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         await this.databaseProvider.createShare(share);
     };
 
     deleteShare = async (share: IShare): Promise<boolean> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return false;
+        }
+
         const success = await this.databaseProvider.deleteShare(share);
         return success;
     };
@@ -181,10 +266,20 @@ export default class DatabaseService {
         uid: string,
         profileId: string
     ): Promise<void> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         await this.databaseProvider.addShareListener(uid, profileId);
     };
 
     removeAllShareListeners = async (): Promise<void> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         await this.databaseProvider.removeAllShareListeners();
     };
 
@@ -192,6 +287,11 @@ export default class DatabaseService {
         uid: string,
         profileId: string
     ): Promise<void> => {
+        if (!this.databaseProvider) {
+            console.error('Database Service is not initialized!');
+            return undefined;
+        }
+
         await this.databaseProvider.removeShareListener(uid, profileId);
     };
 }

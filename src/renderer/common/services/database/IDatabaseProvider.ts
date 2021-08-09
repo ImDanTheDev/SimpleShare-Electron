@@ -1,7 +1,7 @@
-import IAccountInfo from '../auth/IAccountInfo';
-import IProfile from '../auth/IProfile';
-import IPublicGeneralInfo from '../auth/IPublicGeneralInfo';
-import IShare from '../auth/IShare';
+import IAccountInfo from '../IAccountInfo';
+import IProfile from '../IProfile';
+import IPublicGeneralInfo from '../IPublicGeneralInfo';
+import IShare from '../IShare';
 
 export default interface IDatabaseProvider {
     // Accounts

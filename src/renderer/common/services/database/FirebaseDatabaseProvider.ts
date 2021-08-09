@@ -1,23 +1,10 @@
-import IAccountInfo from '../auth/IAccountInfo';
-import IProfile from '../auth/IProfile';
-import IPublicGeneralInfo from '../auth/IPublicGeneralInfo';
-import IShare from '../auth/IShare';
+import IAccountInfo from '../IAccountInfo';
+import IProfile from '../IProfile';
+import IPublicGeneralInfo from '../IPublicGeneralInfo';
+import IShare from '../IShare';
 import IDatabaseProvider from './IDatabaseProvider';
 
-import {
-    Firestore,
-    getFirestore,
-    collection,
-    doc,
-    getDoc,
-    getDocs,
-    setDoc,
-    deleteDoc,
-    query,
-    where,
-    limit,
-    onSnapshot,
-} from 'firebase/firestore';
+import firebase from 'firebase/app';
 import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
 
 interface IShareListener {
@@ -27,7 +14,7 @@ interface IShareListener {
 }
 
 export default class FirestoreDatabaseProvider implements IDatabaseProvider {
-    private readonly firestore: Firestore;
+    private readonly firestore: firebase.firestore.Firestore;
     private shareListeners: IShareListener[] = [];
 
     private onShareAddedCallback: (share: IShare) => void;
@@ -39,7 +26,7 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         onShareDeleted: (share: IShare) => void,
         onShareModified: (share: IShare) => void
     ) {
-        this.firestore = getFirestore();
+        this.firestore = firebase.firestore();
         this.onShareAddedCallback = onShareAdded;
         this.onShareDeletedCallback = onShareDeleted;
         this.onShareModifiedCallback = onShareModified;
@@ -47,14 +34,12 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
 
     getAccountInfo = async (uid: string): Promise<IAccountInfo | undefined> => {
         try {
-            const accountsCollectionRef = collection(
-                this.firestore,
-                'accounts'
-            );
-            const accountDocRef = doc(accountsCollectionRef, uid);
-            const accountDoc = await getDoc(accountDocRef);
+            const accountDocRef = this.firestore
+                .collection('accounts')
+                .doc(uid);
+            const accountDoc = await accountDocRef.get();
 
-            if (accountDoc.exists()) {
+            if (accountDoc.exists) {
                 const accountDocData = accountDoc.data();
                 if (accountDocData) {
                     return {
@@ -71,13 +56,11 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
 
     doesAccountExist = async (uid: string): Promise<boolean> => {
         try {
-            const accountsCollectionRef = collection(
-                this.firestore,
-                'accounts'
-            );
-            const accountDocRef = doc(accountsCollectionRef, uid);
-            const accountDoc = await getDoc(accountDocRef);
-            return accountDoc.exists();
+            const accountDocRef = this.firestore
+                .collection('accounts')
+                .doc(uid);
+            const accountDoc = await accountDocRef.get();
+            return accountDoc.exists;
         } catch {
             return false;
         }
@@ -98,12 +81,10 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         accountInfo: IAccountInfo
     ): Promise<boolean> => {
         try {
-            const accountsCollectionRef = collection(
-                this.firestore,
-                'accounts'
-            );
-            const accountDocRef = doc(accountsCollectionRef, uid);
-            await setDoc(accountDocRef, accountInfo);
+            const accountDocRef = this.firestore
+                .collection('accounts')
+                .doc(uid);
+            await accountDocRef.set(accountInfo);
             return true;
         } catch (e) {
             console.log(e);
@@ -114,14 +95,12 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
     getUidByPhoneNumber = async (
         phoneNumber: string
     ): Promise<string | undefined> => {
-        const accountsCollectionRef = collection(this.firestore, 'accounts');
+        const query = this.firestore
+            .collection('accounts')
+            .where('phoneNumber', '==', phoneNumber)
+            .limit(1);
 
-        const q = query(
-            accountsCollectionRef,
-            where('phoneNumber', '==', phoneNumber),
-            limit(1)
-        );
-        const matchingAccountDocs = await getDocs(q);
+        const matchingAccountDocs = await query.get();
 
         if (matchingAccountDocs.size <= 0) return undefined;
         const matchingAccountDoc = matchingAccountDocs.docs[0];
@@ -131,16 +110,14 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
     getPublicGeneralInfo = async (
         uid: string
     ): Promise<IPublicGeneralInfo | undefined> => {
-        const generalInfoDocRef = doc(
-            collection(
-                doc(collection(this.firestore, 'accounts'), uid),
-                'public'
-            ),
-            'GeneralInfo'
-        );
+        const generalInfoDocRef = this.firestore
+            .collection('accounts')
+            .doc(uid)
+            .collection('public')
+            .doc('GeneralInfo');
+        const generalInfoDoc = await generalInfoDocRef.get();
 
-        const generalInfoDoc = await getDoc(generalInfoDocRef);
-        if (generalInfoDoc.exists()) {
+        if (generalInfoDoc.exists) {
             const generalInfoData = generalInfoDoc.data();
             if (generalInfoData) {
                 return {
@@ -156,27 +133,23 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         uid: string,
         info: IPublicGeneralInfo
     ): Promise<void> => {
-        const generalInfoDocRef = doc(
-            collection(
-                doc(collection(this.firestore, 'accounts'), uid),
-                'public'
-            ),
-            'GeneralInfo'
-        );
-        await setDoc(generalInfoDocRef, info);
+        const generalInfoDocRef = this.firestore
+            .collection('accounts')
+            .doc(uid)
+            .collection('public')
+            .doc('GeneralInfo');
+        await generalInfoDocRef.set(info);
     };
 
     createDefaultProfile = async (uid: string): Promise<boolean> => {
         try {
-            const defaultProfileDocRef = doc(
-                collection(
-                    doc(collection(this.firestore, 'accounts'), uid),
-                    'profiles'
-                ),
-                'default'
-            );
+            const defaultProfileDocRef = this.firestore
+                .collection('accounts')
+                .doc(uid)
+                .collection('profiles')
+                .doc('default');
 
-            await setDoc(defaultProfileDocRef, {
+            await defaultProfileDocRef.set({
                 name: 'default',
             });
 
@@ -189,17 +162,13 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
 
     createProfile = async (uid: string, profile: IProfile): Promise<void> => {
         try {
-            const profileDocRef = doc(
-                collection(
-                    doc(collection(this.firestore, 'accounts'), uid),
-                    'profiles'
-                ),
-                profile.id
-            );
+            const profileDocRef = this.firestore
+                .collection('accounts')
+                .doc(uid)
+                .collection('profiles')
+                .doc(profile.id);
 
-            await setDoc(profileDocRef, {
-                name: profile.name,
-            });
+            await profileDocRef.set({ name: profile.name });
 
             throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
         } catch (e) {
@@ -209,12 +178,11 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
     };
 
     getAllProfiles = async (uid: string): Promise<IProfile[]> => {
-        const profilesCollectionRef = collection(
-            doc(collection(this.firestore, 'accounts'), uid),
-            'profiles'
-        );
-
-        const profileDocs = await getDocs(profilesCollectionRef);
+        const profilesCollectionRef = this.firestore
+            .collection('accounts')
+            .doc(uid)
+            .collection('profiles');
+        const profileDocs = await profilesCollectionRef.get();
 
         const profiles: IProfile[] = profileDocs.docs.map((doc): IProfile => {
             const profileData = doc.data();
@@ -231,15 +199,13 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         uid: string,
         profileId: string
     ): Promise<IProfile | undefined> => {
-        const defaultProfileDocRef = doc(
-            collection(
-                doc(collection(this.firestore, 'accounts'), uid),
-                'profiles'
-            ),
-            profileId
-        );
+        const defaultProfileDocRef = this.firestore
+            .collection('accounts')
+            .doc(uid)
+            .collection('profiles')
+            .doc(profileId);
 
-        const profileDoc = await getDoc(defaultProfileDocRef);
+        const profileDoc = await defaultProfileDocRef.get();
         const profileData = profileDoc.data();
 
         if (!profileData) return undefined;
@@ -254,18 +220,14 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         uid: string,
         name: string
     ): Promise<string | undefined> => {
-        const profilesCollectionRef = collection(
-            doc(collection(this.firestore, 'accounts'), uid),
-            'profiles'
-        );
+        const profilesCollectionRef = this.firestore
+            .collection('accounts')
+            .doc(uid)
+            .collection('profiles');
 
-        const q = query(
-            profilesCollectionRef,
-            where('name', '==', name),
-            limit(1)
-        );
+        const query = profilesCollectionRef.where('name', '==', name).limit(1);
 
-        const matchingProfileDocs = await getDocs(q);
+        const matchingProfileDocs = await query.get();
 
         if (matchingProfileDocs.size <= 0) return undefined;
         const matchingProfileDoc = matchingProfileDocs.docs[0];
@@ -277,21 +239,20 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         profileId: string
     ): Promise<boolean> => {
         try {
-            const profileDocRef = doc(
-                collection(
-                    doc(collection(this.firestore, 'accounts'), uid),
-                    'profiles'
-                ),
-                profileId
-            );
+            const profileDocRef = this.firestore
+                .collection('accounts')
+                .doc(uid)
+                .collection('profiles')
+                .doc(profileId);
 
-            await deleteDoc(profileDocRef);
+            await profileDocRef.delete();
 
-            const sharesCollection = collection(
-                doc(collection(this.firestore, 'shares'), uid),
-                profileId
-            );
-            const shareDocs = await getDocs(sharesCollection);
+            const sharesCollection = this.firestore
+                .collection('shares')
+                .doc(uid)
+                .collection(profileId);
+
+            const shareDocs = await sharesCollection.get();
             shareDocs.docs.forEach(async (doc) => {
                 await this.deleteShareById(uid, profileId, doc.id);
             });
@@ -303,14 +264,12 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
     };
 
     createShare = async (share: IShare): Promise<void> => {
-        const shareDoc = doc(
-            collection(
-                doc(collection(this.firestore, 'shares'), share.toUid),
-                share.toProfileId
-            ),
-            share.id
-        );
-        await setDoc(shareDoc, share);
+        const shareDoc = this.firestore
+            .collection('shares')
+            .doc(share.toUid)
+            .collection(share.toProfileId)
+            .doc(share.id);
+        await shareDoc.set(share);
     };
 
     deleteShareById = async (
@@ -318,14 +277,12 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         profileId: string,
         shareId: string | undefined
     ): Promise<void> => {
-        const shareDoc = doc(
-            collection(
-                doc(collection(this.firestore, 'shares'), userId),
-                profileId
-            ),
-            shareId
-        );
-        deleteDoc(shareDoc);
+        const shareDoc = this.firestore
+            .collection('shares')
+            .doc(userId)
+            .collection(profileId)
+            .doc(shareId);
+        await shareDoc.delete();
     };
 
     deleteShare = async (share: IShare): Promise<boolean> => {
@@ -345,11 +302,12 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         uid: string,
         profileId: string
     ): Promise<void> => {
-        const profileSharesCollection = collection(
-            doc(collection(this.firestore, 'shares'), uid),
-            profileId
-        );
-        const unsubscribe = onSnapshot(profileSharesCollection, (snapshot) => {
+        const profileSharesCollection = this.firestore
+            .collection('shares')
+            .doc(uid)
+            .collection(profileId);
+
+        const unsubscribe = profileSharesCollection.onSnapshot((snapshot) => {
             const docChanges = snapshot.docChanges();
             docChanges.forEach((change) => {
                 const changedShareId = change.doc.id;

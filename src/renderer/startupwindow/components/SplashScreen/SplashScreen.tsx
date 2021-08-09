@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import styles from './SplashScreen.module.scss';
 
 interface Props {
-    onFinish: () => void;
     opacity: number;
 }
 
@@ -23,7 +22,6 @@ const SplashScreen: React.FC<Props> = (props: Props) => {
             <img
                 className={styles.logo}
                 src='assets/images/SimpleShare_Logo_512.png'
-                onClick={props.onFinish}
             />
         </div>
     );

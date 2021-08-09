@@ -1,18 +1,13 @@
-import {
-    Auth,
-    getAuth,
-    signInWithPopup,
-    GoogleAuthProvider,
-    signOut,
-} from 'firebase/auth';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 import IAuthProvider from './IAuthProvider';
-import IUser from './IUser';
+import IUser from '../IUser';
 
 export default class FirebaseAuthProvider implements IAuthProvider {
-    private readonly auth: Auth;
+    private readonly auth: firebase.auth.Auth;
 
     constructor(onAuthStateChanged: (user: IUser | undefined) => void) {
-        this.auth = getAuth();
+        this.auth = firebase.auth();
 
         this.auth.onAuthStateChanged((firebaseUser) => {
             if (firebaseUser) {
@@ -27,23 +22,31 @@ export default class FirebaseAuthProvider implements IAuthProvider {
     }
 
     googleSignIn = async (): Promise<IUser> => {
-        const googleProvider = new GoogleAuthProvider();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        let firebaseUser: firebase.User | undefined;
+
         try {
-            const userCredential = await signInWithPopup(
-                this.auth,
+            const userCredential = await this.auth.signInWithPopup(
                 googleProvider
             );
-            const firebaseUser = userCredential.user;
-            return {
-                uid: firebaseUser.uid,
-                displayName: firebaseUser.displayName || undefined,
-            };
-        } catch {
-            throw new Error('An error occurred while signing in.');
+            firebaseUser = userCredential.user || undefined;
+
+            if (firebaseUser) {
+                return {
+                    uid: firebaseUser.uid,
+                    displayName: firebaseUser.displayName || undefined,
+                };
+            } else {
+                throw new Error('Failed to sign in.');
+            }
+        } catch (e) {
+            console.log('Failed to sign in error: ', e);
+            throw new Error('Failed to sign in.');
         }
     };
 
     signOut = async (): Promise<void> => {
-        await signOut(this.auth);
+        await this.auth.signOut();
     };
 }

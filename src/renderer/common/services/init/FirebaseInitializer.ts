@@ -1,9 +1,9 @@
 import IServiceInitializer from './IServiceInitializer';
-import { initializeApp } from 'firebase/app';
+import firebase from 'firebase/app';
 
 export default class FirebaseInitializer implements IServiceInitializer {
     initialize = async (): Promise<void> => {
-        initializeApp({
+        firebase.initializeApp({
             apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
             authDomain: 'simpleshare-428bb.firebaseapp.com',
             projectId: 'simpleshare-428bb',

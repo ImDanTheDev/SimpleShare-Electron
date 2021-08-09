@@ -1,9 +1,11 @@
 import React from 'react';
 import styles from './AccountDropdown.module.scss';
 import { MdExpandMore } from 'react-icons/md';
+import { authService } from '../../../common/services/api';
 
 export const AccountDropdown: React.FC = () => {
     const handleSignOut = () => {
+        authService.signOut();
         window.api.send('APP_SHOW_STARTUP_WINDOW', {});
     };
 

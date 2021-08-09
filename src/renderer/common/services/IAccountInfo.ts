@@ -1,7 +1,4 @@
-import {
-    MAX_PROFILE_NAME_LENGTH,
-    MIN_PHONE_NUMBER_LENGTH,
-} from '../../constants';
+import { MAX_PROFILE_NAME_LENGTH, MIN_PHONE_NUMBER_LENGTH } from '../constants';
 
 export default interface IAccountInfo {
     isAccountComplete: boolean;

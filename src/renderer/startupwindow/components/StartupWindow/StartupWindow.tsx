@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../common/redux/store';
 import { authService, initService } from '../../../common/services/api';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import SignInScreen from '../SignInScreen/SignInScreen';
@@ -32,10 +34,57 @@ export const StartupWindow: React.FC = () => {
     const [opacityAnimInterval, setOpacityAnimInterval] =
         useState<NodeJS.Timer>();
 
+    const user = useSelector((state: RootState) => state.auth.user);
+    const initializing = useSelector(
+        (state: RootState) => state.auth.initializing
+    );
+
     useEffect(() => {
         initService.initialize();
         authService.initialize();
     }, []);
+
+    useEffect(() => {
+        const showSignInScreen = () => {
+            setOpacityAnimFrame(0);
+            setCurrentScreen('SignInScreen');
+            setFrameRadius(signInFrameRadius);
+
+            setOpacityAnimInterval(
+                setInterval(() => {
+                    setOpacityAnimFrame((oldFrame) => oldFrame + 1);
+                }, opacityAnimFrameTime)
+            );
+        };
+
+        const startAuthFlow = async () => {
+            if (initializing === undefined || initializing === true) {
+                if (initializing === true && user === undefined) {
+                    // Firebase only called onAuthStateChanged once, so
+                    // a user is not available. Try to sign in.
+                    console.log('Going to Sign In Screen');
+                    showSignInScreen();
+                }
+            } else {
+                // Firebase called onAuthStateChanged twice, so a
+                // user may be available. If a user is not available,
+                // then the attempted sign in failed. Try to sign in again.
+                // If a user is available, then the sign in succeeded.
+
+                if (user === undefined) {
+                    console.log('Going to Sign In Screen');
+                    showSignInScreen();
+                }
+            }
+        };
+
+        startAuthFlow();
+    }, [initializing, user]);
+
+    useEffect(() => {
+        if (!user) return;
+        window.api.send('APP_SHOW_MAIN_WINDOW', {});
+    }, [user]);
 
     useEffect(() => {
         setOpacityAnimFrame(0);
@@ -75,38 +124,13 @@ export const StartupWindow: React.FC = () => {
         }
     }, [opacityAnimFrame, currentScreen]);
 
-    const handleSplashScreenFinish = () => {
-        setOpacityAnimFrame(0);
-        setCurrentScreen('SignInScreen');
-        setFrameRadius(signInFrameRadius);
-
-        setOpacityAnimInterval(
-            setInterval(() => {
-                setOpacityAnimFrame((oldFrame) => oldFrame + 1);
-            }, opacityAnimFrameTime)
-        );
-    };
-
     const handleSignIn = async () => {
-        //window.api.send('APP_SHOW_MAIN_WINDOW', {});
-        const user = await authService.googleSignIn();
-        if (user) {
-            console.log(`Signed in as: ${user.displayName}`);
-            window.api.send('APP_SHOW_MAIN_WINDOW', {});
-        } else {
-            // TODO: Resolve error or should feedback to user.
-            console.log('An error occurred while signing in.');
-        }
+        await authService.googleSignIn();
     };
 
     const renderScreen = () => {
         if (currentScreen === 'SplashScreen') {
-            return (
-                <SplashScreen
-                    onFinish={handleSplashScreenFinish}
-                    opacity={splashScreenOpacity}
-                />
-            );
+            return <SplashScreen opacity={splashScreenOpacity} />;
         } else if (currentScreen === 'SignInScreen') {
             return (
                 <SignInScreen

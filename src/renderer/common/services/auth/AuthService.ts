@@ -2,7 +2,7 @@ import { setUser } from '../../redux/auth-slice';
 import { store } from '../../redux/store';
 import FirebaseAuthProvider from './FirebaseAuthProvider';
 import IAuthProvider from './IAuthProvider';
-import IUser from './IUser';
+import IUser from '../IUser';
 
 export enum AuthProviderType {
     Firebase,
