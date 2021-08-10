@@ -2,11 +2,19 @@ import React from 'react';
 import styles from './AccountDropdown.module.scss';
 import { MdExpandMore } from 'react-icons/md';
 import { authService } from '../../../common/services/api';
+import { useDispatch } from 'react-redux';
+import { setCurrentScreen } from '../../../common/redux/nav-slice';
 
 export const AccountDropdown: React.FC = () => {
+    const dispatch = useDispatch();
+
     const handleSignOut = () => {
         authService.signOut();
         window.api.send('APP_SHOW_STARTUP_WINDOW', {});
+    };
+
+    const handleSettings = () => {
+        dispatch(setCurrentScreen('AccountSettingsScreen'));
     };
 
     return (
@@ -22,7 +30,12 @@ export const AccountDropdown: React.FC = () => {
                     </div>
                 </div>
                 <div className={styles.dropdown}>
-                    <div className={styles.dropdownItem}>Settings</div>
+                    <div
+                        className={styles.dropdownItem}
+                        onClick={handleSettings}
+                    >
+                        Settings
+                    </div>
                     <div
                         className={styles.dropdownItem}
                         onClick={handleSignOut}

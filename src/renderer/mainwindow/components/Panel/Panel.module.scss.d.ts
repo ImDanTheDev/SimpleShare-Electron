@@ -2,8 +2,6 @@
 // Please do not change this file!
 interface CssExports {
   'body': string;
-  'moreButton': string;
-  'moreButtonLabel': string;
   'panel': string;
   'title': string;
   'titleBar': string;

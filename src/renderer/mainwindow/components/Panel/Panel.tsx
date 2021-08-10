@@ -1,25 +1,19 @@
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, ReactNode } from 'react';
 import styles from './Panel.module.scss';
-import { MdMoreVert } from 'react-icons/md';
-import { CircleButton } from '../CircleButton/CircleButton';
 
 interface Props {
     title: string;
-    onMoreClicked?: () => void;
+    left?: ReactNode;
+    right?: ReactNode;
 }
 
 export const Panel: React.FC<Props> = (props: PropsWithChildren<Props>) => {
     return (
         <div className={styles.panel}>
             <div className={styles.titleBar}>
+                {props.left}
                 <div className={styles.title}>{props.title}</div>
-                <CircleButton
-                    width={26}
-                    height={26}
-                    onClick={props.onMoreClicked}
-                >
-                    <MdMoreVert className={styles.moreButtonLabel} />
-                </CircleButton>
+                {props.right}
             </div>
             <div className={styles.body}>{props.children}</div>
         </div>

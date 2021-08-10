@@ -62,7 +62,9 @@
     overflow: hidden;
     overflow-x: scroll;
     box-sizing: content-box;
-    padding-bottom: 8px;
-    padding-top: 4px;
     height: 100%;
+}
+
+.profileList::-webkit-scrollbar {
+    display: none;
 }

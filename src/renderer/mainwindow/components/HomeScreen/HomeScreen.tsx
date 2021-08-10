@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Inbox } from '../Inbox/Inbox';
 import { Outbox } from '../Outbox/Outbox';
-import { Toolbar } from '../Toolbar/Toolbar';
 import styles from './HomeScreen.module.scss';
 
 export const HomeScreen: React.FC = () => {
@@ -17,17 +16,14 @@ export const HomeScreen: React.FC = () => {
     }, []);
 
     return (
-        <div className={styles.homeScreen}>
-            <Toolbar />
-            <div className={styles.body}>
-                <div className={styles.sideBar}>
-                    <Outbox />
-                    <button className={styles.sendShareButton}>
-                        Send a new Share
-                    </button>
-                </div>
-                <Inbox />
+        <div className={styles.body}>
+            <div className={styles.sideBar}>
+                <Outbox />
+                <button className={styles.sendShareButton}>
+                    Send a new Share
+                </button>
             </div>
+            <Inbox />
         </div>
     );
 };
