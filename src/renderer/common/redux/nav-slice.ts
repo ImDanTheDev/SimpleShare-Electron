@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type ScreenType = 'HomeScreen' | 'AccountSettingsScreen';
+type ScreenType =
+    | 'HomeScreen'
+    | 'AccountSettingsScreen'
+    | 'CompleteAccountScreen';
 export interface NavState {
     screen: ScreenType;
 }

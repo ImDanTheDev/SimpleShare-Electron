@@ -4,6 +4,7 @@ import { RootState } from '../../../common/redux/store';
 import { authService, initService } from '../../../common/services/api';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsScreen';
+import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';
 import { HomeScreen } from '../HomeScreen/HomeScreen';
 import { Toolbar } from '../Toolbar/Toolbar';
 import styles from './MainWindow.module.scss';
@@ -20,6 +21,8 @@ const MainWindow: React.FC = () => {
         switch (currentScreen) {
             case 'HomeScreen':
                 return <HomeScreen />;
+            case 'CompleteAccountScreen':
+                return <CompleteAccountScreen />;
             case 'AccountSettingsScreen':
                 return <AccountSettingsScreen />;
         }
