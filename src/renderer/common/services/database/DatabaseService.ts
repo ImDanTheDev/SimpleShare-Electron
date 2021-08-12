@@ -1,3 +1,4 @@
+import { error, log } from '../../log';
 import {
     setAccountInfo,
     setPublicGeneralInfo,
@@ -26,7 +27,7 @@ export default class DatabaseService {
 
     initialize = (): void => {
         if (this.databaseProvider) {
-            console.log('Database Service is already initialized');
+            log('Database Service is already initialized');
             return;
         }
 
@@ -53,7 +54,7 @@ export default class DatabaseService {
 
     getAccountInfo = async (uid: string): Promise<IAccountInfo | undefined> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -65,7 +66,7 @@ export default class DatabaseService {
 
     doesAccountExist = async (uid: string): Promise<boolean> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return false;
         }
 
@@ -78,7 +79,7 @@ export default class DatabaseService {
         publicGeneralInfo: IPublicGeneralInfo
     ): Promise<boolean> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return false;
         }
 
@@ -99,7 +100,7 @@ export default class DatabaseService {
         accountInfo: IAccountInfo
     ): Promise<boolean> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return false;
         }
 
@@ -117,7 +118,7 @@ export default class DatabaseService {
         phoneNumber: string
     ): Promise<string | undefined> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -131,7 +132,7 @@ export default class DatabaseService {
         uid: string
     ): Promise<IPublicGeneralInfo | undefined> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -146,7 +147,7 @@ export default class DatabaseService {
         info: IPublicGeneralInfo
     ): Promise<void> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -156,7 +157,7 @@ export default class DatabaseService {
 
     createDefaultProfile = async (uid: string): Promise<boolean> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return false;
         }
 
@@ -165,7 +166,7 @@ export default class DatabaseService {
 
     createProfile = async (uid: string, profile: IProfile): Promise<void> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -177,13 +178,13 @@ export default class DatabaseService {
             // handling the ADD, DELETE, MODIFIED operations.
             await this.getAllProfiles(uid);
         } catch (e) {
-            console.log('Failed to create profile');
+            log('Failed to create profile');
         }
     };
 
     getAllProfiles = async (uid: string): Promise<IProfile[]> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return [];
         }
 
@@ -199,7 +200,7 @@ export default class DatabaseService {
         profileId: string
     ): Promise<IProfile | undefined> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -212,7 +213,7 @@ export default class DatabaseService {
         name: string
     ): Promise<string | undefined> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -228,7 +229,7 @@ export default class DatabaseService {
         profileId: string
     ): Promise<boolean> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return false;
         }
 
@@ -245,7 +246,7 @@ export default class DatabaseService {
 
     createShare = async (share: IShare): Promise<void> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -254,7 +255,7 @@ export default class DatabaseService {
 
     deleteShare = async (share: IShare): Promise<boolean> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return false;
         }
 
@@ -267,7 +268,7 @@ export default class DatabaseService {
         profileId: string
     ): Promise<void> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -276,7 +277,7 @@ export default class DatabaseService {
 
     removeAllShareListeners = async (): Promise<void> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 
@@ -288,7 +289,7 @@ export default class DatabaseService {
         profileId: string
     ): Promise<void> => {
         if (!this.databaseProvider) {
-            console.error('Database Service is not initialized!');
+            error('Database Service is not initialized!');
             return undefined;
         }
 

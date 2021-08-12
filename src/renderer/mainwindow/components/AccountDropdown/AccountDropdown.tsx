@@ -10,7 +10,6 @@ export const AccountDropdown: React.FC = () => {
 
     const handleSignOut = () => {
         authService.signOut();
-        window.api.send('APP_SHOW_STARTUP_WINDOW', {});
     };
 
     const handleSettings = () => {

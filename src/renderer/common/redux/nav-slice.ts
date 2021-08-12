@@ -3,13 +3,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 type ScreenType =
     | 'HomeScreen'
     | 'AccountSettingsScreen'
-    | 'CompleteAccountScreen';
+    | 'CompleteAccountScreen'
+    | 'LoadingScreen';
 export interface NavState {
     screen: ScreenType;
 }
 
 const initialState: NavState = {
-    screen: 'HomeScreen',
+    screen: 'LoadingScreen',
 };
 
 export const navSlice = createSlice({

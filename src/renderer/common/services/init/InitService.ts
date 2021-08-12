@@ -1,3 +1,4 @@
+import { log } from '../../log';
 import FirebaseInitializer from './FirebaseInitializer';
 import IServiceInitializer from './IServiceInitializer';
 
@@ -17,7 +18,7 @@ export default class InitService {
 
     initialize = (): void => {
         if (this.initService && this.isServiceInitialized) {
-            console.log('Service Initializer is already initialized');
+            log('Service Initializer is already initialized');
             return;
         }
 
@@ -30,6 +31,6 @@ export default class InitService {
         this.initService.initialize();
 
         this.isServiceInitialized = true;
-        console.log('Service Initializer initialized.');
+        log('Service Initializer initialized.');
     };
 }

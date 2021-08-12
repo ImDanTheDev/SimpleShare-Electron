@@ -121,6 +121,12 @@ const setupIPC = () => {
     ipc.on('APP_REMOVE_ITEM', ({ key }) => {
         electronStore.delete(key);
     });
+    ipc.on('APP_LOG', ({ message, optionalParams }) => {
+        log(message, true, ...optionalParams);
+    });
+    ipc.on('APP_ERROR', ({ message, optionalParams }) => {
+        error(message, true, ...optionalParams);
+    });
 };
 
 // This method will be called when Electron has finished
@@ -131,10 +137,10 @@ app.on('ready', () => {
         forceDownload: false,
     })
         .then((name) => {
-            console.log(`Installed Extension: ${name}`);
+            log(`Installed Extension: ${name}`);
         })
         .catch((err) => {
-            console.log('An error occurred: ', err);
+            log('An error occurred: ', false, err);
         });
 
     setupIPC();
@@ -171,3 +177,27 @@ app.on('activate', () => {
         createStartupWindow();
     }
 });
+
+const log = (
+    message: unknown,
+    renderer?: boolean,
+    ...optionalParams: unknown[]
+) => {
+    // eslint-disable-next-line no-console
+    console.log(
+        `[${renderer ? 'RENDERER' : 'MAIN'}] ${message}`,
+        ...optionalParams
+    );
+};
+
+const error = (
+    message: unknown,
+    renderer?: boolean,
+    ...optionalParams: unknown[]
+) => {
+    // eslint-disable-next-line no-console
+    console.error(
+        `[${renderer ? 'RENDERER' : 'MAIN'}] ${message}`,
+        ...optionalParams
+    );
+};

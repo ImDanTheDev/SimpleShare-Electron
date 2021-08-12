@@ -3,6 +3,7 @@ import { store } from '../../redux/store';
 import FirebaseAuthProvider from './FirebaseAuthProvider';
 import IAuthProvider from './IAuthProvider';
 import IUser from '../IUser';
+import { error, log } from '../../log';
 
 export enum AuthProviderType {
     Firebase,
@@ -20,7 +21,7 @@ export default class AuthService {
 
     initialize = (): void => {
         if (this.authProvider && this.isServiceInitialized) {
-            console.log('Auth Service is already initialized');
+            log('Auth Service is already initialized');
             return;
         }
 
@@ -35,12 +36,12 @@ export default class AuthService {
         }
 
         this.isServiceInitialized = true;
-        console.log('Auth Service initialized.');
+        log('Auth Service initialized.');
     };
 
     googleSignIn = async (): Promise<IUser | undefined> => {
         if (!this.authProvider) {
-            console.error('Auth Service is not initialized!');
+            error('Auth Service is not initialized!');
             return undefined;
         }
 
@@ -50,7 +51,7 @@ export default class AuthService {
 
     signOut = async (): Promise<void> => {
         if (!this.authProvider) {
-            console.error('Auth Service is not initialized!');
+            error('Auth Service is not initialized!');
             return;
         }
 

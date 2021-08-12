@@ -5,7 +5,9 @@ import IShare from '../IShare';
 import IDatabaseProvider from './IDatabaseProvider';
 
 import firebase from 'firebase/app';
+import 'firebase/firestore';
 import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
+import { error, log } from '../../log';
 
 interface IShareListener {
     uid: string;
@@ -87,7 +89,7 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
             await accountDocRef.set(accountInfo);
             return true;
         } catch (e) {
-            console.log(e);
+            log(e);
             return false;
         }
     };
@@ -155,7 +157,7 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
 
             return true;
         } catch (e) {
-            console.log(e);
+            log(e);
             return false;
         }
     };
@@ -172,7 +174,7 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
 
             throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
         } catch (e) {
-            console.error(e);
+            error(e);
             throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
         }
     };

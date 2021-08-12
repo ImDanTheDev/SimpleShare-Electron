@@ -38,6 +38,14 @@ export interface IPCArgs {
     APP_REMOVE_ITEM: {
         key: string;
     };
+    APP_LOG: {
+        message: unknown;
+        optionalParams: unknown[];
+    };
+    APP_ERROR: {
+        message: unknown;
+        optionalParams: unknown[];
+    };
 }
 
 export const IPC_ARG_TEMPLATES: IPCArgs = {
@@ -77,5 +85,13 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
     APP_SET_ITEM: {
         key: '',
         item: '',
+    },
+    APP_LOG: {
+        message: '',
+        optionalParams: [],
+    },
+    APP_ERROR: {
+        message: '',
+        optionalParams: [],
     },
 };

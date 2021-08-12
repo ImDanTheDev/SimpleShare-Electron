@@ -2,6 +2,7 @@ import firebase from 'firebase/app';
 import 'firebase/auth';
 import IAuthProvider from './IAuthProvider';
 import IUser from '../IUser';
+import { log } from '../../log';
 
 export default class FirebaseAuthProvider implements IAuthProvider {
     private readonly auth: firebase.auth.Auth;
@@ -41,7 +42,7 @@ export default class FirebaseAuthProvider implements IAuthProvider {
                 throw new Error('Failed to sign in.');
             }
         } catch (e) {
-            console.log('Failed to sign in error: ', e);
+            log('Failed to sign in error: ', e);
             throw new Error('Failed to sign in.');
         }
     };

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { log } from '../log';
 import IShare from '../services/IShare';
 
 export interface SharesState {
@@ -20,7 +21,7 @@ export const sharesSlice = createSlice({
             if (
                 state.shares.findIndex((s) => s.id === action.payload.id) !== -1
             ) {
-                console.log('Attemped to add share with a duplicate id!');
+                log('Attemped to add share with a duplicate id!');
                 return;
             }
             state.shares.push(action.payload);
