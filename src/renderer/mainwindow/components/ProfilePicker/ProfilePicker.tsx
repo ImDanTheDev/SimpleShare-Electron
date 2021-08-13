@@ -1,9 +1,19 @@
-import React, { useState, useEffect, createRef } from 'react';
+import React, { useState, useEffect, createRef, ReactNode } from 'react';
 import { CircleButton } from '../CircleButton/CircleButton';
 import styles from './ProfilePicker.module.scss';
 import { MdChevronLeft, MdChevronRight, MdAdd } from 'react-icons/md';
+import IProfile from '../../../common/services/IProfile';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../common/redux/store';
+import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 
 export const ProfilePicker: React.FC = () => {
+    const dispatch = useDispatch();
+
+    const profiles: IProfile[] = useSelector(
+        (state: RootState) => state.profiles.profiles
+    );
+
     const [showLeftArrow, setShowLeftArrow] = useState<boolean>(false);
     const [showRightArrow, setShowRightArrow] = useState<boolean>(true);
 
@@ -51,6 +61,32 @@ export const ProfilePicker: React.FC = () => {
         });
     };
 
+    const handleProfileClick = (profile: IProfile) => {
+        dispatch(setCurrentProfile(profile.id || 'default'));
+    };
+
+    const renderProfiles = (): ReactNode[] => {
+        const profileButtons: ReactNode[] = [];
+
+        profiles.forEach((profile) => {
+            profileButtons.push(
+                <CircleButton
+                    height={50}
+                    width={50}
+                    onClick={() => handleProfileClick(profile)}
+                >
+                    <span className={styles.profileLabel}>
+                        {profile.name.length > 2
+                            ? profile.name.slice(0, 2)
+                            : profile.name}
+                    </span>
+                </CircleButton>
+            );
+        });
+
+        return profileButtons;
+    };
+
     return (
         <div className={styles.picker}>
             {showLeftArrow ? (
@@ -64,9 +100,7 @@ export const ProfilePicker: React.FC = () => {
                 <CircleButton height={50} width={50}>
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
-                <CircleButton height={50} width={50}>
-                    <span className={styles.profileLabel}>1</span>
-                </CircleButton>
+                {renderProfiles()}
             </div>
             {showRightArrow ? (
                 <button
