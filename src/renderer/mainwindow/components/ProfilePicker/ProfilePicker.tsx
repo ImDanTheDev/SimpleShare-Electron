@@ -8,6 +8,7 @@ import { RootState } from '../../../common/redux/store';
 import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { log } from '../../../common/log';
+import { setShares } from '../../../common/redux/shares-slice';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
@@ -64,6 +65,7 @@ export const ProfilePicker: React.FC = () => {
     };
 
     const handleProfileClick = (profile: IProfile) => {
+        dispatch(setShares([]));
         dispatch(setCurrentProfile(profile.id || 'default'));
     };
 

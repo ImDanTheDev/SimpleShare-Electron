@@ -176,6 +176,20 @@ const MainWindow: React.FC = () => {
         ensureProfiles();
     }, [profiles, fetchedProfiles, currentProfile, user]);
 
+    useEffect(() => {
+        if (!user) return;
+
+        const switchShareListener = async () => {
+            if (!currentProfile || !currentProfile.id) return;
+            await databaseService.switchShareListener(
+                user.uid,
+                currentProfile.id
+            );
+        };
+
+        switchShareListener();
+    }, [user, currentProfile]);
+
     const renderScreen = (): ReactNode => {
         switch (currentScreen) {
             case 'HomeScreen':

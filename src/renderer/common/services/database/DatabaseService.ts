@@ -263,6 +263,14 @@ export default class DatabaseService {
         return success;
     };
 
+    switchShareListener = async (
+        uid: string,
+        profileId: string
+    ): Promise<void> => {
+        await this.removeAllShareListeners();
+        await this.addShareListener(uid, profileId);
+    };
+
     addShareListener = async (
         uid: string,
         profileId: string
