@@ -2,6 +2,11 @@
 // Please do not change this file!
 interface CssExports {
   'backButtonIcon': string;
+  'field': string;
+  'label': string;
+  'labeledField': string;
+  'panelBody': string;
+  'saveButton': string;
   'screen': string;
 }
 export const cssExports: CssExports;

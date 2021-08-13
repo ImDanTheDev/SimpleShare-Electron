@@ -29,10 +29,10 @@ export const CompleteAccountScreen: React.FC = () => {
     );
 
     const [displayName, setDisplayName] = useState<string>(
-        accountInfo?.phoneNumber || ''
+        publicGeneralInfo?.displayName || ''
     );
     const [phoneNumber, setPhoneNumber] = useState<string>(
-        publicGeneralInfo?.displayName || ''
+        accountInfo?.phoneNumber || ''
     );
 
     useEffect(() => {

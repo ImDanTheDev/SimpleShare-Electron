@@ -33,7 +33,7 @@ export const AccountDropdown: React.FC = () => {
                         className={styles.dropdownItem}
                         onClick={handleSettings}
                     >
-                        Settings
+                        Account Settings
                     </div>
                     <div
                         className={styles.dropdownItem}
