@@ -1,7 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { log } from '../../../common/log';
-import { setCurrentScreen } from '../../../common/redux/nav-slice';
+import {
+    setCurrentModal,
+    setCurrentScreen,
+} from '../../../common/redux/nav-slice';
 import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { RootState } from '../../../common/redux/store';
 import {
@@ -16,12 +19,14 @@ import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsScreen';
 import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';
 import { HomeScreen } from '../HomeScreen/HomeScreen';
+import { NewProfileModal } from '../NewProfileModal/NewProfileModal';
 import { Toolbar } from '../Toolbar/Toolbar';
 import styles from './MainWindow.module.scss';
 
 const MainWindow: React.FC = () => {
     const dispatch = useDispatch();
     const currentScreen = useSelector((state: RootState) => state.nav.screen);
+    const currentModal = useSelector((state: RootState) => state.nav.modal);
     const initializing = useSelector(
         (state: RootState) => state.auth.initializing
     );
@@ -184,12 +189,39 @@ const MainWindow: React.FC = () => {
         }
     };
 
+    const handleDismissModalOverlay = () => {
+        dispatch(setCurrentModal('None'));
+    };
+
+    const renderModal = (): ReactNode => {
+        let modal: ReactNode = <></>;
+
+        switch (currentModal) {
+            case 'NewProfileModal':
+                modal = <NewProfileModal />;
+                break;
+            case 'None':
+                return <></>;
+        }
+
+        return (
+            <div className={styles.modalContainer}>
+                <div
+                    className={styles.dismissOverlay}
+                    onClick={handleDismissModalOverlay}
+                ></div>
+                {modal}
+            </div>
+        );
+    };
+
     return (
         <WindowFrame borderRadius={0}>
             <div className={styles.windowContent}>
                 <Toolbar />
                 {renderScreen()}
             </div>
+            {renderModal()}
         </WindowFrame>
     );
 };

@@ -5,12 +5,16 @@ type ScreenType =
     | 'AccountSettingsScreen'
     | 'CompleteAccountScreen'
     | 'LoadingScreen';
+
+type ModalType = 'NewProfileModal' | 'None';
 export interface NavState {
     screen: ScreenType;
+    modal: ModalType;
 }
 
 const initialState: NavState = {
     screen: 'LoadingScreen',
+    modal: 'None',
 };
 
 export const navSlice = createSlice({
@@ -20,8 +24,11 @@ export const navSlice = createSlice({
         setCurrentScreen: (state, action: PayloadAction<ScreenType>) => {
             state.screen = action.payload;
         },
+        setCurrentModal: (state, action: PayloadAction<ModalType>) => {
+            state.modal = action.payload;
+        },
     },
 });
 
-export const { setCurrentScreen } = navSlice.actions;
+export const { setCurrentScreen, setCurrentModal } = navSlice.actions;
 export default navSlice.reducer;

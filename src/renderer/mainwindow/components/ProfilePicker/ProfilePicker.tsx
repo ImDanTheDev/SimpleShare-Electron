@@ -6,6 +6,8 @@ import IProfile from '../../../common/services/IProfile';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
 import { setCurrentProfile } from '../../../common/redux/profiles-slice';
+import { setCurrentModal } from '../../../common/redux/nav-slice';
+import { log } from '../../../common/log';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
@@ -65,12 +67,21 @@ export const ProfilePicker: React.FC = () => {
         dispatch(setCurrentProfile(profile.id || 'default'));
     };
 
+    const handleNewProfile = () => {
+        if (profiles.length >= 5) {
+            log('You may only have 5 profiles');
+            return;
+        }
+        dispatch(setCurrentModal('NewProfileModal'));
+    };
+
     const renderProfiles = (): ReactNode[] => {
         const profileButtons: ReactNode[] = [];
 
         profiles.forEach((profile) => {
             profileButtons.push(
                 <CircleButton
+                    key={profile.id}
                     height={50}
                     width={50}
                     onClick={() => handleProfileClick(profile)}
@@ -97,7 +108,7 @@ export const ProfilePicker: React.FC = () => {
                 <></>
             )}
             <div className={styles.profileList} ref={profileListRef}>
-                <CircleButton height={50} width={50}>
+                <CircleButton height={50} width={50} onClick={handleNewProfile}>
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
                 {renderProfiles()}
