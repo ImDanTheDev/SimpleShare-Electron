@@ -6,7 +6,7 @@ type ScreenType =
     | 'CompleteAccountScreen'
     | 'LoadingScreen';
 
-type ModalType = 'NewProfileModal' | 'None';
+type ModalType = 'NewProfileModal' | 'SendShareModal' | 'None';
 export interface NavState {
     screen: ScreenType;
     modal: ModalType;

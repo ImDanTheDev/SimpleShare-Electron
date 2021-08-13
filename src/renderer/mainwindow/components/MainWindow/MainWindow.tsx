@@ -20,6 +20,7 @@ import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsS
 import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';
 import { HomeScreen } from '../HomeScreen/HomeScreen';
 import { NewProfileModal } from '../NewProfileModal/NewProfileModal';
+import { SendShareModal } from '../SendShareModal/SendShareModal';
 import { Toolbar } from '../Toolbar/Toolbar';
 import styles from './MainWindow.module.scss';
 
@@ -213,6 +214,9 @@ const MainWindow: React.FC = () => {
         switch (currentModal) {
             case 'NewProfileModal':
                 modal = <NewProfileModal />;
+                break;
+            case 'SendShareModal':
+                modal = <SendShareModal />;
                 break;
             case 'None':
                 return <></>;
