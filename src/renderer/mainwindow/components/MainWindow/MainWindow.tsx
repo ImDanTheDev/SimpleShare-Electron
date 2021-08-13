@@ -1,6 +1,7 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { log } from '../../../common/log';
+import { setPublicGeneralInfo } from '../../../common/redux/account-slice';
 import {
     setCurrentModal,
     setCurrentScreen,
@@ -73,7 +74,11 @@ const MainWindow: React.FC = () => {
                 setFetchedAccountInfo(true);
 
                 log('Fetching public general info');
-                await databaseService.getPublicGeneralInfo(user.uid);
+                dispatch(
+                    setPublicGeneralInfo(
+                        await databaseService.getPublicGeneralInfo(user.uid)
+                    )
+                );
                 setFetchedPublicGeneralInfo(true);
             } else {
                 log(`User is not signed in, going to sign in screen.`);

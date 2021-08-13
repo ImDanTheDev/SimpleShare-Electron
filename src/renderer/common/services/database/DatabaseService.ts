@@ -138,7 +138,6 @@ export default class DatabaseService {
 
         const publicGeneralInfo =
             await this.databaseProvider.getPublicGeneralInfo(uid);
-        store.dispatch(setPublicGeneralInfo(publicGeneralInfo));
         return publicGeneralInfo;
     };
 
