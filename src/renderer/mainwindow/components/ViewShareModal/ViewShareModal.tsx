@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { databaseService } from '../../../common/services/api';

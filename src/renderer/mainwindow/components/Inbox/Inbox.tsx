@@ -11,6 +11,12 @@ export const Inbox: React.FC = () => {
         (state: RootState) => state.shares.shares
     );
 
+    const currentProfile = useSelector((state: RootState) =>
+        state.profiles.profiles.find(
+            (profile) => profile.id === state.profiles.currentProfileId
+        )
+    );
+
     const renderCards = (): ReactNode[] => {
         const cards: ReactNode[] = [];
 
@@ -22,7 +28,7 @@ export const Inbox: React.FC = () => {
     };
 
     return (
-        <Panel title='Inbox'>
+        <Panel title={`Inbox - ${currentProfile?.name} (${shares.length})`}>
             <div className={styles.inboxItemList}>{renderCards()}</div>
         </Panel>
     );

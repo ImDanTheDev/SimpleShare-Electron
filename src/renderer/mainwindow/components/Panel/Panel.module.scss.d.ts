@@ -2,7 +2,9 @@
 // Please do not change this file!
 interface CssExports {
   'body': string;
+  'left': string;
   'panel': string;
+  'right': string;
   'title': string;
   'titleBar': string;
 }

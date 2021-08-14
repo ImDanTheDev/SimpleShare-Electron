@@ -11,9 +11,9 @@ export const Panel: React.FC<Props> = (props: PropsWithChildren<Props>) => {
     return (
         <div className={styles.panel}>
             <div className={styles.titleBar}>
-                {props.left}
+                <div className={styles.left}>{props.left}</div>
                 <div className={styles.title}>{props.title}</div>
-                {props.right}
+                <div className={styles.right}>{props.right}</div>
             </div>
             <div className={styles.body}>{props.children}</div>
         </div>

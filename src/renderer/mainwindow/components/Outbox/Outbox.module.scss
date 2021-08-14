@@ -12,6 +12,17 @@
     padding-right: 2px;
 }
 
+.clearLink {
+    text-decoration: underline;
+    color: #bcbcbc;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.clearLink:hover {
+    font-size: 18px;
+}
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
