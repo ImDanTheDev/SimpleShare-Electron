@@ -22,7 +22,7 @@ export const ViewShareModal: React.FC = () => {
 
     useEffect(() => {
         if (!currentShare) {
-            log('AAAAAAAAAA');
+            dispatch(setCurrentModal('None'));
             return;
         }
 
