@@ -80,7 +80,10 @@ export const AccountSettingsScreen: React.FC = () => {
             <Panel
                 title='Account Settings'
                 left={
-                    <CircleButton width={26} height={26} onClick={handleBack}>
+                    <CircleButton
+                        style={{ width: 26, height: 26 }}
+                        onClick={handleBack}
+                    >
                         <MdChevronLeft className={styles.backButtonIcon} />
                     </CircleButton>
                 }

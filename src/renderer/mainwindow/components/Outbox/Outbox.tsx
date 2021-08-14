@@ -32,9 +32,13 @@ export const Outbox: React.FC = () => {
         <Panel
             title={`Outbox (${shares.length})`}
             right={
-                <span className={styles.clearLink} onClick={handleClear}>
-                    Clear
-                </span>
+                shares.length > 0 ? (
+                    <span className={styles.clearLink} onClick={handleClear}>
+                        Clear
+                    </span>
+                ) : (
+                    <></>
+                )
             }
         >
             <div className={styles.outboxItemList}>{renderCards()}</div>

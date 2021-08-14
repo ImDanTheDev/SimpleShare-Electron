@@ -17,6 +17,13 @@ export const ProfilePicker: React.FC = () => {
         (state: RootState) => state.profiles.profiles
     );
 
+    const currentProfile: IProfile | undefined = useSelector(
+        (state: RootState) =>
+            state.profiles.profiles.find(
+                (profile) => profile.id === state.profiles.currentProfileId
+            )
+    );
+
     const [showLeftArrow, setShowLeftArrow] = useState<boolean>(false);
     const [showRightArrow, setShowRightArrow] = useState<boolean>(true);
 
@@ -84,8 +91,13 @@ export const ProfilePicker: React.FC = () => {
             profileButtons.push(
                 <CircleButton
                     key={profile.id}
-                    height={50}
-                    width={50}
+                    style={{
+                        width: 50,
+                        height: 50,
+                        borderWidth: profile.id === currentProfile?.id ? 2 : 1,
+                        borderRadius:
+                            profile.id === currentProfile?.id ? 16 : '50%',
+                    }}
                     onClick={() => handleProfileClick(profile)}
                 >
                     <span className={styles.profileLabel}>
@@ -110,7 +122,10 @@ export const ProfilePicker: React.FC = () => {
                 <></>
             )}
             <div className={styles.profileList} ref={profileListRef}>
-                <CircleButton height={50} width={50} onClick={handleNewProfile}>
+                <CircleButton
+                    style={{ height: 50, width: 50 }}
+                    onClick={handleNewProfile}
+                >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
                 {renderProfiles()}
