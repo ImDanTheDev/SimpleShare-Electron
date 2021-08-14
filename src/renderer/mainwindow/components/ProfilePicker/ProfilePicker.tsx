@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createRef, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { CircleButton } from '../CircleButton/CircleButton';
 import styles from './ProfilePicker.module.scss';
 import { MdChevronLeft, MdChevronRight, MdAdd } from 'react-icons/md';
@@ -25,37 +25,52 @@ export const ProfilePicker: React.FC = () => {
     );
 
     const [showLeftArrow, setShowLeftArrow] = useState<boolean>(false);
-    const [showRightArrow, setShowRightArrow] = useState<boolean>(true);
+    const [showRightArrow, setShowRightArrow] = useState<boolean>(false);
 
-    const profileListRef = createRef<HTMLDivElement>();
+    const [renderedProfiles, setRenderedProfiles] = useState<ReactNode[]>([]);
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const profileListRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
-        const handleScroll = () => {
-            if (!profileListRef.current) return;
-
-            if (profileListRef.current.scrollLeft > 0) {
-                setShowLeftArrow(true);
-            } else {
-                setShowLeftArrow(false);
-            }
-
-            if (
-                profileListRef.current.scrollLeft <
-                profileListRef.current.scrollWidth -
-                    profileListRef.current.clientWidth
-            ) {
-                setShowRightArrow(true);
-            } else {
-                setShowRightArrow(false);
-            }
-        };
-
         profileListRef.current?.addEventListener('scroll', handleScroll);
 
         return () => {
             profileListRef.current?.removeEventListener('scroll', handleScroll);
         };
     }, []);
+
+    useEffect(() => {
+        setRenderedProfiles(renderProfiles());
+    }, [profiles]);
+
+    useEffect(() => {
+        // Refresh scroll buttons after profiles are rendered.
+        profileListRef.current?.scroll(1, 0);
+        profileListRef.current?.scroll(0, 0);
+    }, [renderedProfiles]);
+
+    const handleScroll = () => {
+        if (!profileListRef.current) {
+            return;
+        }
+
+        if (profileListRef.current.scrollLeft > 0) {
+            setShowLeftArrow(true);
+        } else {
+            setShowLeftArrow(false);
+        }
+
+        if (
+            profileListRef.current.scrollLeft <
+            profileListRef.current.scrollWidth -
+                profileListRef.current.clientWidth
+        ) {
+            setShowRightArrow(true);
+        } else {
+            setShowRightArrow(false);
+        }
+    };
 
     const handleLeftArrow = () => {
         profileListRef.current?.scrollBy({
@@ -128,7 +143,7 @@ export const ProfilePicker: React.FC = () => {
                 >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
-                {renderProfiles()}
+                {renderedProfiles}
             </div>
             {showRightArrow ? (
                 <button
