@@ -364,4 +364,14 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
             listener.unsubscribe();
         }
     };
+
+    hasShareListener = (uid: string, profileId: string): boolean => {
+        return (
+            this.shareListeners.find(
+                (profileListener) =>
+                    profileListener.uid === uid &&
+                    profileListener.profileId === profileId
+            ) !== undefined
+        );
+    };
 }

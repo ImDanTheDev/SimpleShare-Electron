@@ -43,4 +43,5 @@ export default interface IDatabaseProvider {
     addShareListener: (uid: string, profileId: string) => Promise<void>;
     removeShareListener: (uid: string, profileId: string) => Promise<void>;
     removeAllShareListeners: () => Promise<void>;
+    hasShareListener: (uid: string, profileId: string) => boolean;
 }

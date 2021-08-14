@@ -266,6 +266,13 @@ export default class DatabaseService {
         uid: string,
         profileId: string
     ): Promise<void> => {
+        if (!this.databaseProvider) {
+            error('Database Service is not initialized!');
+            return undefined;
+        }
+
+        if (this.databaseProvider.hasShareListener(uid, profileId)) return;
+
         await this.removeAllShareListeners();
         await this.addShareListener(uid, profileId);
     };
