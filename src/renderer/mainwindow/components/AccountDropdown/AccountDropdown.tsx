@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentScreen } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
+import { setEditingProfiles } from '../../../common/redux/profiles-slice';
 
 export const AccountDropdown: React.FC = () => {
     const dispatch = useDispatch();
@@ -14,12 +15,20 @@ export const AccountDropdown: React.FC = () => {
         (state: RootState) => state.user.publicGeneralInfo
     );
 
+    const editingProfiles: boolean = useSelector(
+        (state: RootState) => state.profiles.editingProfiles
+    );
+
     const handleSignOut = () => {
         authService.signOut();
     };
 
     const handleSettings = () => {
         dispatch(setCurrentScreen('AccountSettingsScreen'));
+    };
+
+    const handleEditProfiles = () => {
+        dispatch(setEditingProfiles(!editingProfiles));
     };
 
     return (
@@ -37,6 +46,13 @@ export const AccountDropdown: React.FC = () => {
                     </div>
                 </div>
                 <div className={styles.dropdown}>
+                    <div
+                        className={styles.dropdownItem}
+                        onClick={handleEditProfiles}
+                    >
+                        {editingProfiles ? 'Disable' : 'Enable'} Profile Edit
+                        Mode
+                    </div>
                     <div
                         className={styles.dropdownItem}
                         onClick={handleSettings}

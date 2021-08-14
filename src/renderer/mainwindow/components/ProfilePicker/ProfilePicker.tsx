@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { CircleButton } from '../CircleButton/CircleButton';
 import styles from './ProfilePicker.module.scss';
-import { MdChevronLeft, MdChevronRight, MdAdd } from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdAdd, MdClose } from 'react-icons/md';
 import IProfile from '../../../common/services/IProfile';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
@@ -9,9 +9,15 @@ import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { log } from '../../../common/log';
 import { setShares } from '../../../common/redux/shares-slice';
+import { databaseService } from '../../../common/services/api';
+import IUser from '../../../common/services/IUser';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
+
+    const user: IUser | undefined = useSelector(
+        (state: RootState) => state.auth.user
+    );
 
     const profiles: IProfile[] = useSelector(
         (state: RootState) => state.profiles.profiles
@@ -24,31 +30,24 @@ export const ProfilePicker: React.FC = () => {
             )
     );
 
+    const editingProfiles: boolean = useSelector(
+        (state: RootState) => state.profiles.editingProfiles
+    );
+
     const [showLeftArrow, setShowLeftArrow] = useState<boolean>(false);
     const [showRightArrow, setShowRightArrow] = useState<boolean>(false);
-
-    const [renderedProfiles, setRenderedProfiles] = useState<ReactNode[]>([]);
 
     // eslint-disable-next-line @typescript-eslint/ban-types
     const profileListRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         profileListRef.current?.addEventListener('scroll', handleScroll);
-
+        profileListRef.current?.scroll(1, 0);
+        profileListRef.current?.scroll(0, 0);
         return () => {
             profileListRef.current?.removeEventListener('scroll', handleScroll);
         };
     }, []);
-
-    useEffect(() => {
-        setRenderedProfiles(renderProfiles());
-    }, [profiles]);
-
-    useEffect(() => {
-        // Refresh scroll buttons after profiles are rendered.
-        profileListRef.current?.scroll(1, 0);
-        profileListRef.current?.scroll(0, 0);
-    }, [renderedProfiles]);
 
     const handleScroll = () => {
         if (!profileListRef.current) {
@@ -87,6 +86,7 @@ export const ProfilePicker: React.FC = () => {
     };
 
     const handleProfileClick = (profile: IProfile) => {
+        if (editingProfiles || currentProfile?.id === profile.id) return;
         dispatch(setShares([]));
         dispatch(setCurrentProfile(profile.id || 'default'));
     };
@@ -97,6 +97,24 @@ export const ProfilePicker: React.FC = () => {
             return;
         }
         dispatch(setCurrentModal('NewProfileModal'));
+    };
+
+    const handleDeleteProfile = async (profile: IProfile) => {
+        if (!user || !profile.id) return;
+        await databaseService.deleteProfile(user.uid, profile.id);
+    };
+
+    const renderDeleteButton = (profile: IProfile) => {
+        if (!editingProfiles || profile.id === 'default') return <></>;
+
+        return (
+            <div
+                className={styles.deleteProfileButton}
+                onClick={() => handleDeleteProfile(profile)}
+            >
+                <MdClose className={styles.deleteProfileButtonIcon} />
+            </div>
+        );
     };
 
     const renderProfiles = (): ReactNode[] => {
@@ -115,6 +133,7 @@ export const ProfilePicker: React.FC = () => {
                     }}
                     onClick={() => handleProfileClick(profile)}
                 >
+                    {renderDeleteButton(profile)}
                     <span className={styles.profileLabel}>
                         {profile.name.length > 2
                             ? profile.name.slice(0, 2)
@@ -143,7 +162,7 @@ export const ProfilePicker: React.FC = () => {
                 >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
-                {renderedProfiles}
+                {renderProfiles()}
             </div>
             {showRightArrow ? (
                 <button
