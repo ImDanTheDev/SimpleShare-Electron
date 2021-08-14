@@ -5,12 +5,17 @@ import IShare from '../../../common/services/IShare';
 import { databaseService } from '../../../common/services/api';
 import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import IProfile from '../../../common/services/IProfile';
+import { useDispatch } from 'react-redux';
+import { setCurrentModal } from '../../../common/redux/nav-slice';
+import { setCurrentShare } from '../../../common/redux/shares-slice';
 
 interface Props {
     share: IShare;
 }
 
 export const InboxItem: React.FC<Props> = (props: Props) => {
+    const dispatch = useDispatch();
+
     const [senderDisplayName, setSenderDisplayName] = useState<string>('');
     const [senderProfileName, setSenderProfileName] = useState<string>('');
 
@@ -54,6 +59,11 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
         navigator.clipboard.writeText(props.share.content);
     };
 
+    const handleView = () => {
+        dispatch(setCurrentShare(props.share));
+        dispatch(setCurrentModal('ViewShareModal'));
+    };
+
     return (
         <div className={styles.item}>
             <div className={styles.header}>
@@ -77,7 +87,9 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
                 <div className={styles.copyTextButton} onClick={handleCopyText}>
                     Copy Text
                 </div>
-                <div className={styles.viewButton}>View</div>
+                <div className={styles.viewButton} onClick={handleView}>
+                    View
+                </div>
             </div>
         </div>
     );

@@ -4,10 +4,12 @@ import IShare from '../services/IShare';
 
 export interface SharesState {
     shares: IShare[];
+    currentShare: IShare | undefined;
 }
 
 const initialState: SharesState = {
     shares: [],
+    currentShare: undefined,
 };
 
 export const sharesSlice = createSlice({
@@ -39,13 +41,17 @@ export const sharesSlice = createSlice({
             target.toProfileId = action.payload.toProfileId;
             target.toUid = action.payload.toUid;
         },
+        setCurrentShare: (state, action: PayloadAction<IShare>) => {
+            state.currentShare = action.payload;
+        },
     },
 });
 
 export const {
-    setShares: setShares,
-    addShare: addShare,
-    deleteShare: deleteShare,
-    updateShare: updateShare,
+    setShares,
+    addShare,
+    deleteShare,
+    updateShare,
+    setCurrentShare,
 } = sharesSlice.actions;
 export default sharesSlice.reducer;

@@ -23,6 +23,7 @@ import { HomeScreen } from '../HomeScreen/HomeScreen';
 import { NewProfileModal } from '../NewProfileModal/NewProfileModal';
 import { SendShareModal } from '../SendShareModal/SendShareModal';
 import { Toolbar } from '../Toolbar/Toolbar';
+import { ViewShareModal } from '../ViewShareModal/ViewShareModal';
 import styles from './MainWindow.module.scss';
 
 const MainWindow: React.FC = () => {
@@ -222,6 +223,9 @@ const MainWindow: React.FC = () => {
                 break;
             case 'SendShareModal':
                 modal = <SendShareModal />;
+                break;
+            case 'ViewShareModal':
+                modal = <ViewShareModal />;
                 break;
             case 'None':
                 return <></>;
