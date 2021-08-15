@@ -7,7 +7,7 @@ import IDatabaseProvider from './IDatabaseProvider';
 import firebase from 'firebase/app';
 import 'firebase/firestore';
 import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
-import { error, log } from '../../log';
+import { log } from '../../log';
 
 interface IShareListener {
     uid: string;
@@ -171,11 +171,8 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
                 .doc(profile.id);
 
             await profileDocRef.set({ name: profile.name });
-
-            throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
         } catch (e) {
-            error(e);
-            throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
+            throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR, e);
         }
     };
 
