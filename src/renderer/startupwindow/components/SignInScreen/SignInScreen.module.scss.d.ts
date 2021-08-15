@@ -6,6 +6,7 @@ interface CssExports {
   'closeButton': string;
   'closeButtonGroup': string;
   'closeButtonIcon': string;
+  'errorMessage': string;
   'footer': string;
   'frame': string;
   'link': string;

@@ -1,10 +1,12 @@
 export default class SimpleShareError extends Error {
     readonly code: ErrorCode;
+    readonly additionalInfo: string | undefined;
 
-    constructor(code: ErrorCode) {
+    constructor(code: ErrorCode, additionalInfo?: string) {
         super(code);
         this.name = 'SimpleShareError';
         this.code = code;
+        this.additionalInfo = additionalInfo;
     }
 }
 

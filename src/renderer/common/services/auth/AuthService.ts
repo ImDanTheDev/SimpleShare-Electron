@@ -39,10 +39,17 @@ export default class AuthService {
         log('Auth Service initialized.');
     };
 
-    googleSignIn = async (): Promise<IUser | undefined> => {
+    googleSignIn = async (): Promise<IUser> => {
         if (!this.authProvider) {
-            error('Auth Service is not initialized!');
-            return undefined;
+            error(
+                'Auth Service is not initialized! Attempting to initializing...'
+            );
+            this.initialize();
+            if (!this.authProvider) {
+                error('Auth Service is still not initialized.');
+                // TODO: Change this to a SimpleShare error.
+                throw new Error('Auth Service failed to initialize');
+            }
         }
 
         const user = await this.authProvider.googleSignIn();

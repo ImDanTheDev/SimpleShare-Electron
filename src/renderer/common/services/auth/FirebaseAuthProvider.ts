@@ -3,6 +3,7 @@ import 'firebase/auth';
 import IAuthProvider from './IAuthProvider';
 import IUser from '../IUser';
 import { log } from '../../log';
+import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
 
 export default class FirebaseAuthProvider implements IAuthProvider {
     private readonly auth: firebase.auth.Auth;
@@ -39,11 +40,20 @@ export default class FirebaseAuthProvider implements IAuthProvider {
                     displayName: firebaseUser.displayName || undefined,
                 };
             } else {
-                throw new Error('Failed to sign in.');
+                throw new SimpleShareError(
+                    ErrorCode.SIGN_IN_INVALID_CREDENTIALS
+                );
             }
         } catch (e) {
-            log('Failed to sign in error: ', e);
-            throw new Error('Failed to sign in.');
+            switch (e.code) {
+                case 'auth/popup-closed-by-user':
+                    throw new SimpleShareError(ErrorCode.SIGN_IN_CANCELLED);
+                default:
+                    log('Failed to sign in error: ', e);
+                    throw new SimpleShareError(
+                        ErrorCode.UNEXPECTED_SIGN_IN_ERROR
+                    );
+            }
         }
     };
 

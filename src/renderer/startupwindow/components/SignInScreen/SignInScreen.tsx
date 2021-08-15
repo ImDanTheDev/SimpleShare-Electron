@@ -5,6 +5,7 @@ import { MdClose } from 'react-icons/md';
 interface Props {
     opacity: number;
     onSignIn: () => void;
+    errorMessage: string | undefined;
 }
 
 const SignInScreen: React.FC<Props> = (props: Props) => {
@@ -18,6 +19,10 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
 
     const handleClose = () => {
         window.api.send('APP_QUIT', {});
+    };
+
+    const handleSignIn = () => {
+        props.onSignIn();
     };
 
     return (
@@ -35,13 +40,12 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
             <div className={styles.body}>
                 <div className={styles.prompt}>Choose your sign-in method:</div>
                 <div className={styles.signInMethods}>
-                    <div
-                        className={styles.signInMethod}
-                        onClick={props.onSignIn}
-                    >
+                    <div className={styles.signInMethod} onClick={handleSignIn}>
                         Google
                     </div>
                 </div>
+                <div className={styles.errorMessage}>{props.errorMessage}</div>
+
                 <div className={styles.footer}>
                     <a className={styles.link}>Privacy Policy</a>
                     <div className={styles.closeButtonGroup}>
