@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { error, log } from '../../../common/log';
+import { log } from '../../../common/log';
 import { RootState } from '../../../common/redux/store';
 import { authService, initService } from '../../../common/services/api';
-import SimpleShareError, { ErrorCode } from '../../../common/SimpleShareError';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import SignInScreen from '../SignInScreen/SignInScreen';
 import SplashScreen from '../SplashScreen/SplashScreen';
@@ -41,8 +40,6 @@ export const StartupWindow: React.FC = () => {
     const initializing = useSelector(
         (state: RootState) => state.auth.initializing
     );
-
-    const [errorMessage, setErrorMessage] = useState<string>('');
 
     useEffect(() => {
         initService.initialize();
@@ -96,72 +93,11 @@ export const StartupWindow: React.FC = () => {
         }
     }, [opacityAnimFrame]);
 
-    // useEffect(() => {
-    //     if (currentScreen === 'SplashScreen') {
-    //         // Going to the splash screen.
-    //         setSplashScreenOpacity(
-    //             (opacityAnimFrame / opacityAnimFrameCount) * 100
-    //         );
-    //         setSignInScreenOpacity(
-    //             1 - (opacityAnimFrame / opacityAnimFrameCount) * 100
-    //         );
-    //     } else if (currentScreen === 'SignInScreen') {
-    //         // Going to the sign in screen.
-    //         setSplashScreenOpacity(
-    //             (1 - opacityAnimFrame / opacityAnimFrameCount) * 100
-    //         );
-    //         setSignInScreenOpacity(
-    //             (opacityAnimFrame / opacityAnimFrameCount) * 100
-    //         );
-    //     }
-    // }, [opacityAnimFrame, currentScreen]);
-
-    const handleSignIn = async () => {
-        try {
-            await authService.googleSignIn();
-        } catch (e) {
-            if (e instanceof SimpleShareError) {
-                switch (e.code) {
-                    case ErrorCode.SIGN_IN_CANCELLED:
-                        log('The user cancelled the sign in process.');
-                        setErrorMessage('');
-                        break;
-                    case ErrorCode.SIGN_IN_INVALID_CREDENTIALS:
-                        log('Invalid credentials were provided.');
-                        setErrorMessage(
-                            'Sign in failed with invalid credentials.'
-                        );
-                        break;
-                    case ErrorCode.UNEXPECTED_SIGN_IN_ERROR:
-                        error(
-                            'An unexpected error occurred while signing in: ',
-                            e.additionalInfo
-                        );
-                        setErrorMessage(
-                            'An unexpected error occurred while signing in. Try again later.'
-                        );
-                        break;
-                }
-            } else {
-                error('An unexpected error occurred while signing in: ', e);
-                setErrorMessage(
-                    'An unexpected error occurred while signing in. Try again later.'
-                );
-            }
-        }
-    };
-
     const renderScreen = () => {
         if (currentScreen === 'SplashScreen') {
             return <SplashScreen opacity={splashScreenOpacity} />;
         } else if (currentScreen === 'SignInScreen') {
-            return (
-                <SignInScreen
-                    onSignIn={handleSignIn}
-                    opacity={signInScreenOpacity}
-                    errorMessage={errorMessage}
-                />
-            );
+            return <SignInScreen opacity={signInScreenOpacity} />;
         }
     };
 

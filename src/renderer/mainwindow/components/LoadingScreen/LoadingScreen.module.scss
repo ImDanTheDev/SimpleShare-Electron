@@ -1,8 +1,13 @@
-.loadingText {
+.screen {
     flex: 1 1;
-    color: #fff;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.loadingText {
+    color: #fff;
     font-size: 48px;
+    padding-bottom: 16px;
 }

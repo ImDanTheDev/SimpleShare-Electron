@@ -11,7 +11,7 @@ const initialState: ProfilesState = {
     profiles: [
         {
             id: 'default',
-            name: 'Default',
+            name: 'default',
         },
     ],
     currentProfileId: 'default',
