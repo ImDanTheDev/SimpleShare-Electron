@@ -20,6 +20,7 @@ import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsScreen';
 import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';
 import { HomeScreen } from '../HomeScreen/HomeScreen';
+import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
 import { NewProfileModal } from '../NewProfileModal/NewProfileModal';
 import { SendShareModal } from '../SendShareModal/SendShareModal';
 import { Toolbar } from '../Toolbar/Toolbar';
@@ -119,7 +120,7 @@ const MainWindow: React.FC = () => {
 
         const fetchProfiles = async () => {
             if (!user) return;
-            await databaseService.getAllProfiles(user?.uid);
+            await databaseService.getAllProfiles(user.uid);
             setFetchedProfiles(true);
         };
 
@@ -206,7 +207,7 @@ const MainWindow: React.FC = () => {
             case 'AccountSettingsScreen':
                 return <AccountSettingsScreen />;
             case 'LoadingScreen':
-                return <div>Loading</div>;
+                return <LoadingScreen />;
         }
     };
 
