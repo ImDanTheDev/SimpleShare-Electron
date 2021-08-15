@@ -7,6 +7,7 @@ import { setCurrentScreen } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import { setEditingProfiles } from '../../../common/redux/profiles-slice';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 
 export const AccountDropdown: React.FC = () => {
     const dispatch = useDispatch();
@@ -38,7 +39,9 @@ export const AccountDropdown: React.FC = () => {
                     <div className={styles.welcomeGroup}>
                         <div className={styles.welcomeText}>Welcome</div>
                         <div className={styles.displayName}>
-                            {publicGeneralInfo?.displayName}
+                            {publicGeneralInfo?.displayName || (
+                                <LoadingIcon style={{ fontSize: 20 }} />
+                            )}
                         </div>
                     </div>
                     <div className={styles.arrow}>

@@ -11,6 +11,7 @@ import { log } from '../../../common/log';
 import { setShares } from '../../../common/redux/shares-slice';
 import { databaseService } from '../../../common/services/api';
 import IUser from '../../../common/services/IUser';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
@@ -21,6 +22,10 @@ export const ProfilePicker: React.FC = () => {
 
     const profiles: IProfile[] = useSelector(
         (state: RootState) => state.profiles.profiles
+    );
+
+    const fetchingProfiles: boolean | undefined = useSelector(
+        (state: RootState) => state.profiles.fetchingProfiles
     );
 
     const currentProfile: IProfile | undefined = useSelector(
@@ -87,8 +92,9 @@ export const ProfilePicker: React.FC = () => {
 
     const handleProfileClick = (profile: IProfile) => {
         if (editingProfiles || currentProfile?.id === profile.id) return;
+        if (!profile.id) return;
         dispatch(setShares([]));
-        dispatch(setCurrentProfile(profile.id || 'default'));
+        dispatch(setCurrentProfile(profile.id));
     };
 
     const handleNewProfile = () => {
@@ -162,7 +168,11 @@ export const ProfilePicker: React.FC = () => {
                 >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
-                {renderProfiles()}
+                {fetchingProfiles || fetchingProfiles === undefined ? (
+                    <LoadingIcon />
+                ) : (
+                    renderProfiles()
+                )}
             </div>
             {showRightArrow ? (
                 <button

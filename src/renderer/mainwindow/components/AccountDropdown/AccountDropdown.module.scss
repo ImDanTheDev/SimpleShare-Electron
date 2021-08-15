@@ -32,13 +32,6 @@
     z-index: 1;
 }
 
-// .pickerContent:hover {
-//     border-bottom-left-radius: 0px;
-//     border-bottom-right-radius: 0px;
-//     border-bottom-style: none;
-//     filter: drop-shadow(0px 2px 4px #1a1a1a);
-// }
-
 .welcomeGroup {
     color: #fff;
     flex: 1 1;
@@ -57,6 +50,8 @@
 .displayName {
     color: #fff;
     font-size: 18px;
+    display: flex;
+    align-items: center;
 }
 
 .arrow {

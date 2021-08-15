@@ -3,19 +3,16 @@ import IProfile from '../services/IProfile';
 
 export interface ProfilesState {
     profiles: IProfile[];
-    currentProfileId: string;
+    currentProfileId: string | undefined;
     editingProfiles: boolean;
+    fetchingProfiles: boolean | undefined;
 }
 
 const initialState: ProfilesState = {
-    profiles: [
-        {
-            id: 'default',
-            name: 'default',
-        },
-    ],
-    currentProfileId: 'default',
+    profiles: [],
+    currentProfileId: undefined,
     editingProfiles: false,
+    fetchingProfiles: undefined,
 };
 
 export const profilesSlice = createSlice({
@@ -31,9 +28,16 @@ export const profilesSlice = createSlice({
         setEditingProfiles: (state, action: PayloadAction<boolean>) => {
             state.editingProfiles = action.payload;
         },
+        setFetchingProfiles: (state, action: PayloadAction<boolean>) => {
+            state.fetchingProfiles = action.payload;
+        },
     },
 });
 
-export const { setProfiles, setCurrentProfile, setEditingProfiles } =
-    profilesSlice.actions;
+export const {
+    setProfiles,
+    setCurrentProfile,
+    setEditingProfiles,
+    setFetchingProfiles,
+} = profilesSlice.actions;
 export default profilesSlice.reducer;

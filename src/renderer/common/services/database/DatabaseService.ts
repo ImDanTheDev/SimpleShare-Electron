@@ -3,7 +3,7 @@ import {
     setAccountInfo,
     setPublicGeneralInfo,
 } from '../../redux/account-slice';
-import { setProfiles } from '../../redux/profiles-slice';
+import { setFetchingProfiles, setProfiles } from '../../redux/profiles-slice';
 import { addShare, deleteShare, updateShare } from '../../redux/shares-slice';
 import { store } from '../../redux/store';
 import IAccountInfo from '../IAccountInfo';
@@ -187,9 +187,12 @@ export default class DatabaseService {
             return [];
         }
 
+        store.dispatch(setFetchingProfiles(true));
+
         const profiles = await this.databaseProvider.getAllProfiles(uid);
 
         store.dispatch(setProfiles(profiles || []));
+        store.dispatch(setFetchingProfiles(false));
 
         return profiles;
     };
