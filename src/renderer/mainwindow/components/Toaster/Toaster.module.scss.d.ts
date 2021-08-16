@@ -2,6 +2,7 @@
 // Please do not change this file!
 interface CssExports {
   'closeButton': string;
+  'dismissOverlay': string;
   'dismissToastIcon': string;
   'list': string;
   'notificationIcon': string;
@@ -14,6 +15,7 @@ interface CssExports {
   'toastInfo': string;
   'toastMessage': string;
   'toaster': string;
+  'toasterContainer': string;
   'toasterHeader': string;
 }
 export const cssExports: CssExports;

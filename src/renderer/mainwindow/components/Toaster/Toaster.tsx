@@ -134,18 +134,26 @@ export const Toaster: React.FC = () => {
 
     if (isToasterOpen) {
         return (
-            <div className={styles.toaster}>
-                <div className={styles.toasterHeader}>
-                    <div className={styles.title}>
-                        <MdNotifications className={styles.notificationIcon} />
-                        <div> {toasts.length} Notifications</div>
+            <div className={styles.toasterContainer}>
+                <div
+                    className={styles.dismissOverlay}
+                    onClick={handleNotificationIconClick}
+                />
+                <div className={styles.toaster}>
+                    <div className={styles.toasterHeader}>
+                        <div className={styles.title}>
+                            <MdNotifications
+                                className={styles.notificationIcon}
+                            />
+                            <div> {toasts.length} Notifications</div>
+                        </div>
+                        <MdClose
+                            className={styles.closeButton}
+                            onClick={handleNotificationIconClick}
+                        />
                     </div>
-                    <MdClose
-                        className={styles.closeButton}
-                        onClick={handleNotificationIconClick}
-                    />
+                    <div className={styles.list}>{renderToasts()}</div>
                 </div>
-                <div className={styles.list}>{renderToasts()}</div>
             </div>
         );
     }
