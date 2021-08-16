@@ -30,6 +30,7 @@
     height: 100%;
     position: relative;
     z-index: 1;
+    transition: border-radius 0.05s, border-radius 0.05s;
 }
 
 .welcomeGroup {
@@ -63,7 +64,6 @@
 }
 
 .dropdown {
-    display: none;
     color: #fff;
     position: absolute;
     margin-top: -10px;
@@ -81,14 +81,18 @@
     border-top-style: none;
     z-index: 0;
     overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.25s, opacity 0.25s;
+}
+
+.picker:hover .dropdown {
+    opacity: 1;
+    max-height: 150px;
 }
 
 .picker:hover .arrow {
     transform: translateY(4px);
-}
-
-.picker:hover .dropdown {
-    display: block;
 }
 
 .picker:hover .pickerContent {
@@ -96,10 +100,6 @@
     border-bottom-right-radius: 0px;
     border-bottom-color: transparent;
     filter: drop-shadow(0px 2px 2px #1a1a1a);
-}
-
-.dropdown:hover {
-    display: block;
 }
 
 .dropdownItem {
