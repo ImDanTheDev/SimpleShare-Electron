@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Panel } from '../Panel/Panel';
 import { CircleButton } from '../CircleButton/CircleButton';
 import { MdChevronLeft } from 'react-icons/md';
@@ -17,6 +17,7 @@ import IAccountInfo from '../../../common/services/IAccountInfo';
 import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import { log } from '../../../common/log';
 import { databaseService } from '../../../common/services/api';
+import { pushToast } from '../../../common/redux/toaster-slice';
 
 export const AccountSettingsScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -40,6 +41,27 @@ export const AccountSettingsScreen: React.FC = () => {
         accountInfo?.phoneNumber || ''
     );
 
+    const [displayNameError, setDisplayNameError] = useState<string>('');
+    const [phoneNumberError, setPhoneNumberError] = useState<string>('');
+
+    useEffect(() => {
+        if (displayName.length < MIN_DISPLAY_NAME_LENGTH) {
+            setDisplayNameError(
+                `Display names must be at least ${MIN_DISPLAY_NAME_LENGTH} characters long.`
+            );
+        } else {
+            setDisplayNameError('');
+        }
+
+        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+            setPhoneNumberError(
+                `Phone numbers must be at least ${MIN_PHONE_NUMBER_LENGTH} characters long.`
+            );
+        } else {
+            setPhoneNumberError('');
+        }
+    }, [displayName, phoneNumber]);
+
     const handleBack = () => {
         dispatch(setCurrentScreen('HomeScreen'));
     };
@@ -47,6 +69,12 @@ export const AccountSettingsScreen: React.FC = () => {
     const handleSave = async () => {
         if (!user) {
             log('User is undefined. Cannot save account');
+            pushToast({
+                message: 'You are signed out. Please sign in and try again.',
+                type: 'error',
+                duration: 5,
+                openToaster: true,
+            });
             return;
         }
 
@@ -72,6 +100,13 @@ export const AccountSettingsScreen: React.FC = () => {
             dispatch(setCurrentScreen('HomeScreen'));
         } catch {
             log('Failed to save account');
+            pushToast({
+                message:
+                    'An unexpected error occurred while updating your account. Try again later.',
+                type: 'error',
+                duration: 5,
+                openToaster: true,
+            });
         }
     };
 
@@ -89,33 +124,46 @@ export const AccountSettingsScreen: React.FC = () => {
                 }
             >
                 <div className={styles.panelBody}>
-                    <div className={styles.labeledField}>
-                        <span className={styles.label}>Display Name:</span>
-                        <input
-                            className={styles.field}
-                            type='text'
-                            spellCheck='false'
-                            minLength={MIN_DISPLAY_NAME_LENGTH}
-                            maxLength={MAX_DISPLAY_NAME_LENGTH}
-                            value={displayName}
-                            onChange={(e) => setDisplayName(e.target.value)}
-                        />
+                    <div className={styles.items}>
+                        <div className={styles.itemGroup}>
+                            <div className={styles.label}>Display Name:</div>
+                            <input
+                                className={styles.field}
+                                type='text'
+                                spellCheck='false'
+                                minLength={MIN_DISPLAY_NAME_LENGTH}
+                                maxLength={MAX_DISPLAY_NAME_LENGTH}
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                            />
+                            <div className={styles.errorMessage}>
+                                {displayNameError}
+                            </div>
+                        </div>
+                        <div className={styles.itemGroup}>
+                            <div className={styles.label}>Phone Number:</div>
+                            <input
+                                className={styles.field}
+                                type='tel'
+                                spellCheck='false'
+                                minLength={MIN_PHONE_NUMBER_LENGTH}
+                                maxLength={MAX_PHONE_NUMBER_LENGTH}
+                                value={phoneNumber}
+                                onChange={(e) => setPhoneNumber(e.target.value)}
+                            />
+                            <div className={styles.errorMessage}>
+                                {phoneNumberError}
+                            </div>
+                        </div>
+                        <div className={styles.itemGroup}>
+                            <button
+                                className={styles.saveButton}
+                                onClick={handleSave}
+                            >
+                                Save Account
+                            </button>
+                        </div>
                     </div>
-                    <div className={styles.labeledField}>
-                        <span className={styles.label}>Phone Number:</span>
-                        <input
-                            className={styles.field}
-                            type='tel'
-                            spellCheck='false'
-                            minLength={MIN_PHONE_NUMBER_LENGTH}
-                            maxLength={MAX_PHONE_NUMBER_LENGTH}
-                            value={phoneNumber}
-                            onChange={(e) => setPhoneNumber(e.target.value)}
-                        />
-                    </div>
-                    <button className={styles.saveButton} onClick={handleSave}>
-                        Save Account
-                    </button>
                 </div>
             </Panel>
         </div>

@@ -128,7 +128,7 @@ export const ProfilePicker: React.FC = () => {
                 pushToast({
                     message:
                         'You are signed out. Please sign in and try again.',
-                    type: 'info',
+                    type: 'error',
                     duration: 5,
                     openToaster: true,
                 })

@@ -4,6 +4,7 @@ import FirebaseAuthProvider from './FirebaseAuthProvider';
 import IAuthProvider from './IAuthProvider';
 import IUser from '../IUser';
 import { error, log } from '../../log';
+import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
 
 export enum AuthProviderType {
     Firebase,

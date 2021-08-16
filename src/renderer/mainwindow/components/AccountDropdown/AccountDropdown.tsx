@@ -8,6 +8,7 @@ import { RootState } from '../../../common/redux/store';
 import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import { setEditingProfiles } from '../../../common/redux/profiles-slice';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { pushToast } from '../../../common/redux/toaster-slice';
 
 export const AccountDropdown: React.FC = () => {
     const dispatch = useDispatch();
@@ -21,7 +22,19 @@ export const AccountDropdown: React.FC = () => {
     );
 
     const handleSignOut = () => {
-        authService.signOut();
+        try {
+            authService.signOut();
+        } catch {
+            dispatch(
+                pushToast({
+                    message:
+                        'An error occurred while signing out. Try again later or restart Simple Share.',
+                    type: 'error',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+        }
     };
 
     const handleSettings = () => {

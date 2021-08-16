@@ -2,9 +2,11 @@
 // Please do not change this file!
 interface CssExports {
   'backButtonIcon': string;
+  'errorMessage': string;
   'field': string;
+  'itemGroup': string;
+  'items': string;
   'label': string;
-  'labeledField': string;
   'panelBody': string;
   'saveButton': string;
   'screen': string;
