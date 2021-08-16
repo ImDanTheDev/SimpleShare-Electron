@@ -132,9 +132,16 @@ export const Toaster: React.FC = () => {
         return renderedToasts;
     };
 
-    if (isToasterOpen) {
-        return (
-            <div className={styles.toasterContainer}>
+    return (
+        <>
+            <div
+                className={styles.toasterContainer}
+                style={{
+                    left: isToasterOpen ? 2 : -300,
+                    width: isToasterOpen ? 'auto' : 0,
+                    right: isToasterOpen ? 2 : 'auto',
+                }}
+            >
                 <div
                     className={styles.dismissOverlay}
                     onClick={handleNotificationIconClick}
@@ -155,15 +162,17 @@ export const Toaster: React.FC = () => {
                     <div className={styles.list}>{renderToasts()}</div>
                 </div>
             </div>
-        );
-    }
-    return (
-        <div
-            className={styles.pullOutTab}
-            onClick={handleNotificationIconClick}
-        >
-            <MdNotifications className={styles.notificationIcon} />
-            {toasts.length}
-        </div>
+            {isToasterOpen ? (
+                <></>
+            ) : (
+                <div
+                    className={styles.pullOutTab}
+                    onClick={handleNotificationIconClick}
+                >
+                    <MdNotifications className={styles.notificationIcon} />
+                    {toasts.length}
+                </div>
+            )}
+        </>
     );
 };

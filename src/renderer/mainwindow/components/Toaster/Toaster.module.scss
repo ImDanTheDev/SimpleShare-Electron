@@ -5,6 +5,7 @@
     right: 2px;
     bottom: 2px;
     z-index: 20;
+    transition: left 0.2s, right 0.2s, width 0.2s;
 }
 
 .dismissOverlay {
