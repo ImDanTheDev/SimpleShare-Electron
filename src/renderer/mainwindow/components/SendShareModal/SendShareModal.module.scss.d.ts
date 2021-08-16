@@ -3,7 +3,9 @@
 interface CssExports {
   'button': string;
   'buttons': string;
+  'errorMessage': string;
   'field': string;
+  'fieldLabel': string;
   'modal': string;
   'title': string;
 }

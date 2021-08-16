@@ -69,12 +69,15 @@ export const AccountSettingsScreen: React.FC = () => {
     const handleSave = async () => {
         if (!user) {
             log('User is undefined. Cannot save account');
-            pushToast({
-                message: 'You are signed out. Please sign in and try again.',
-                type: 'error',
-                duration: 5,
-                openToaster: true,
-            });
+            dispatch(
+                pushToast({
+                    message:
+                        'You are signed out. Please sign in and try again.',
+                    type: 'error',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
             return;
         }
 
@@ -100,13 +103,15 @@ export const AccountSettingsScreen: React.FC = () => {
             dispatch(setCurrentScreen('HomeScreen'));
         } catch {
             log('Failed to save account');
-            pushToast({
-                message:
-                    'An unexpected error occurred while updating your account. Try again later.',
-                type: 'error',
-                duration: 5,
-                openToaster: true,
-            });
+            dispatch(
+                pushToast({
+                    message:
+                        'An unexpected error occurred while updating your account. Try again later.',
+                    type: 'error',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
         }
     };
 

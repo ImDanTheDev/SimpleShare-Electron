@@ -8,6 +8,7 @@ import IProfile from '../../../common/services/IProfile';
 import { useDispatch } from 'react-redux';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { setCurrentShare } from '../../../common/redux/shares-slice';
+import { pushToast } from '../../../common/redux/toaster-slice';
 
 interface Props {
     share: IShare;
@@ -52,11 +53,20 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
     }, [props.share]);
 
     const handleDelete = async () => {
-        await databaseService.deleteShare(props.share);
+        if (!(await databaseService.deleteShare(props.share))) {
+            dispatch(
+                pushToast({
+                    message:
+                        'An unexpected error occurred while deleting the inbox item. Try again later.',
+                    duration: 5,
+                    type: 'error',
+                })
+            );
+        }
     };
 
-    const handleCopyText = () => {
-        navigator.clipboard.writeText(props.share.content);
+    const handleCopyText = async () => {
+        await navigator.clipboard.writeText(props.share.content);
     };
 
     const handleView = () => {

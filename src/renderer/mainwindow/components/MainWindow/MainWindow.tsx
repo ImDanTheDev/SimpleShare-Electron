@@ -8,6 +8,7 @@ import {
 } from '../../../common/redux/nav-slice';
 import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { RootState } from '../../../common/redux/store';
+import { pushToast } from '../../../common/redux/toaster-slice';
 import {
     authService,
     databaseService,
@@ -121,7 +122,18 @@ const MainWindow: React.FC = () => {
 
         const fetchProfiles = async () => {
             if (!user) return;
-            await databaseService.getAllProfiles(user.uid);
+            try {
+                await databaseService.getAllProfiles(user.uid);
+            } catch {
+                dispatch(
+                    pushToast({
+                        message:
+                            'An unexpected error occurred while fetching your profiles. Try again later.',
+                        duration: 5,
+                        type: 'error',
+                    })
+                );
+            }
             setFetchedProfiles(true);
         };
 
@@ -151,8 +163,8 @@ const MainWindow: React.FC = () => {
                         // may happen if a profile is created by the user, but instead of
                         // uploading to firestore, it is saved to the store.
                         // Either way, this will no longer be as big of an issue once
-                        // logic is implemented for finding the default profile in the
-                        // above TODO. If a profile with the default field set to true
+                        // logic is implemented for finding the default profile using a isDefault
+                        // field. If a profile with the default field set to true
                         // does not exist, one will just be created.
                         log('Account has a profile without an id.');
                     }

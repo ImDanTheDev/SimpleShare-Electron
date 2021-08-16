@@ -3,6 +3,7 @@ import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
+import { pushToast } from '../../../common/redux/toaster-slice';
 import { databaseService } from '../../../common/services/api';
 import IProfile from '../../../common/services/IProfile';
 import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
@@ -21,6 +22,13 @@ export const ViewShareModal: React.FC = () => {
 
     useEffect(() => {
         if (!currentShare) {
+            dispatch(
+                pushToast({
+                    message: 'The selected share does not exist.',
+                    type: 'info',
+                    duration: 5,
+                })
+            );
             dispatch(setCurrentModal('None'));
             return;
         }

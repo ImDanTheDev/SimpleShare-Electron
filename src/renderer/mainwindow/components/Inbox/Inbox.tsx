@@ -28,7 +28,11 @@ export const Inbox: React.FC = () => {
     };
 
     return (
-        <Panel title={`Inbox - ${currentProfile?.name} (${shares.length})`}>
+        <Panel
+            title={`Inbox - ${currentProfile?.name || 'Unknown Profile'} (${
+                shares.length
+            })`}
+        >
             <div className={styles.inboxItemList}>{renderCards()}</div>
         </Panel>
     );
