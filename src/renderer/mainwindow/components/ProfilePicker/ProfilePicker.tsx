@@ -7,11 +7,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
 import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { log } from '../../../common/log';
 import { setShares } from '../../../common/redux/shares-slice';
 import { databaseService } from '../../../common/services/api';
 import IUser from '../../../common/services/IUser';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { pushToast } from '../../../common/redux/toaster-slice';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
@@ -92,22 +92,74 @@ export const ProfilePicker: React.FC = () => {
 
     const handleProfileClick = (profile: IProfile) => {
         if (editingProfiles || currentProfile?.id === profile.id) return;
-        if (!profile.id) return;
+        if (!profile.id) {
+            dispatch(
+                pushToast({
+                    message: 'The selected profile does not exist.',
+                    type: 'warn',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+            return;
+        }
         dispatch(setShares([]));
         dispatch(setCurrentProfile(profile.id));
     };
 
     const handleNewProfile = () => {
         if (profiles.length >= 5) {
-            log('You may only have 5 profiles');
+            dispatch(
+                pushToast({
+                    message: 'You may only have 5 profiles.',
+                    type: 'info',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
             return;
         }
         dispatch(setCurrentModal('NewProfileModal'));
     };
 
     const handleDeleteProfile = async (profile: IProfile) => {
-        if (!user || !profile.id) return;
-        await databaseService.deleteProfile(user.uid, profile.id);
+        if (!user) {
+            dispatch(
+                pushToast({
+                    message:
+                        'You are signed out. Please sign in and try again.',
+                    type: 'info',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+            return;
+        }
+        if (!profile.id) {
+            dispatch(
+                pushToast({
+                    message: 'The selected profile does not exist.',
+                    type: 'warn',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+            return;
+        }
+
+        try {
+            await databaseService.deleteProfile(user.uid, profile.id);
+        } catch {
+            dispatch(
+                pushToast({
+                    message:
+                        'An unexpected error occurred while deleting the profile.',
+                    type: 'error',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+        }
     };
 
     const renderDeleteButton = (profile: IProfile) => {

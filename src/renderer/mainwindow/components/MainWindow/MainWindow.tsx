@@ -23,6 +23,7 @@ import { HomeScreen } from '../HomeScreen/HomeScreen';
 import { LoadingScreen } from '../LoadingScreen/LoadingScreen';
 import { NewProfileModal } from '../NewProfileModal/NewProfileModal';
 import { SendShareModal } from '../SendShareModal/SendShareModal';
+import { Toaster } from '../Toaster/Toaster';
 import { Toolbar } from '../Toolbar/Toolbar';
 import { ViewShareModal } from '../ViewShareModal/ViewShareModal';
 import styles from './MainWindow.module.scss';
@@ -250,6 +251,7 @@ const MainWindow: React.FC = () => {
                 {renderScreen()}
             </div>
             {renderModal()}
+            <Toaster />
         </WindowFrame>
     );
 };

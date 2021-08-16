@@ -6,6 +6,7 @@ import {
 import { setFetchingProfiles, setProfiles } from '../../redux/profiles-slice';
 import { addShare, deleteShare, updateShare } from '../../redux/shares-slice';
 import { store } from '../../redux/store';
+import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
 import IAccountInfo from '../IAccountInfo';
 import IProfile from '../IProfile';
 import IPublicGeneralInfo from '../IPublicGeneralInfo';
@@ -226,24 +227,24 @@ export default class DatabaseService {
         return profileId;
     };
 
-    deleteProfile = async (
-        uid: string,
-        profileId: string
-    ): Promise<boolean> => {
+    deleteProfile = async (uid: string, profileId: string): Promise<void> => {
         if (!this.databaseProvider) {
             error('Database Service is not initialized!');
-            return false;
+            throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
         }
 
         const success = await this.databaseProvider.deleteProfile(
             uid,
             profileId
         );
+
+        if (!success)
+            throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
+
         // TODO: Instead of refetching all profiles after creating one,
         // consider registering a collection listener for 'profiles' and
         // handling the ADD, DELETE, MODIFIED operations.
         await this.getAllProfiles(uid);
-        return success;
     };
 
     createShare = async (share: IShare): Promise<void> => {

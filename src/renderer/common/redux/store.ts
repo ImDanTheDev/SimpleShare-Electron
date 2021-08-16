@@ -22,6 +22,7 @@ import profilesReducer, { ProfilesState } from './profiles-slice';
 import sharesReducer, { SharesState } from './shares-slice';
 import outboxReducer, { OutboxState } from './outbox-slice';
 import navReducer, { NavState } from './nav-slice';
+import toasterReducer, { ToasterState } from './toaster-slice';
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -30,6 +31,7 @@ const rootReducer = combineReducers({
     shares: sharesReducer,
     outbox: outboxReducer,
     nav: navReducer,
+    toaster: toasterReducer,
 });
 
 const persistConfig: PersistConfig<
@@ -40,11 +42,12 @@ const persistConfig: PersistConfig<
         shares: SharesState;
         outbox: OutboxState;
         nav: NavState;
+        toaster: ToasterState;
     }>
 > = {
     key: 'root',
     storage: electronStorage(),
-    blacklist: ['user', 'auth', 'profiles', 'shares', 'nav'],
+    blacklist: ['user', 'auth', 'profiles', 'shares', 'nav', 'toaster'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
