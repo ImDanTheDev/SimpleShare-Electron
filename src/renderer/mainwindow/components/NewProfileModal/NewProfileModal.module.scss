@@ -13,7 +13,7 @@
     overflow: hidden;
     padding: 16px;
     align-items: center;
-    max-width: 700px;
+    width: 400px;
     max-height: 600px;
 }
 
@@ -81,4 +81,16 @@ textarea::-webkit-resizer {
 textarea::-webkit-scrollbar-button {
     height: 8px;
     width: 8px;
+}
+
+.errorMessage {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    padding-left: 16px;
+    padding-right: 16px;
+    text-align: center;
+    justify-content: center;
+    color: #e63333;
+    font-weight: bold;
 }

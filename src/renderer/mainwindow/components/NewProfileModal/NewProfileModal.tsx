@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     MAX_PROFILE_NAME_LENGTH,
     MIN_PROFILE_NAME_LENGTH,
 } from '../../../common/constants';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { error, log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
@@ -21,15 +22,31 @@ export const NewProfileModal: React.FC = () => {
 
     const [profileName, setProfileName] = useState<string>('');
     const [creatingProfile, setCreatingProfile] = useState<boolean>(false);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
     };
 
+    useEffect(() => {
+        if (profileName.length < 2) {
+            setErrorMessage(
+                `Profile names must be at least ${MIN_PROFILE_NAME_LENGTH} characters long.`
+            );
+        } else {
+            setErrorMessage('');
+        }
+    }, [profileName]);
+
     const handleSave = async () => {
         if (creatingProfile) return;
+        setCreatingProfile(true);
         if (!user) {
             log('User is not signed in. Cannot create profile.');
+            setErrorMessage(
+                'You are not signed in. Please sign in and try again.'
+            );
+            setCreatingProfile(false);
             return;
         }
 
@@ -37,14 +54,15 @@ export const NewProfileModal: React.FC = () => {
             log(
                 `Profile names must be at least ${MIN_PROFILE_NAME_LENGTH} long`
             );
+            setCreatingProfile(false);
             return;
         }
 
         try {
-            setCreatingProfile(true);
             await databaseService.createProfile(user.uid, {
                 name: profileName,
             });
+            handleDismiss();
         } catch (e) {
             if (e instanceof SimpleShareError) {
                 if (e.code === ErrorCode.UNEXPECTED_DATABASE_ERROR) {
@@ -52,14 +70,13 @@ export const NewProfileModal: React.FC = () => {
                         'An unexpected error occurred while creating the profile.',
                         e
                     );
+                    setErrorMessage(
+                        'An unexpected error occurred. Try again later.'
+                    );
                 }
             }
-        } finally {
             setCreatingProfile(false);
-            handleDismiss();
         }
-
-        dispatch(setCurrentModal('None'));
     };
 
     return (
@@ -74,6 +91,9 @@ export const NewProfileModal: React.FC = () => {
                 maxLength={MAX_PROFILE_NAME_LENGTH}
                 onChange={(e) => setProfileName(e.target.value)}
             />
+            <div className={styles.errorMessage}>
+                {creatingProfile ? <LoadingIcon /> : errorMessage}
+            </div>
             <div className={styles.buttons}>
                 <button className={styles.button} onClick={handleDismiss}>
                     Cancel
