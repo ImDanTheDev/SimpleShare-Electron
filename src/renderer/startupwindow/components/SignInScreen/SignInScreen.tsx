@@ -69,10 +69,7 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
     return (
         <div className={styles.frame} style={{ opacity: `${props.opacity}%` }}>
             <div className={styles.banner}>
-                <img
-                    className={styles.logo}
-                    src='assets/images/SimpleShare_Logo_512.png'
-                />
+                <img className={styles.logo} src='assets/images/logo.svg' />
                 <div className={styles.title}>
                     Welcome to <br />
                     Simple Share

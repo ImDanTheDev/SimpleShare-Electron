@@ -11,10 +11,7 @@ export const Toolbar: React.FC = () => {
 
     return (
         <div className={styles.toolBar}>
-            <img
-                className={styles.logo}
-                src='assets/images/SimpleShare_Logo_512.png'
-            />
+            <img className={styles.logo} src='assets/images/logo.svg' />
             <AccountDropdown />
             <ProfilePicker />
             <div className={styles.closeButtonGroup}>
