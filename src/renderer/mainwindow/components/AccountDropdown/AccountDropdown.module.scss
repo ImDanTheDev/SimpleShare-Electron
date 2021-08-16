@@ -84,7 +84,6 @@
 }
 
 .picker:hover .arrow {
-    //transform: rotate(180deg);
     transform: translateY(4px);
 }
 
@@ -95,7 +94,6 @@
 .picker:hover .pickerContent {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    //border-bottom-style: none;
     border-bottom-color: transparent;
     filter: drop-shadow(0px 2px 2px #1a1a1a);
 }
