@@ -8,8 +8,6 @@ import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 
 interface Props {
     opacity: number;
-    //onSignIn: () => void;
-    //errorMessage: string | undefined;
 }
 
 const SignInScreen: React.FC<Props> = (props: Props) => {
