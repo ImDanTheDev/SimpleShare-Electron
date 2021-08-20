@@ -19,7 +19,7 @@ const SplashScreen: React.FC<Props> = (props: Props) => {
             className={styles.splashScreen}
             style={{ opacity: `${props.opacity}%` }}
         >
-            <img className={styles.logo} src='assets/images/logo.svg' />
+            <img className={styles.logo} src='/assets/images/logo.svg' />
         </div>
     );
 };

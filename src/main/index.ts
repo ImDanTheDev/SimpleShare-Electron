@@ -1,14 +1,13 @@
-import { app, BrowserWindow, session } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import installExtension, {
     REDUX_DEVTOOLS,
     REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
 import ElectronStore from 'electron-store';
 import MainIPC from './main-ipc';
+import { start } from './webserver';
 
 // Magic strings set by webpack
-declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
-declare const STARTUP_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const STARTUP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
@@ -16,8 +15,6 @@ declare const STARTUP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
-
-app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors');
 
 let electronStore: ElectronStore;
 let currentWindow: BrowserWindow;
@@ -41,7 +38,7 @@ const createStartupWindow = (): void => {
     });
 
     ipc.setWindow(currentWindow);
-    currentWindow.loadURL(STARTUP_WINDOW_WEBPACK_ENTRY);
+    currentWindow.loadURL('http://localhost:3090/startup_window/index.html');
     currentWindow.on('ready-to-show', () => {
         currentWindow.show();
     });
@@ -63,7 +60,7 @@ const createMainWindow = (): void => {
     });
 
     ipc.setWindow(currentWindow);
-    currentWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+    currentWindow.loadURL('http://localhost:3090/main_window/index.html');
     currentWindow.on('ready-to-show', () => {
         currentWindow.show();
     });
@@ -105,12 +102,14 @@ const setupIPC = () => {
         app.quit();
     });
     ipc.on('APP_SHOW_STARTUP_WINDOW', () => {
-        currentWindow.close();
+        const oldWindow = currentWindow;
         createStartupWindow();
+        oldWindow.close();
     });
     ipc.on('APP_SHOW_MAIN_WINDOW', () => {
-        currentWindow.close();
+        const oldWindow = currentWindow;
         createMainWindow();
+        oldWindow.close();
     });
     ipc.handle('APP_GET_ITEM', (args) => {
         return electronStore.get(args.key);
@@ -133,30 +132,23 @@ const setupIPC = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
-    installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS], {
-        forceDownload: false,
-    })
-        .then((name) => {
-            log(`Installed Extension: ${name}`);
+    if (process.env.INIT_CWD) {
+        installExtension([REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS], {
+            forceDownload: false,
         })
-        .catch((err) => {
-            log('An error occurred: ', false, err);
-        });
+            .then((name) => {
+                log(`Installed Extension: ${name}`);
+            })
+            .catch((err) => {
+                log('An error occurred: ', false, err);
+            });
+    }
+
+    start();
 
     setupIPC();
 
     electronStore = new ElectronStore();
-
-    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-        callback({
-            responseHeaders: {
-                ...details.responseHeaders,
-                'Content-Security-Policy': [
-                    "connect-src 'self' 'unsafe-eval' 'unsafe-inline' data: https://apis.google.com https://*.googleapis.com;",
-                ],
-            },
-        });
-    });
 
     createStartupWindow();
 });

@@ -10,6 +10,7 @@
     border-width: 1px;
     border-style: solid;
     border-color: #f4a2617f;
+    overflow: hidden;
 }
 
 .profilePicture {
@@ -35,6 +36,7 @@
 
     margin: 4px;
     color: #fff;
+    min-width: 0;
 }
 
 .to {
@@ -54,6 +56,7 @@
     flex: 0 0;
 
     color: #aaa;
+    font-size: 12px;
 }
 
 .content {
@@ -63,4 +66,7 @@
     flex: 1 1;
 
     color: #fff;
+    overflow: hidden;
+    white-space: pre;
+    font-size: 16px;
 }

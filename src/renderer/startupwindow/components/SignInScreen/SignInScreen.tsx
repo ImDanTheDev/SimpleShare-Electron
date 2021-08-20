@@ -67,7 +67,7 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
     return (
         <div className={styles.frame} style={{ opacity: `${props.opacity}%` }}>
             <div className={styles.banner}>
-                <img className={styles.logo} src='assets/images/logo.svg' />
+                <img className={styles.logo} src='/assets/images/logo.svg' />
                 <div className={styles.title}>
                     Welcome to <br />
                     Simple Share
@@ -90,7 +90,7 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
                     )}
                 </div>
                 <div className={styles.footer}>
-                    <a className={styles.link}>Privacy Policy</a>
+                    {/* <a className={styles.link}>Privacy Policy</a> */}
                     <div className={styles.closeButtonGroup}>
                         <button
                             className={styles.closeButton}
@@ -99,7 +99,7 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
                             <MdClose className={styles.closeButtonIcon} />
                         </button>
                     </div>
-                    <a className={styles.link}>Terms of Services</a>
+                    {/* <a className={styles.link}>Terms of Services</a> */}
                 </div>
             </div>
         </div>
