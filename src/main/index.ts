@@ -175,11 +175,13 @@ const log = (
     renderer?: boolean,
     ...optionalParams: unknown[]
 ) => {
-    // eslint-disable-next-line no-console
-    console.log(
-        `[${renderer ? 'RENDERER' : 'MAIN'}] ${message}`,
-        ...optionalParams
-    );
+    if (process.env.INIT_CWD) {
+        // eslint-disable-next-line no-console
+        console.log(
+            `[${renderer ? 'RENDERER' : 'MAIN'}] ${message}`,
+            ...optionalParams
+        );
+    }
 };
 
 const error = (
@@ -187,9 +189,11 @@ const error = (
     renderer?: boolean,
     ...optionalParams: unknown[]
 ) => {
-    // eslint-disable-next-line no-console
-    console.error(
-        `[${renderer ? 'RENDERER' : 'MAIN'}] ${message}`,
-        ...optionalParams
-    );
+    if (process.env.INIT_CWD) {
+        // eslint-disable-next-line no-console
+        console.error(
+            `[${renderer ? 'RENDERER' : 'MAIN'}] ${message}`,
+            ...optionalParams
+        );
+    }
 };
