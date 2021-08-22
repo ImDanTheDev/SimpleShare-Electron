@@ -10,7 +10,6 @@ import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { setShares } from '../../../common/redux/shares-slice';
 import { databaseService } from '../../../common/services/api';
 import IUser from '../../../common/services/IUser';
-import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { pushToast } from '../../../common/redux/toaster-slice';
 
 export const ProfilePicker: React.FC = () => {
@@ -24,15 +23,14 @@ export const ProfilePicker: React.FC = () => {
         (state: RootState) => state.profiles.profiles
     );
 
-    const fetchingProfiles: boolean | undefined = useSelector(
-        (state: RootState) => state.profiles.fetchingProfiles
-    );
-
-    const currentProfile: IProfile | undefined = useSelector(
+    const currentProfile = useSelector(
         (state: RootState) =>
+            // Find current profile.
+            // If current profile doesnt exist, pick the first profile.
+            // If no profiles exist, return undefined.
             state.profiles.profiles.find(
                 (profile) => profile.id === state.profiles.currentProfileId
-            )
+            ) || state.profiles.profiles[0]
     );
 
     const editingProfiles: boolean = useSelector(
@@ -220,11 +218,7 @@ export const ProfilePicker: React.FC = () => {
                 >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
-                {fetchingProfiles || fetchingProfiles === undefined ? (
-                    <LoadingIcon />
-                ) : (
-                    renderProfiles()
-                )}
+                {renderProfiles()}
             </div>
             {showRightArrow ? (
                 <button

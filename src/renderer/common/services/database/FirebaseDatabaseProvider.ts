@@ -15,23 +15,38 @@ interface IShareListener {
     unsubscribe: () => void;
 }
 
+interface IProfileListener {
+    uid: string;
+    unsubscribe: () => void;
+}
+
 export default class FirestoreDatabaseProvider implements IDatabaseProvider {
     private readonly firestore: firebase.firestore.Firestore;
     private shareListeners: IShareListener[] = [];
+    private profileListeners: IProfileListener[] = [];
 
     private onShareAddedCallback: (share: IShare) => void;
     private onShareDeletedCallback: (share: IShare) => void;
     private onShareModifiedCallback: (share: IShare) => void;
+    private onProfileAddedCallback: (profile: IProfile) => void;
+    private onProfileDeletedCallback: (profile: IProfile) => void;
+    private onProfileModifiedCallback: (profile: IProfile) => void;
 
     constructor(
         onShareAdded: (share: IShare) => void,
         onShareDeleted: (share: IShare) => void,
-        onShareModified: (share: IShare) => void
+        onShareModified: (share: IShare) => void,
+        onProfileAdded: (profile: IProfile) => void,
+        onProfileDeleted: (profile: IProfile) => void,
+        onProfileModified: (profile: IProfile) => void
     ) {
         this.firestore = firebase.firestore();
         this.onShareAddedCallback = onShareAdded;
         this.onShareDeletedCallback = onShareDeleted;
         this.onShareModifiedCallback = onShareModified;
+        this.onProfileAddedCallback = onProfileAdded;
+        this.onProfileDeletedCallback = onProfileDeleted;
+        this.onProfileModifiedCallback = onProfileModified;
     }
 
     getAccountInfo = async (uid: string): Promise<IAccountInfo | undefined> => {
@@ -269,6 +284,63 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
         }
     };
 
+    addProfileListener = async (uid: string): Promise<void> => {
+        const profilesCollection = this.firestore
+            .collection('accounts')
+            .doc(uid)
+            .collection('profiles');
+        const unsubscribe = profilesCollection.onSnapshot((snapshot) => {
+            const docChanges = snapshot.docChanges();
+            docChanges.forEach((change) => {
+                const profileId = change.doc.id;
+                const profileData = change.doc.data();
+                const profile: IProfile = {
+                    id: profileId,
+                    name: profileData.name,
+                };
+
+                switch (change.type) {
+                    case 'added':
+                        this.onProfileAddedCallback(profile);
+                        break;
+                    case 'modified':
+                        this.onProfileModifiedCallback(profile);
+                        break;
+                    case 'removed':
+                        this.onProfileDeletedCallback(profile);
+                        break;
+                }
+            });
+        });
+        this.profileListeners.push({
+            uid: uid,
+            unsubscribe: unsubscribe,
+        });
+    };
+
+    removeProfileListener = async (uid: string): Promise<void> => {
+        const listener = this.profileListeners.find(
+            (x) => x.uid === uid && x.uid === uid
+        );
+        listener?.unsubscribe();
+        this.profileListeners = this.profileListeners.filter(
+            (x) => x.uid !== uid && x.uid !== uid
+        );
+    };
+
+    removeAllProfileListeners = async (): Promise<void> => {
+        for (let listener; (listener = this.profileListeners.pop()); ) {
+            listener.unsubscribe();
+        }
+    };
+
+    hasProfileListener = (uid: string): boolean => {
+        return (
+            this.profileListeners.find((listener) => listener.uid === uid) !==
+            undefined
+        );
+    };
+
     createShare = async (share: IShare): Promise<void> => {
         const shareDoc = this.firestore
             .collection('shares')
@@ -372,9 +444,8 @@ export default class FirestoreDatabaseProvider implements IDatabaseProvider {
     hasShareListener = (uid: string, profileId: string): boolean => {
         return (
             this.shareListeners.find(
-                (profileListener) =>
-                    profileListener.uid === uid &&
-                    profileListener.profileId === profileId
+                (listener) =>
+                    listener.uid === uid && listener.profileId === profileId
             ) !== undefined
         );
     };

@@ -11,10 +11,14 @@ export const Inbox: React.FC = () => {
         (state: RootState) => state.shares.shares
     );
 
-    const currentProfile = useSelector((state: RootState) =>
-        state.profiles.profiles.find(
-            (profile) => profile.id === state.profiles.currentProfileId
-        )
+    const currentProfile = useSelector(
+        (state: RootState) =>
+            // Find current profile.
+            // If current profile doesnt exist, pick the first profile.
+            // If no profiles exist, return undefined.
+            state.profiles.profiles.find(
+                (profile) => profile.id === state.profiles.currentProfileId
+            ) || state.profiles.profiles[0]
     );
 
     const renderCards = (): ReactNode[] => {

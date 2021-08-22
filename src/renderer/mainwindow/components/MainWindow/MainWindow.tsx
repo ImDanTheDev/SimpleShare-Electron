@@ -6,9 +6,7 @@ import {
     setCurrentModal,
     setCurrentScreen,
 } from '../../../common/redux/nav-slice';
-import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { RootState } from '../../../common/redux/store';
-import { pushToast } from '../../../common/redux/toaster-slice';
 import {
     authService,
     databaseService,
@@ -48,11 +46,6 @@ const MainWindow: React.FC = () => {
         useState<boolean>(false);
     const [fetchedPublicGeneralInfo, setFetchedPublicGeneralInfo] =
         useState<boolean>(false);
-    const [fetchedProfiles, setFetchedProfiles] = useState<boolean>(false);
-
-    const profiles: IProfile[] = useSelector(
-        (state: RootState) => state.profiles.profiles
-    );
 
     const currentProfile: IProfile | undefined = useSelector(
         (state: RootState) => {
@@ -73,6 +66,10 @@ const MainWindow: React.FC = () => {
             if (initializing) return;
             if (user) {
                 log(`User is signed in as: ${user.displayName}`);
+
+                log('Added profile listener');
+                await databaseService.switchProfileListener(user.uid);
+
                 log('Fetching account info');
                 await databaseService.getAccountInfo(user.uid);
                 setFetchedAccountInfo(true);
@@ -106,8 +103,7 @@ const MainWindow: React.FC = () => {
                     isPublicGeneralInfoComplete(publicGeneralInfo)
                 ) {
                     log('Account doc and public general info is complete');
-                    log('Fetching profiles');
-                    await fetchProfiles();
+                    dispatch(setCurrentScreen('HomeScreen'));
                 } else {
                     log('Account doc and public general info is not complete');
                     log('Going to complete account screen');
@@ -120,23 +116,6 @@ const MainWindow: React.FC = () => {
             }
         };
 
-        const fetchProfiles = async () => {
-            if (!user) return;
-            try {
-                await databaseService.getAllProfiles(user.uid);
-            } catch {
-                dispatch(
-                    pushToast({
-                        message:
-                            'An unexpected error occurred while fetching your profiles. Try again later.',
-                        duration: 5,
-                        type: 'error',
-                    })
-                );
-            }
-            setFetchedProfiles(true);
-        };
-
         continueAuthFlow();
     }, [
         accountInfo,
@@ -145,57 +124,6 @@ const MainWindow: React.FC = () => {
         fetchedPublicGeneralInfo,
         user,
     ]);
-
-    useEffect(() => {
-        const ensureProfiles = async () => {
-            if (!fetchedProfiles || !user) return;
-
-            if (profiles.length > 0) {
-                if (!currentProfile) {
-                    log('A profile is not selected');
-                    if (profiles[0].id) {
-                        log(`Selected profile with id: ${profiles[0].id}`);
-                        dispatch(setCurrentProfile(profiles[0].id));
-                    } else {
-                        // TODO: Do something here.
-                        // We checked if a profile exists, and it does, but the id is blank.
-                        // This should never happen as id's are assigned by firestore. This
-                        // may happen if a profile is created by the user, but instead of
-                        // uploading to firestore, it is saved to the store.
-                        // Either way, this will no longer be as big of an issue once
-                        // logic is implemented for finding the default profile using a isDefault
-                        // field. If a profile with the default field set to true
-                        // does not exist, one will just be created.
-                        log('Account has a profile without an id.');
-                    }
-                } else {
-                    log('A profile is selected');
-                    if (
-                        profiles.findIndex(
-                            (p) => p.id === currentProfile.id
-                        ) === -1
-                    ) {
-                        log('The selected profile does not exist');
-                        log('Creating default profile');
-                        await databaseService.createDefaultProfile(user.uid);
-                        log('Fetching profiles');
-                        await databaseService.getAllProfiles(user.uid);
-                    } else {
-                        log('Selected profile exists');
-                        log('Going to home screen');
-                        dispatch(setCurrentScreen('HomeScreen'));
-                    }
-                }
-            } else {
-                log('Account has 0 profiles. Creating default profile.');
-                await databaseService.createDefaultProfile(user.uid);
-                log('Fetching profiles');
-                await databaseService.getAllProfiles(user.uid);
-            }
-        };
-
-        ensureProfiles();
-    }, [profiles, fetchedProfiles, currentProfile, user]);
 
     useEffect(() => {
         if (!user) return;

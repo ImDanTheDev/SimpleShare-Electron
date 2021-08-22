@@ -3,7 +3,11 @@ import {
     setAccountInfo,
     setPublicGeneralInfo,
 } from '../../redux/account-slice';
-import { setFetchingProfiles, setProfiles } from '../../redux/profiles-slice';
+import {
+    addProfile,
+    deleteProfile,
+    updateProfile,
+} from '../../redux/profiles-slice';
 import { addShare, deleteShare, updateShare } from '../../redux/shares-slice';
 import { store } from '../../redux/store';
 import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
@@ -47,6 +51,18 @@ export default class DatabaseService {
                     (share: IShare) => {
                         // OnShareModified - Called when a share is modified in any of the profiles being listened to.
                         store.dispatch(updateShare(share));
+                    },
+                    (profile: IProfile) => {
+                        // OnProfileAdded
+                        store.dispatch(addProfile(profile));
+                    },
+                    (profile: IProfile) => {
+                        // OnProfileDeleted
+                        store.dispatch(deleteProfile(profile));
+                    },
+                    (profile: IProfile) => {
+                        // OnProfileModified
+                        store.dispatch(updateProfile(profile));
                     }
                 );
                 break;
@@ -172,30 +188,9 @@ export default class DatabaseService {
 
         try {
             await this.databaseProvider.createProfile(uid, profile);
-
-            // TODO: Instead of refetching all profiles after creating one,
-            // consider registering a collection listener for 'profiles' and
-            // handling the ADD, DELETE, MODIFIED operations.
-            await this.getAllProfiles(uid);
         } catch (e) {
             log('Failed to create profile');
         }
-    };
-
-    getAllProfiles = async (uid: string): Promise<IProfile[]> => {
-        if (!this.databaseProvider) {
-            error('Database Service is not initialized!');
-            return [];
-        }
-
-        store.dispatch(setFetchingProfiles(true));
-
-        const profiles = await this.databaseProvider.getAllProfiles(uid);
-
-        store.dispatch(setProfiles(profiles || []));
-        store.dispatch(setFetchingProfiles(false));
-
-        return profiles;
     };
 
     getProfile = async (
@@ -240,11 +235,45 @@ export default class DatabaseService {
 
         if (!success)
             throw new SimpleShareError(ErrorCode.UNEXPECTED_DATABASE_ERROR);
+    };
 
-        // TODO: Instead of refetching all profiles after creating one,
-        // consider registering a collection listener for 'profiles' and
-        // handling the ADD, DELETE, MODIFIED operations.
-        await this.getAllProfiles(uid);
+    switchProfileListener = async (uid: string): Promise<void> => {
+        if (!this.databaseProvider) {
+            error('Database Service is not initialized!');
+            return;
+        }
+
+        if (this.databaseProvider.hasProfileListener(uid)) return;
+
+        await this.removeAllProfileListeners();
+        await this.addProfileListener(uid);
+    };
+
+    addProfileListener = async (uid: string): Promise<void> => {
+        if (!this.databaseProvider) {
+            error('Database Service is not initialized!');
+            return;
+        }
+
+        await this.databaseProvider.addProfileListener(uid);
+    };
+
+    removeAllProfileListeners = async (): Promise<void> => {
+        if (!this.databaseProvider) {
+            error('Database Service is not initialized!');
+            return;
+        }
+
+        await this.databaseProvider.removeAllProfileListeners();
+    };
+
+    removeProfileListener = async (uid: string): Promise<void> => {
+        if (!this.databaseProvider) {
+            error('Database Service is not initialized!');
+            return;
+        }
+
+        await this.databaseProvider.removeProfileListener(uid);
     };
 
     createShare = async (share: IShare): Promise<void> => {
