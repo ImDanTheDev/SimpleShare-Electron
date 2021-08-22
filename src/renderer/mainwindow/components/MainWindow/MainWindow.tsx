@@ -6,6 +6,7 @@ import {
     setCurrentModal,
     setCurrentScreen,
 } from '../../../common/redux/nav-slice';
+import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { RootState } from '../../../common/redux/store';
 import {
     authService,
@@ -54,6 +55,8 @@ const MainWindow: React.FC = () => {
             );
         }
     );
+
+    const profiles = useSelector((state: RootState) => state.profiles.profiles);
 
     useEffect(() => {
         initService.initialize();
@@ -128,6 +131,16 @@ const MainWindow: React.FC = () => {
     useEffect(() => {
         if (!user) return;
 
+        if (
+            currentProfile === undefined &&
+            profiles.length > 0 &&
+            profiles[0].id
+        ) {
+            // The current profile was undefined. Now profiles exist, so pick the first one.
+            dispatch(setCurrentProfile(profiles[0].id));
+            return;
+        }
+
         const switchShareListener = async () => {
             if (!currentProfile || !currentProfile.id) return;
             await databaseService.switchShareListener(
@@ -137,7 +150,7 @@ const MainWindow: React.FC = () => {
         };
 
         switchShareListener();
-    }, [user, currentProfile]);
+    }, [user, currentProfile, profiles]);
 
     const renderScreen = (): ReactNode => {
         switch (currentScreen) {
