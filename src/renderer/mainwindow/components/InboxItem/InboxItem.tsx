@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styles from './InboxItem.module.scss';
 import { MdDeleteForever } from 'react-icons/md';
-import IShare from '../../../common/services/IShare';
 import { databaseService } from '../../../common/services/api';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
-import IProfile from '../../../common/services/IProfile';
 import { useDispatch } from 'react-redux';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { setCurrentShare } from '../../../common/redux/shares-slice';
 import { pushToast } from '../../../common/redux/toaster-slice';
+import { IProfile, IPublicGeneralInfo, IShare } from 'simpleshare-common';
 
 interface Props {
     share: IShare;

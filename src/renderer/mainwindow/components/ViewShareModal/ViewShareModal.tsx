@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
+import { IProfile, IPublicGeneralInfo, IShare } from 'simpleshare-common';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
 import { databaseService } from '../../../common/services/api';
-import IProfile from '../../../common/services/IProfile';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
-import IShare from '../../../common/services/IShare';
 import styles from './ViewShareModal.module.scss';
 
 export const ViewShareModal: React.FC = () => {

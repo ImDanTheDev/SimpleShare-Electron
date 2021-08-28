@@ -2,19 +2,16 @@ import React, { useEffect, useState } from 'react';
 import styles from './CompleteAccountScreen.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { Panel } from '../Panel/Panel';
-import IUser from '../../../common/services/IUser';
 import { RootState } from '../../../common/redux/store';
-import IAccountInfo from '../../../common/services/IAccountInfo';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import { log } from '../../../common/log';
-import {
-    MAX_DISPLAY_NAME_LENGTH,
-    MAX_PHONE_NUMBER_LENGTH,
-    MIN_DISPLAY_NAME_LENGTH,
-    MIN_PHONE_NUMBER_LENGTH,
-} from '../../../common/constants';
 import { authService, databaseService } from '../../../common/services/api';
 import { pushToast } from '../../../common/redux/toaster-slice';
+import {
+    constants,
+    IAccountInfo,
+    IPublicGeneralInfo,
+    IUser,
+} from 'simpleshare-common';
 
 export const CompleteAccountScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -58,17 +55,17 @@ export const CompleteAccountScreen: React.FC = () => {
     }, [user]);
 
     useEffect(() => {
-        if (displayName.length < MIN_DISPLAY_NAME_LENGTH) {
+        if (displayName.length < constants.MIN_DISPLAY_NAME_LENGTH) {
             setDisplayNameError(
-                `Display names must be at least ${MIN_DISPLAY_NAME_LENGTH} characters long.`
+                `Display names must be at least ${constants.MIN_DISPLAY_NAME_LENGTH} characters long.`
             );
         } else {
             setDisplayNameError('');
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
             setPhoneNumberError(
-                `Phone numbers must be at least ${MIN_PHONE_NUMBER_LENGTH} characters long.`
+                `Phone numbers must be at least ${constants.MIN_PHONE_NUMBER_LENGTH} characters long.`
             );
         } else {
             setPhoneNumberError('');
@@ -88,12 +85,12 @@ export const CompleteAccountScreen: React.FC = () => {
                 return;
             }
 
-            if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+            if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
                 log(`'${phoneNumber}' is not a valid phone number.`);
                 return;
             }
 
-            if (displayName.length < MIN_DISPLAY_NAME_LENGTH) {
+            if (displayName.length < constants.MIN_DISPLAY_NAME_LENGTH) {
                 log(`'${displayName}' is not a valid display name`);
                 return;
             }
@@ -185,8 +182,8 @@ export const CompleteAccountScreen: React.FC = () => {
                                 className={styles.field}
                                 type='text'
                                 spellCheck='false'
-                                minLength={MIN_DISPLAY_NAME_LENGTH}
-                                maxLength={MAX_DISPLAY_NAME_LENGTH}
+                                minLength={constants.MIN_DISPLAY_NAME_LENGTH}
+                                maxLength={constants.MAX_DISPLAY_NAME_LENGTH}
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                             />
@@ -200,8 +197,8 @@ export const CompleteAccountScreen: React.FC = () => {
                                 className={styles.field}
                                 type='tel'
                                 spellCheck='false'
-                                minLength={MIN_PHONE_NUMBER_LENGTH}
-                                maxLength={MAX_PHONE_NUMBER_LENGTH}
+                                minLength={constants.MIN_PHONE_NUMBER_LENGTH}
+                                maxLength={constants.MAX_PHONE_NUMBER_LENGTH}
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                             />

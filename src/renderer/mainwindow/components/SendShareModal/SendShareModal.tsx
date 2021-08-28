@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    MAX_PHONE_NUMBER_LENGTH,
-    MAX_PROFILE_NAME_LENGTH,
-    MAX_SHARE_TEXT_LENGTH,
-    MIN_PHONE_NUMBER_LENGTH,
-    MIN_PROFILE_NAME_LENGTH,
-} from '../../../common/constants';
+import { constants, IProfile, IShare, IUser } from 'simpleshare-common';
 import { error, log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { addShareToOutbox } from '../../../common/redux/outbox-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
 import { databaseService } from '../../../common/services/api';
-import IProfile from '../../../common/services/IProfile';
-import IShare from '../../../common/services/IShare';
-import IUser from '../../../common/services/IUser';
 import styles from './SendShareModal.module.scss';
 
 export const SendShareModal: React.FC = () => {
@@ -45,25 +36,25 @@ export const SendShareModal: React.FC = () => {
     };
 
     useEffect(() => {
-        if (profileName.length < MIN_PROFILE_NAME_LENGTH) {
+        if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
             setProfileNameError(
-                `Profile name must be at least ${MIN_PROFILE_NAME_LENGTH} characters long.`
+                `Profile name must be at least ${constants.MIN_PROFILE_NAME_LENGTH} characters long.`
             );
         } else {
             setProfileNameError('');
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
             setPhoneNumberError(
-                `Phone number must be at least ${MIN_PHONE_NUMBER_LENGTH} characters long.`
+                `Phone number must be at least ${constants.MIN_PHONE_NUMBER_LENGTH} characters long.`
             );
         } else {
             setPhoneNumberError('');
         }
 
-        if (shareText.length > MAX_SHARE_TEXT_LENGTH) {
+        if (shareText.length > constants.MAX_SHARE_TEXT_LENGTH) {
             setShareTextError(
-                `Share text must not exceed ${MAX_SHARE_TEXT_LENGTH} characters.`
+                `Share text must not exceed ${constants.MAX_SHARE_TEXT_LENGTH} characters.`
             );
         } else {
             setShareTextError('');
@@ -85,19 +76,19 @@ export const SendShareModal: React.FC = () => {
             return;
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
             log(`'${phoneNumber}' is not a valid phone number.`);
             return;
         }
 
-        if (profileName.length < MIN_PROFILE_NAME_LENGTH) {
+        if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
             log(`'${profileName}' is not a valid profile name.`);
             return;
         }
 
-        if (shareText.length > MAX_SHARE_TEXT_LENGTH) {
+        if (shareText.length > constants.MAX_SHARE_TEXT_LENGTH) {
             log(
-                `Your message length must not exceed ${MAX_SHARE_TEXT_LENGTH} characters.`
+                `Your message length must not exceed ${constants.MAX_SHARE_TEXT_LENGTH} characters.`
             );
             return;
         }
@@ -149,8 +140,8 @@ export const SendShareModal: React.FC = () => {
                 type='text'
                 value={phoneNumber}
                 placeholder='+11234567890'
-                minLength={MIN_PHONE_NUMBER_LENGTH}
-                maxLength={MAX_PHONE_NUMBER_LENGTH}
+                minLength={constants.MIN_PHONE_NUMBER_LENGTH}
+                maxLength={constants.MAX_PHONE_NUMBER_LENGTH}
                 onChange={(e) => setPhoneNumber(e.target.value)}
             />
             <span className={styles.errorMessage}>{phoneNumberError}</span>
@@ -160,8 +151,8 @@ export const SendShareModal: React.FC = () => {
                 type='text'
                 value={profileName}
                 placeholder='Laptop'
-                minLength={MIN_PROFILE_NAME_LENGTH}
-                maxLength={MAX_PROFILE_NAME_LENGTH}
+                minLength={constants.MIN_PROFILE_NAME_LENGTH}
+                maxLength={constants.MAX_PROFILE_NAME_LENGTH}
                 onChange={(e) => setProfileName(e.target.value)}
             />
             <span className={styles.errorMessage}>{profileNameError}</span>
@@ -170,7 +161,7 @@ export const SendShareModal: React.FC = () => {
                 className={styles.field}
                 value={shareText}
                 placeholder='Type anything you want here!'
-                maxLength={MAX_SHARE_TEXT_LENGTH}
+                maxLength={constants.MAX_SHARE_TEXT_LENGTH}
                 rows={5}
                 onChange={(e) => setShareText(e.target.value)}
             />

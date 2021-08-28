@@ -1,5 +1,10 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+    IProfile,
+    isAccountComplete,
+    isPublicGeneralInfoComplete,
+} from 'simpleshare-common';
 import { log } from '../../../common/log';
 import { setPublicGeneralInfo } from '../../../common/redux/account-slice';
 import {
@@ -13,9 +18,6 @@ import {
     databaseService,
     initService,
 } from '../../../common/services/api';
-import { isAccountComplete } from '../../../common/services/IAccountInfo';
-import IProfile from '../../../common/services/IProfile';
-import { isPublicGeneralInfoComplete } from '../../../common/services/IPublicGeneralInfo';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsScreen';
 import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';

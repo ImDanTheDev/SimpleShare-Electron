@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import IUser from '../services/IUser';
+import { IUser } from 'simpleshare-common';
 
 export interface AuthState {
     initializing: boolean;

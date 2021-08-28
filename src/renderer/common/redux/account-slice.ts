@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import IAccountInfo from '../services/IAccountInfo';
-import IPublicGeneralInfo from '../services/IPublicGeneralInfo';
+import { IAccountInfo, IPublicGeneralInfo } from 'simpleshare-common';
 
 export interface AccountInfoState {
     accountInfo: IAccountInfo | undefined;

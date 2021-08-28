@@ -3,8 +3,8 @@ import styles from './SignInScreen.module.scss';
 import { MdClose } from 'react-icons/md';
 import { error, log } from '../../../common/log';
 import { authService } from '../../../common/services/api';
-import SimpleShareError, { ErrorCode } from '../../../common/SimpleShareError';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { ErrorCode, SimpleShareError } from 'simpleshare-common';
 
 interface Props {
     opacity: number;

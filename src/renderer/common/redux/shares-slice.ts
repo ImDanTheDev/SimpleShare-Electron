@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IShare } from 'simpleshare-common';
 import { log } from '../log';
-import IShare from '../services/IShare';
 
 export interface SharesState {
     shares: IShare[];

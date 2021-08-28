@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IProfile } from 'simpleshare-common';
 import { log } from '../log';
-import IProfile from '../services/IProfile';
 
 export interface ProfilesState {
     profiles: IProfile[];

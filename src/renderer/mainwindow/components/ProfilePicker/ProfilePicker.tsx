@@ -2,15 +2,14 @@ import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { CircleButton } from '../CircleButton/CircleButton';
 import styles from './ProfilePicker.module.scss';
 import { MdChevronLeft, MdChevronRight, MdAdd, MdClose } from 'react-icons/md';
-import IProfile from '../../../common/services/IProfile';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
 import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { setShares } from '../../../common/redux/shares-slice';
 import { databaseService } from '../../../common/services/api';
-import IUser from '../../../common/services/IUser';
 import { pushToast } from '../../../common/redux/toaster-slice';
+import { IProfile, IUser } from 'simpleshare-common';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();

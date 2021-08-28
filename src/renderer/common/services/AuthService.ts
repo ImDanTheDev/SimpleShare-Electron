@@ -1,10 +1,8 @@
-import { setUser } from '../../redux/auth-slice';
-import { store } from '../../redux/store';
-import FirebaseAuthProvider from './FirebaseAuthProvider';
-import IAuthProvider from './IAuthProvider';
-import IUser from '../IUser';
-import { error, log } from '../../log';
-import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
+import { FirebaseAuthProvider, IAuthProvider, IUser } from 'simpleshare-common';
+import { OFAuth } from '@omnifire/web';
+import { setUser } from '../redux/auth-slice';
+import { store } from '../redux/store';
+import { error, log } from '../log';
 
 export enum AuthProviderType {
     Firebase,
@@ -27,13 +25,17 @@ export default class AuthService {
         }
 
         switch (this.authProviderType) {
-            case AuthProviderType.Firebase:
+            case AuthProviderType.Firebase: {
+                const ofAuth = new OFAuth();
+                ofAuth.configureGoogle();
                 this.authProvider = new FirebaseAuthProvider(
+                    ofAuth,
                     (user: IUser | undefined) => {
                         store.dispatch(setUser(user));
                     }
                 );
                 break;
+            }
         }
 
         this.isServiceInitialized = true;

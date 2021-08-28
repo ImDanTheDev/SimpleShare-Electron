@@ -1,22 +1,23 @@
-import { error, log } from '../../log';
+import { OFFirestore } from '@omnifire/web';
 import {
-    setAccountInfo,
-    setPublicGeneralInfo,
-} from '../../redux/account-slice';
+    ErrorCode,
+    FirebaseDatabaseProvider,
+    IAccountInfo,
+    IDatabaseProvider,
+    IProfile,
+    IPublicGeneralInfo,
+    IShare,
+    SimpleShareError,
+} from 'simpleshare-common';
+import { error, log } from '../log';
+import { setAccountInfo, setPublicGeneralInfo } from '../redux/account-slice';
 import {
     addProfile,
     deleteProfile,
     updateProfile,
-} from '../../redux/profiles-slice';
-import { addShare, deleteShare, updateShare } from '../../redux/shares-slice';
-import { store } from '../../redux/store';
-import SimpleShareError, { ErrorCode } from '../../SimpleShareError';
-import IAccountInfo from '../IAccountInfo';
-import IProfile from '../IProfile';
-import IPublicGeneralInfo from '../IPublicGeneralInfo';
-import IShare from '../IShare';
-import FirestoreDatabaseProvider from './FirebaseDatabaseProvider';
-import IDatabaseProvider from './IDatabaseProvider';
+} from '../redux/profiles-slice';
+import { addShare, deleteShare, updateShare } from '../redux/shares-slice';
+import { store } from '../redux/store';
 
 export enum DatabaseProviderType {
     Firestore,
@@ -38,7 +39,8 @@ export default class DatabaseService {
 
         switch (this.databaseProviderType) {
             case DatabaseProviderType.Firestore:
-                this.databaseProvider = new FirestoreDatabaseProvider(
+                this.databaseProvider = new FirebaseDatabaseProvider(
+                    new OFFirestore(),
                     (share: IShare) => {
                         // OnShareAdded - Called when a share is added to any of the profiles being listened to.
                         store.dispatch(addShare(share));

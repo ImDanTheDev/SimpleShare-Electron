@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { IPublicGeneralInfo, IShare } from 'simpleshare-common';
 import { databaseService } from '../../../common/services/api';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
-import IShare from '../../../common/services/IShare';
 import styles from './OutboxItem.module.scss';
 
 interface Props {

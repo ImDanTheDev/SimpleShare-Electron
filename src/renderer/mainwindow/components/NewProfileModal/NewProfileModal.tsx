@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    MAX_PROFILE_NAME_LENGTH,
-    MIN_PROFILE_NAME_LENGTH,
-} from '../../../common/constants';
+    constants,
+    ErrorCode,
+    IUser,
+    SimpleShareError,
+} from 'simpleshare-common';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { error, log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { databaseService } from '../../../common/services/api';
-import IUser from '../../../common/services/IUser';
-import SimpleShareError, { ErrorCode } from '../../../common/SimpleShareError';
 import styles from './NewProfileModal.module.scss';
 
 export const NewProfileModal: React.FC = () => {
@@ -31,7 +31,7 @@ export const NewProfileModal: React.FC = () => {
     useEffect(() => {
         if (profileName.length < 2) {
             setErrorMessage(
-                `Profile names must be at least ${MIN_PROFILE_NAME_LENGTH} characters long.`
+                `Profile names must be at least ${constants.MIN_PROFILE_NAME_LENGTH} characters long.`
             );
         } else {
             setErrorMessage('');
@@ -50,9 +50,9 @@ export const NewProfileModal: React.FC = () => {
             return;
         }
 
-        if (profileName.length < MIN_PROFILE_NAME_LENGTH) {
+        if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
             log(
-                `Profile names must be at least ${MIN_PROFILE_NAME_LENGTH} long`
+                `Profile names must be at least ${constants.MIN_PROFILE_NAME_LENGTH} long`
             );
             setCreatingProfile(false);
             return;
@@ -87,8 +87,8 @@ export const NewProfileModal: React.FC = () => {
                 type='text'
                 value={profileName}
                 placeholder='Profile name...'
-                minLength={MIN_PROFILE_NAME_LENGTH}
-                maxLength={MAX_PROFILE_NAME_LENGTH}
+                minLength={constants.MIN_PROFILE_NAME_LENGTH}
+                maxLength={constants.MAX_PROFILE_NAME_LENGTH}
                 onChange={(e) => setProfileName(e.target.value)}
             />
             <div className={styles.errorMessage}>

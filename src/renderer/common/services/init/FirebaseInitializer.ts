@@ -1,9 +1,10 @@
 import IServiceInitializer from './IServiceInitializer';
-import firebase from 'firebase/app';
+import { OFFirebase } from '@omnifire/web';
 
 export default class FirebaseInitializer implements IServiceInitializer {
     initialize = async (): Promise<void> => {
-        firebase.initializeApp({
+        const ofFirebase = new OFFirebase();
+        ofFirebase.initializeApp({
             apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
             authDomain: 'simpleshare-428bb.firebaseapp.com',
             projectId: 'simpleshare-428bb',

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
+import { IShare } from 'simpleshare-common';
 import { RootState } from '../../../common/redux/store';
-import IShare from '../../../common/services/IShare';
 import { InboxItem } from '../InboxItem/InboxItem';
 import { Panel } from '../Panel/Panel';
 import styles from './Inbox.module.scss';

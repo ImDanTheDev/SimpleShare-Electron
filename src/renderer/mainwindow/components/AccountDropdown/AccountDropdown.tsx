@@ -5,10 +5,10 @@ import { authService } from '../../../common/services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentScreen } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import { setEditingProfiles } from '../../../common/redux/profiles-slice';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { pushToast } from '../../../common/redux/toaster-slice';
+import { IPublicGeneralInfo } from 'simpleshare-common';
 
 export const AccountDropdown: React.FC = () => {
     const dispatch = useDispatch();
