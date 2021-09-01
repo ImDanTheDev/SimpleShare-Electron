@@ -1,14 +1,17 @@
 import React from 'react';
 import styles from './AccountDropdown.module.scss';
 import { MdExpandMore } from 'react-icons/md';
-import { authService } from '../../../common/services/api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentScreen } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
-import { setEditingProfiles } from '../../../common/redux/profiles-slice';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { pushToast } from '../../../common/redux/toaster-slice';
-import { IPublicGeneralInfo } from 'simpleshare-common';
+import {
+    IAccountInfo,
+    IPublicGeneralInfo,
+    setEditingProfiles,
+    signOut,
+} from 'simpleshare-common';
 
 export const AccountDropdown: React.FC = () => {
     const dispatch = useDispatch();
@@ -17,13 +20,17 @@ export const AccountDropdown: React.FC = () => {
         (state: RootState) => state.user.publicGeneralInfo
     );
 
+    const accountInfo: IAccountInfo | undefined = useSelector(
+        (state: RootState) => state.user.accountInfo
+    );
+
     const editingProfiles: boolean = useSelector(
         (state: RootState) => state.profiles.editingProfiles
     );
 
     const handleSignOut = () => {
         try {
-            authService.signOut();
+            dispatch(signOut());
         } catch {
             dispatch(
                 pushToast({
@@ -62,19 +69,26 @@ export const AccountDropdown: React.FC = () => {
                     </div>
                 </div>
                 <div className={styles.dropdown}>
-                    <div
-                        className={styles.dropdownItem}
-                        onClick={handleEditProfiles}
-                    >
-                        {editingProfiles ? 'Disable' : 'Enable'} Profile Edit
-                        Mode
-                    </div>
-                    <div
-                        className={styles.dropdownItem}
-                        onClick={handleSettings}
-                    >
-                        Account Settings
-                    </div>
+                    {accountInfo?.isAccountComplete &&
+                        publicGeneralInfo?.isComplete && (
+                            <>
+                                <div
+                                    className={styles.dropdownItem}
+                                    onClick={handleEditProfiles}
+                                >
+                                    {editingProfiles ? 'Disable' : 'Enable'}{' '}
+                                    Profile Edit Mode
+                                </div>
+
+                                <div
+                                    className={styles.dropdownItem}
+                                    onClick={handleSettings}
+                                >
+                                    Account Settings
+                                </div>
+                            </>
+                        )}
+
                     <div
                         className={styles.dropdownItem}
                         onClick={handleSignOut}

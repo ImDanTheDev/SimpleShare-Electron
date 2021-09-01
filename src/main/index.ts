@@ -1,8 +1,9 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import installExtension, {
     REDUX_DEVTOOLS,
     REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
+import fs from 'fs/promises';
 import ElectronStore from 'electron-store';
 import MainIPC from './main-ipc';
 import { start } from './webserver';
@@ -125,6 +126,26 @@ const setupIPC = () => {
     });
     ipc.on('APP_ERROR', ({ message, optionalParams }) => {
         error(message, true, ...optionalParams);
+    });
+    ipc.handle('APP_GET_FILE', async (args) => {
+        const dialogResult = await dialog.showOpenDialog(currentWindow, {
+            properties: ['openFile'],
+            filters: args.filters,
+        });
+        if (dialogResult.filePaths.length <= 0) {
+            log('No files selected');
+            return undefined;
+        }
+        const filePath = dialogResult.filePaths[0];
+
+        try {
+            const buffer = await fs.readFile(filePath);
+            const b64Data = buffer.toString('base64');
+            return b64Data;
+        } catch (e) {
+            error('An error occurred while reading a file: ', false, e);
+            return undefined;
+        }
     });
 };
 

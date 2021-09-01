@@ -7,14 +7,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentScreen } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { log } from '../../../common/log';
-import { databaseService } from '../../../common/services/api';
 import { pushToast } from '../../../common/redux/toaster-slice';
 import {
     constants,
     IAccountInfo,
     IPublicGeneralInfo,
     IUser,
+    updateAccount,
 } from 'simpleshare-common';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 
 export const AccountSettingsScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -29,6 +30,14 @@ export const AccountSettingsScreen: React.FC = () => {
 
     const publicGeneralInfo: IPublicGeneralInfo | undefined = useSelector(
         (state: RootState) => state.user.publicGeneralInfo
+    );
+
+    const updatingAccount = useSelector(
+        (state: RootState) => state.user.updatingAccount
+    );
+
+    const updateAccountError = useSelector(
+        (state: RootState) => state.user.updateAccountError
     );
 
     const [displayName, setDisplayName] = useState<string>(
@@ -59,6 +68,20 @@ export const AccountSettingsScreen: React.FC = () => {
         }
     }, [displayName, phoneNumber]);
 
+    useEffect(() => {
+        if (updateAccountError) {
+            dispatch(
+                pushToast({
+                    message:
+                        'An unexpected error occurred while updating your account. Try again later.',
+                    type: 'error',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+        }
+    }, [updateAccountError]);
+
     const handleBack = () => {
         dispatch(setCurrentScreen('HomeScreen'));
     };
@@ -88,28 +111,18 @@ export const AccountSettingsScreen: React.FC = () => {
             return;
         }
 
-        try {
-            await databaseService.setAccountInfo(user.uid, {
-                phoneNumber: phoneNumber,
-                isAccountComplete: true,
-            });
-            await databaseService.setPublicGeneralInfo(user.uid, {
-                displayName: displayName,
-                isComplete: true,
-            });
-            dispatch(setCurrentScreen('HomeScreen'));
-        } catch {
-            log('Failed to save account');
-            dispatch(
-                pushToast({
-                    message:
-                        'An unexpected error occurred while updating your account. Try again later.',
-                    type: 'error',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-        }
+        dispatch(
+            updateAccount({
+                accountInfo: {
+                    phoneNumber: phoneNumber,
+                    isAccountComplete: true,
+                },
+                publicGeneralInfo: {
+                    displayName: displayName,
+                    isComplete: true,
+                },
+            })
+        );
     };
 
     return (
@@ -158,12 +171,16 @@ export const AccountSettingsScreen: React.FC = () => {
                             </div>
                         </div>
                         <div className={styles.itemGroup}>
-                            <button
-                                className={styles.saveButton}
-                                onClick={handleSave}
-                            >
-                                Save Account
-                            </button>
+                            {updatingAccount ? (
+                                <LoadingIcon />
+                            ) : (
+                                <button
+                                    className={styles.saveButton}
+                                    onClick={handleSave}
+                                >
+                                    Save Account
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

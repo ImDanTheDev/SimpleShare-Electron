@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { constants, IProfile, IShare, IUser } from 'simpleshare-common';
-import { error, log } from '../../../common/log';
+import { constants, IProfile, IUser, sendShare } from 'simpleshare-common';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { addShareToOutbox } from '../../../common/redux/outbox-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
-import { databaseService } from '../../../common/services/api';
 import styles from './SendShareModal.module.scss';
 
 export const SendShareModal: React.FC = () => {
@@ -23,6 +22,14 @@ export const SendShareModal: React.FC = () => {
             )
     );
 
+    const sendingShare = useSelector(
+        (state: RootState) => state.shares.sendingShare
+    );
+    const sentShare = useSelector((state: RootState) => state.shares.sentShare);
+    const sendShareError = useSelector(
+        (state: RootState) => state.shares.sendShareError
+    );
+
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [profileName, setProfileName] = useState<string>('');
     const [shareText, setShareText] = useState<string>('');
@@ -30,10 +37,22 @@ export const SendShareModal: React.FC = () => {
     const [phoneNumberError, setPhoneNumberError] = useState<string>('');
     const [profileNameError, setProfileNameError] = useState<string>('');
     const [shareTextError, setShareTextError] = useState<string>('');
+    const [triedSendingShare, setTriedSendingShare] = useState<boolean>(false);
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
     };
+
+    useEffect(() => {
+        if (
+            triedSendingShare &&
+            !sendingShare &&
+            sentShare &&
+            !sendShareError
+        ) {
+            dispatch(setCurrentModal('None'));
+        }
+    }, [triedSendingShare, sendingShare, sentShare, sendShareError]);
 
     useEffect(() => {
         if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
@@ -62,6 +81,7 @@ export const SendShareModal: React.FC = () => {
     }, [profileName, phoneNumber, shareText]);
 
     const handleSend = async () => {
+        setTriedSendingShare(true);
         if (!user || !currentProfile || !currentProfile.id) {
             log('ERROR: Not signed in!');
             dispatch(
@@ -76,59 +96,24 @@ export const SendShareModal: React.FC = () => {
             return;
         }
 
-        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
-            log(`'${phoneNumber}' is not a valid phone number.`);
+        if (
+            phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH ||
+            profileName.length < constants.MIN_PROFILE_NAME_LENGTH ||
+            shareText.length > constants.MAX_SHARE_TEXT_LENGTH
+        ) {
             return;
         }
 
-        if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
-            log(`'${profileName}' is not a valid profile name.`);
-            return;
-        }
-
-        if (shareText.length > constants.MAX_SHARE_TEXT_LENGTH) {
-            log(
-                `Your message length must not exceed ${constants.MAX_SHARE_TEXT_LENGTH} characters.`
-            );
-            return;
-        }
-
-        const toUid = await databaseService.getUidByPhoneNumber(phoneNumber);
-        if (!toUid) {
-            log('Could not find a user with the provided phone number.');
-            setPhoneNumberError('User does not exist.');
-            return;
-        }
-
-        const toProfileId = await databaseService.getProfileIdByName(
-            toUid,
-            profileName
+        dispatch(
+            sendShare({
+                toPhoneNumber: phoneNumber,
+                toProfileName: profileName,
+                share: {
+                    content: shareText,
+                    type: 'text',
+                },
+            })
         );
-        if (!toProfileId) {
-            log(`Profile '${profileName}' does not exist.`);
-            setProfileNameError('Profile does not exist.');
-            return;
-        }
-
-        const share: IShare = {
-            fromUid: user.uid,
-            fromProfileId: currentProfile.id,
-            toUid: toUid,
-            toProfileId: toProfileId,
-            content: shareText,
-            type: 'text',
-        };
-
-        try {
-            await databaseService.createShare(share);
-            dispatch(addShareToOutbox(share));
-            dispatch(setCurrentModal('None'));
-        } catch (e) {
-            error('Failed to send share: ', e);
-            setShareTextError(
-                'An error occurred while sending the share. Try again later.'
-            );
-        }
     };
 
     return (
@@ -166,14 +151,25 @@ export const SendShareModal: React.FC = () => {
                 onChange={(e) => setShareText(e.target.value)}
             />
             <span className={styles.errorMessage}>{shareTextError}</span>
-            <div className={styles.buttons}>
-                <button className={styles.button} onClick={handleDismiss}>
-                    Cancel
-                </button>
-                <button className={styles.button} onClick={handleSend}>
-                    Send
-                </button>
-            </div>
+            {sendingShare ? (
+                <LoadingIcon />
+            ) : (
+                <div className={styles.buttons}>
+                    <button className={styles.button} onClick={handleDismiss}>
+                        Cancel
+                    </button>
+                    <button className={styles.button} onClick={handleSend}>
+                        Send
+                    </button>
+                </div>
+            )}
+            {triedSendingShare && sendShareError && (
+                <span className={styles.errorMessage}>
+                    {
+                        'An unexpected error occurred while sending. Try again later.'
+                    }
+                </span>
+            )}
         </div>
     );
 };

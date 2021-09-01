@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { IProfile, IPublicGeneralInfo, IShare } from 'simpleshare-common';
+import { deleteCloudShare, IShare } from 'simpleshare-common';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
-import { databaseService } from '../../../common/services/api';
 import styles from './ViewShareModal.module.scss';
 
 export const ViewShareModal: React.FC = () => {
@@ -14,9 +13,6 @@ export const ViewShareModal: React.FC = () => {
     const currentShare: IShare | undefined = useSelector(
         (state: RootState) => state.shares.currentShare
     );
-
-    const [senderDisplayName, setSenderDisplayName] = useState<string>('');
-    const [senderProfileName, setSenderProfileName] = useState<string>('');
 
     useEffect(() => {
         if (!currentShare) {
@@ -30,40 +26,10 @@ export const ViewShareModal: React.FC = () => {
             dispatch(setCurrentModal('None'));
             return;
         }
-
-        const fetchDisplayName = async () => {
-            try {
-                const publicGeneralInfo: IPublicGeneralInfo | undefined =
-                    await databaseService.getPublicGeneralInfo(
-                        currentShare.fromUid
-                    );
-                setSenderDisplayName(
-                    publicGeneralInfo?.displayName || 'Unknown User'
-                );
-            } catch {
-                setSenderDisplayName('Unknown User');
-            }
-        };
-
-        const fetchProfileName = async () => {
-            try {
-                const profile: IProfile | undefined =
-                    await databaseService.getProfile(
-                        currentShare.fromUid,
-                        currentShare.fromProfileId
-                    );
-                setSenderProfileName(profile?.name || 'Unknown Profile');
-            } catch {
-                setSenderProfileName('Unknown Profile');
-            }
-        };
-
-        fetchDisplayName();
-        fetchProfileName();
     }, [currentShare]);
 
     const handleDelete = async () => {
-        if (currentShare) await databaseService.deleteShare(currentShare);
+        if (currentShare) dispatch(deleteCloudShare(currentShare));
         dispatch(setCurrentModal('None'));
     };
 
@@ -78,14 +44,14 @@ export const ViewShareModal: React.FC = () => {
             <input
                 className={styles.field}
                 type='text'
-                value={senderDisplayName}
+                value={currentShare?.fromDisplayName}
                 readOnly={true}
             />
             <span className={styles.header}>From Profile:</span>
             <input
                 className={styles.field}
                 type='text'
-                value={senderProfileName}
+                value={currentShare?.fromProfileName}
                 readOnly={true}
             />
             <span className={styles.header}>Text Content:</span>

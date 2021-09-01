@@ -46,6 +46,9 @@ export interface IPCArgs {
         message: unknown;
         optionalParams: unknown[];
     };
+    APP_GET_FILE: {
+        filters?: { name: string; extensions: string[] }[];
+    };
 }
 
 export const IPC_ARG_TEMPLATES: IPCArgs = {
@@ -93,5 +96,8 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
     APP_ERROR: {
         message: '',
         optionalParams: [],
+    },
+    APP_GET_FILE: {
+        filters: [{ name: '', extensions: [''] }],
     },
 };

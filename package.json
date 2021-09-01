@@ -64,8 +64,8 @@
         "typescript-plugin-css-modules": "^3.4.0"
     },
     "dependencies": {
-        "@omnifire/api": "^1.1.2",
-        "@omnifire/web": "^1.1.2",
+        "@omnifire/api": "^1.2.0",
+        "@omnifire/web": "^1.2.0",
         "@reduxjs/toolkit": "^1.6.1",
         "electron-squirrel-startup": "^1.0.0",
         "electron-store": "^8.0.0",
@@ -75,6 +75,6 @@
         "react-icons": "^4.2.0",
         "react-redux": "^7.2.4",
         "redux-persist": "^6.0.0",
-        "simpleshare-common": "^1.0.1"
+        "simpleshare-common": "^1.2.1"
     }
 }

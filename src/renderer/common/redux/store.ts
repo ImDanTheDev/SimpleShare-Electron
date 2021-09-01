@@ -14,22 +14,23 @@ import {
     persistReducer,
 } from 'redux-persist';
 import electronStorage from './electron-storage';
-import authReducer, { AuthState } from './auth-slice';
-import userReducer, {
-    AccountInfoState as AccountInfoState,
-} from './account-slice';
-import profilesReducer, { ProfilesState } from './profiles-slice';
-import sharesReducer, { SharesState } from './shares-slice';
-import outboxReducer, { OutboxState } from './outbox-slice';
 import navReducer, { NavState } from './nav-slice';
 import toasterReducer, { ToasterState } from './toaster-slice';
+import {
+    AccountInfoState,
+    AuthState,
+    OutboxState,
+    ProfilesState,
+    reduxReducers,
+    SharesState,
+} from 'simpleshare-common';
 
 const rootReducer = combineReducers({
-    auth: authReducer,
-    user: userReducer,
-    profiles: profilesReducer,
-    shares: sharesReducer,
-    outbox: outboxReducer,
+    auth: reduxReducers.authReducer,
+    user: reduxReducers.accountReducer,
+    profiles: reduxReducers.profilesReducer,
+    shares: reduxReducers.sharesReducer,
+    outbox: reduxReducers.outboxReducer,
     nav: navReducer,
     toaster: toasterReducer,
 });

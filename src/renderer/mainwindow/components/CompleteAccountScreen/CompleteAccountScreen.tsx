@@ -4,14 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Panel } from '../Panel/Panel';
 import { RootState } from '../../../common/redux/store';
 import { log } from '../../../common/log';
-import { authService, databaseService } from '../../../common/services/api';
-import { pushToast } from '../../../common/redux/toaster-slice';
 import {
     constants,
+    createProfile,
     IAccountInfo,
     IPublicGeneralInfo,
     IUser,
+    signOut,
+    updateAccount,
 } from 'simpleshare-common';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 
 export const CompleteAccountScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -28,6 +30,12 @@ export const CompleteAccountScreen: React.FC = () => {
         (state: RootState) => state.user.publicGeneralInfo
     );
 
+    const updatingAccount = useSelector(
+        (state: RootState) => state.user.updatingAccount
+    );
+    const updateAccountError = useSelector(
+        (state: RootState) => state.user.updateAccountError
+    );
     const [displayName, setDisplayName] = useState<string>(
         publicGeneralInfo?.displayName || ''
     );
@@ -43,12 +51,9 @@ export const CompleteAccountScreen: React.FC = () => {
             log(
                 'Error: User is undefined. Cannot continue account completion without a user.'
             );
-            try {
-                // User is undefined, but try to sign out anyways to prevent the startup window immediately redirecting to main window in a loop.
-                authService.signOut();
-            } finally {
-                window.api.send('APP_SHOW_STARTUP_WINDOW', {});
-            }
+            // User is undefined, but try to sign out anyways to prevent the startup window immediately redirecting to main window in a loop.
+            dispatch(signOut());
+            window.api.send('APP_SHOW_STARTUP_WINDOW', {});
 
             return;
         }
@@ -76,12 +81,9 @@ export const CompleteAccountScreen: React.FC = () => {
         const continueAuthFlow = async () => {
             if (!user) {
                 log('User is undefined. An unexpected error occurred.');
-                try {
-                    // User is undefined, but try to sign out anyways to prevent the startup window immediately redirecting to main window in a loop.
-                    authService.signOut();
-                } finally {
-                    window.api.send('APP_SHOW_STARTUP_WINDOW', {});
-                }
+                // User is undefined, but try to sign out anyways to prevent the startup window immediately redirecting to main window in a loop.
+                dispatch(signOut());
+                window.api.send('APP_SHOW_STARTUP_WINDOW', {});
                 return;
             }
 
@@ -95,76 +97,39 @@ export const CompleteAccountScreen: React.FC = () => {
                 return;
             }
 
-            const accountExists = await databaseService.doesAccountExist(
-                user.uid
-            );
+            const accountExists = accountInfo !== undefined;
             if (accountExists) {
-                const success = await databaseService.setAccountInfo(user.uid, {
-                    phoneNumber: phoneNumber,
-                    isAccountComplete: true,
-                });
-
-                if (success) {
-                    log('Saved completed account info to database.');
-                } else {
-                    log('Failed to complete the account.');
-                    dispatch(
-                        pushToast({
-                            message:
-                                'An unexpected error occurred while completing your account. Try again later.',
-                            type: 'error',
-                            duration: 5,
-                            openToaster: true,
-                        })
-                    );
-                    return;
-                }
-
-                try {
-                    await databaseService.setPublicGeneralInfo(user.uid, {
-                        displayName: displayName,
-                        isComplete: true,
-                    });
-                    log('Saved completed public general info to database');
-                } catch {
-                    log('Failed to complete public general info');
-                    dispatch(
-                        pushToast({
-                            message:
-                                'An unexpected error occurred while completing your account. Try again later.',
-                            type: 'error',
-                            duration: 5,
-                            openToaster: true,
-                        })
-                    );
-                }
-            } else {
-                const success = await databaseService.initializeAccount(
-                    user.uid,
-                    {
-                        phoneNumber: phoneNumber,
-                        isAccountComplete: true,
-                    },
-                    {
-                        displayName: displayName,
-                        isComplete: true,
-                    }
+                dispatch(
+                    updateAccount({
+                        accountInfo: {
+                            phoneNumber: phoneNumber,
+                            isAccountComplete: true,
+                        },
+                        publicGeneralInfo: {
+                            displayName: displayName,
+                            isComplete: true,
+                        },
+                    })
                 );
-
-                if (success) {
-                    log('Saved completed account and general info to database');
-                } else {
-                    log('Failed to complete the account');
-                    dispatch(
-                        pushToast({
-                            message:
-                                'An unexpected error occurred while completing your account. Try again later.',
-                            type: 'error',
-                            duration: 5,
-                            openToaster: true,
-                        })
-                    );
-                }
+            } else {
+                dispatch(
+                    updateAccount({
+                        accountInfo: {
+                            phoneNumber: phoneNumber,
+                            isAccountComplete: true,
+                        },
+                        publicGeneralInfo: {
+                            displayName: displayName,
+                            isComplete: true,
+                        },
+                    })
+                );
+                dispatch(
+                    createProfile({
+                        name: 'Default',
+                        id: 'default',
+                    })
+                );
             }
         };
 
@@ -207,12 +172,21 @@ export const CompleteAccountScreen: React.FC = () => {
                             </div>
                         </div>
                         <div className={styles.itemGroup}>
-                            <button
-                                className={styles.completeButton}
-                                onClick={handleComplete}
-                            >
-                                Complete Account
-                            </button>
+                            {updatingAccount ? (
+                                <LoadingIcon />
+                            ) : (
+                                <button
+                                    className={styles.completeButton}
+                                    onClick={handleComplete}
+                                >
+                                    Complete Account
+                                </button>
+                            )}
+
+                            <div className={styles.errorMessage}>
+                                {updateAccountError &&
+                                    'An error occurred while completing your account. Try again later.'}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { IShare } from 'simpleshare-common';
-import { clearOutbox } from '../../../common/redux/outbox-slice';
+import { clearOutbox, IShare } from 'simpleshare-common';
 import { RootState } from '../../../common/redux/store';
 import { OutboxItem } from '../OutboxItem/OutboxItem';
 import { Panel } from '../Panel/Panel';

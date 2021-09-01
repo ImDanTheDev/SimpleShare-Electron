@@ -1,17 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import styles from './SignInScreen.module.scss';
 import { MdClose } from 'react-icons/md';
-import { error, log } from '../../../common/log';
-import { authService } from '../../../common/services/api';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
-import { ErrorCode, SimpleShareError } from 'simpleshare-common';
+import { ErrorCode, signInWithGoogle } from 'simpleshare-common';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../../../common/redux/store';
 
 interface Props {
     opacity: number;
 }
 
 const SignInScreen: React.FC<Props> = (props: Props) => {
-    const [signingIn, setSigningIn] = useState<boolean>(false);
+    const dispatch = useDispatch();
+
+    const signingIn = useSelector((state: RootState) => state.auth.signingIn);
+    const signInError = useSelector(
+        (state: RootState) => state.auth.signInError
+    );
+
     const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
     useEffect(() => {
@@ -22,46 +28,32 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
         });
     }, []);
 
+    useEffect(() => {
+        if (signInError) {
+            switch (signInError.code) {
+                case ErrorCode.SIGN_IN_CANCELLED:
+                    setErrorMessage('Sign in cancelled.');
+                    break;
+                case ErrorCode.SIGN_IN_INVALID_CREDENTIALS:
+                    setErrorMessage('Sign in failed with invalid credentials.');
+                    break;
+                case ErrorCode.UNEXPECTED_SIGN_IN_ERROR:
+                    setErrorMessage(
+                        'An unexpected error occurred while signing in. Try again later.'
+                    );
+                    break;
+            }
+        } else {
+            setErrorMessage(undefined);
+        }
+    }, [signInError]);
+
     const handleClose = () => {
         window.api.send('APP_QUIT', {});
     };
 
     const handleSignIn = async () => {
-        setSigningIn(true);
-        setErrorMessage(undefined);
-        try {
-            await authService.googleSignIn();
-        } catch (e) {
-            setSigningIn(false);
-            if (e instanceof SimpleShareError) {
-                switch (e.code) {
-                    case ErrorCode.SIGN_IN_CANCELLED:
-                        log('The user cancelled the sign in process.');
-                        setErrorMessage(undefined);
-                        break;
-                    case ErrorCode.SIGN_IN_INVALID_CREDENTIALS:
-                        log('Invalid credentials were provided.');
-                        setErrorMessage(
-                            'Sign in failed with invalid credentials.'
-                        );
-                        break;
-                    case ErrorCode.UNEXPECTED_SIGN_IN_ERROR:
-                        error(
-                            'An unexpected error occurred while signing in: ',
-                            e.additionalInfo
-                        );
-                        setErrorMessage(
-                            'An unexpected error occurred while signing in. Try again later.'
-                        );
-                        break;
-                }
-            } else {
-                error('An unexpected error occurred while signing in: ', e);
-                setErrorMessage(
-                    'An unexpected error occurred while signing in. Try again later.'
-                );
-            }
-        }
+        dispatch(signInWithGoogle());
     };
 
     return (

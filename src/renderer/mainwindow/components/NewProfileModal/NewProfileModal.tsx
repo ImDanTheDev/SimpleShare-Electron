@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-    constants,
-    ErrorCode,
-    IUser,
-    SimpleShareError,
-} from 'simpleshare-common';
+import { constants, createProfile } from 'simpleshare-common';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
-import { error, log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
-import { databaseService } from '../../../common/services/api';
 import styles from './NewProfileModal.module.scss';
 
 export const NewProfileModal: React.FC = () => {
     const dispatch = useDispatch();
 
-    const user: IUser | undefined = useSelector(
-        (state: RootState) => state.auth.user
+    const creatingProfile = useSelector(
+        (state: RootState) => state.profiles.creatingProfile
+    );
+    const createProfileError = useSelector(
+        (state: RootState) => state.profiles.createProfileError
+    );
+    const createdProfile = useSelector(
+        (state: RootState) => state.profiles.createdProfile
     );
 
     const [profileName, setProfileName] = useState<string>('');
-    const [creatingProfile, setCreatingProfile] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
+    const [triedCreatingProfile, setTriedCreatingProfile] =
+        useState<boolean>(false);
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
@@ -38,45 +38,37 @@ export const NewProfileModal: React.FC = () => {
         }
     }, [profileName]);
 
-    const handleSave = async () => {
-        if (creatingProfile) return;
-        setCreatingProfile(true);
-        if (!user) {
-            log('User is not signed in. Cannot create profile.');
-            setErrorMessage(
-                'You are not signed in. Please sign in and try again.'
-            );
-            setCreatingProfile(false);
-            return;
-        }
+    useEffect;
 
+    useEffect(() => {
+        if (
+            triedCreatingProfile &&
+            !creatingProfile &&
+            createdProfile &&
+            !createProfileError
+        ) {
+            dispatch(setCurrentModal('None'));
+        } else if (
+            triedCreatingProfile &&
+            !creatingProfile &&
+            !createdProfile &&
+            createProfileError
+        ) {
+            setErrorMessage('An unexpected error occurred. Try again later.');
+        }
+    }, [creatingProfile, createdProfile, createProfileError]);
+
+    const handleSave = () => {
+        setTriedCreatingProfile(true);
         if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
-            log(
-                `Profile names must be at least ${constants.MIN_PROFILE_NAME_LENGTH} long`
-            );
-            setCreatingProfile(false);
             return;
         }
 
-        try {
-            await databaseService.createProfile(user.uid, {
+        dispatch(
+            createProfile({
                 name: profileName,
-            });
-            handleDismiss();
-        } catch (e) {
-            if (e instanceof SimpleShareError) {
-                if (e.code === ErrorCode.UNEXPECTED_DATABASE_ERROR) {
-                    error(
-                        'An unexpected error occurred while creating the profile.',
-                        e
-                    );
-                    setErrorMessage(
-                        'An unexpected error occurred. Try again later.'
-                    );
-                }
-            }
-            setCreatingProfile(false);
-        }
+            })
+        );
     };
 
     return (
@@ -91,6 +83,7 @@ export const NewProfileModal: React.FC = () => {
                 maxLength={constants.MAX_PROFILE_NAME_LENGTH}
                 onChange={(e) => setProfileName(e.target.value)}
             />
+
             <div className={styles.errorMessage}>
                 {creatingProfile ? <LoadingIcon /> : errorMessage}
             </div>

@@ -4,12 +4,14 @@ import styles from './ProfilePicker.module.scss';
 import { MdChevronLeft, MdChevronRight, MdAdd, MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
-import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { setShares } from '../../../common/redux/shares-slice';
-import { databaseService } from '../../../common/services/api';
 import { pushToast } from '../../../common/redux/toaster-slice';
-import { IProfile, IUser } from 'simpleshare-common';
+import {
+    deleteCloudProfile,
+    IProfile,
+    IUser,
+    switchProfile,
+} from 'simpleshare-common';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
@@ -100,8 +102,7 @@ export const ProfilePicker: React.FC = () => {
             );
             return;
         }
-        dispatch(setShares([]));
-        dispatch(setCurrentProfile(profile.id));
+        dispatch(switchProfile(profile));
     };
 
     const handleNewProfile = () => {
@@ -144,19 +145,7 @@ export const ProfilePicker: React.FC = () => {
             return;
         }
 
-        try {
-            await databaseService.deleteProfile(user.uid, profile.id);
-        } catch {
-            dispatch(
-                pushToast({
-                    message:
-                        'An unexpected error occurred while deleting the profile.',
-                    type: 'error',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-        }
+        dispatch(deleteCloudProfile(profile));
     };
 
     const renderDeleteButton = (profile: IProfile) => {
