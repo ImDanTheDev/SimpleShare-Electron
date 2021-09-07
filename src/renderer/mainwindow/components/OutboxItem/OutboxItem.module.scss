@@ -1,72 +1,55 @@
 .item {
     display: flex;
     flex-direction: row;
+    min-width: 0;
 
-    flex: 0 0 64px;
-
-    padding: 4px;
     background-color: #0d161f;
     border-radius: 16px;
     border-width: 1px;
     border-style: solid;
     border-color: #f4a2617f;
-    overflow: hidden;
+    padding: 4px;
 }
 
 .profilePicture {
     display: flex;
     flex-direction: column;
-
-    flex: 0 0 64px;
     height: 64px;
+    aspect-ratio: 1;
+    margin-left: 4px;
 
+    align-self: center;
     align-items: center;
     justify-content: center;
     color: #fff;
     background-color: #303f4e;
     border-radius: 16px;
-    margin: 4px;
 }
 
 .body {
     display: flex;
     flex-direction: column;
-
+    overflow: hidden;
+    margin-top: 2px;
+    margin-left: 8px;
     flex: 1 1;
-
-    margin: 4px;
-    color: #fff;
-    min-width: 0;
 }
 
 .to {
-    display: flex;
-    flex-direction: column;
-
-    flex: 0 0;
-
     color: #aaa;
     font-size: 12px;
 }
 
 .fileName {
-    display: flex;
-    flex-direction: column;
-
-    flex: 0 0;
-
     color: #aaa;
     font-size: 12px;
 }
 
 .content {
-    display: flex;
-    flex-direction: column;
-
-    flex: 1 1;
-
     color: #fff;
-    overflow: hidden;
-    white-space: pre;
+    word-break: break-all;
     font-size: 16px;
+    line-height: 1.15em;
+    height: 2.3em;
+    overflow: hidden;
 }
