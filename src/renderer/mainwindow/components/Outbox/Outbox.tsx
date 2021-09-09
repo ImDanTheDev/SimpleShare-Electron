@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { clearOutbox, IShare } from 'simpleshare-common';
+import { clearOutbox, OutboxEntry } from 'simpleshare-common';
 import { RootState } from '../../../common/redux/store';
 import { OutboxItem } from '../OutboxItem/OutboxItem';
 import { Panel } from '../Panel/Panel';
@@ -9,15 +9,15 @@ import styles from './Outbox.module.scss';
 export const Outbox: React.FC = () => {
     const dispatch = useDispatch();
 
-    const shares: IShare[] = useSelector(
+    const outboxEntries: OutboxEntry[] = useSelector(
         (state: RootState) => state.outbox.shares
     );
 
     const renderCards = (): ReactNode[] => {
         const cards: ReactNode[] = [];
 
-        shares.forEach((share, i) => {
-            cards.push(<OutboxItem key={i} share={share} />);
+        outboxEntries.forEach((entry, i) => {
+            cards.push(<OutboxItem key={i} entry={entry} />);
         });
 
         return cards;
@@ -29,9 +29,9 @@ export const Outbox: React.FC = () => {
 
     return (
         <Panel
-            title={`Outbox (${shares.length})`}
+            title={`Outbox (${outboxEntries.length})`}
             right={
-                shares.length > 0 ? (
+                outboxEntries.length > 0 ? (
                     <span className={styles.clearLink} onClick={handleClear}>
                         Clear
                     </span>

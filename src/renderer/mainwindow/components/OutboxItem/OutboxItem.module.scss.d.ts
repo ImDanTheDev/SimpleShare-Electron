@@ -5,7 +5,8 @@ interface CssExports {
   'content': string;
   'fileName': string;
   'item': string;
-  'profilePicture': string;
+  'profileImage': string;
+  'profilePictureBox': string;
   'to': string;
 }
 export const cssExports: CssExports;
