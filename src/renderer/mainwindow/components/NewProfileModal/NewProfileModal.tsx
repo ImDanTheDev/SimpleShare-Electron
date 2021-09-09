@@ -24,6 +24,8 @@ export const NewProfileModal: React.FC = () => {
     const [triedCreatingProfile, setTriedCreatingProfile] =
         useState<boolean>(false);
 
+    const [pfp, setPFP] = useState<Blob | undefined>(undefined);
+
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
     };
@@ -66,7 +68,32 @@ export const NewProfileModal: React.FC = () => {
 
         dispatch(
             createProfile({
-                name: profileName,
+                profile: {
+                    name: profileName,
+                },
+
+                pfpSrc: pfp,
+            })
+        );
+    };
+
+    const handlePFPClick = async () => {
+        const { buffer, ext } = await window.api.invoke('APP_GET_FILE', {
+            filters: [
+                {
+                    name: 'Images',
+                    extensions: ['jpg', 'jpeg', 'png'],
+                },
+            ],
+        });
+
+        const imageData: Uint8Array = Uint8Array.from(
+            window.atob(buffer),
+            (c) => c.charCodeAt(0)
+        );
+        setPFP(
+            new Blob([imageData], {
+                type: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
             })
         );
     };
@@ -74,15 +101,29 @@ export const NewProfileModal: React.FC = () => {
     return (
         <div className={styles.modal}>
             <span className={styles.title}>New Profile</span>
-            <input
-                className={styles.field}
-                type='text'
-                value={profileName}
-                placeholder='Profile name...'
-                minLength={constants.MIN_PROFILE_NAME_LENGTH}
-                maxLength={constants.MAX_PROFILE_NAME_LENGTH}
-                onChange={(e) => setProfileName(e.target.value)}
-            />
+            <div className={styles.inputs}>
+                <div
+                    className={styles.pfp}
+                    style={
+                        pfp && {
+                            backgroundImage: `url(${URL.createObjectURL(pfp)})`,
+                            backgroundSize: 'contain',
+                        }
+                    }
+                    onClick={handlePFPClick}
+                >
+                    {!pfp && 'PFP'}
+                </div>
+                <input
+                    className={styles.field}
+                    type='text'
+                    value={profileName}
+                    placeholder='Profile name...'
+                    minLength={constants.MIN_PROFILE_NAME_LENGTH}
+                    maxLength={constants.MAX_PROFILE_NAME_LENGTH}
+                    onChange={(e) => setProfileName(e.target.value)}
+                />
+            </div>
 
             <div className={styles.errorMessage}>
                 {creatingProfile ? <LoadingIcon /> : errorMessage}

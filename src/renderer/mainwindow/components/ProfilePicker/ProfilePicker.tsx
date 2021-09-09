@@ -178,11 +178,18 @@ export const ProfilePicker: React.FC = () => {
                     onClick={() => handleProfileClick(profile)}
                 >
                     {renderDeleteButton(profile)}
-                    <span className={styles.profileLabel}>
-                        {profile.name.length > 2
-                            ? profile.name.slice(0, 2)
-                            : profile.name}
-                    </span>
+                    {profile.pfp ? (
+                        <img
+                            className={styles.profileImage}
+                            src={profile.pfp}
+                        />
+                    ) : (
+                        <span className={styles.profileLabel}>
+                            {profile.name.length > 2
+                                ? profile.name.slice(0, 2)
+                                : profile.name}
+                        </span>
+                    )}
                 </CircleButton>
             );
         });

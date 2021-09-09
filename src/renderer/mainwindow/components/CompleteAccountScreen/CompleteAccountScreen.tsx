@@ -126,8 +126,10 @@ export const CompleteAccountScreen: React.FC = () => {
                 );
                 dispatch(
                     createProfile({
-                        name: 'Default',
-                        id: 'default',
+                        profile: {
+                            name: 'Default',
+                            id: 'default',
+                        },
                     })
                 );
             }

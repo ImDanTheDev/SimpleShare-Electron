@@ -7,6 +7,7 @@ import fs from 'fs/promises';
 import ElectronStore from 'electron-store';
 import MainIPC from './main-ipc';
 import { start } from './webserver';
+import path from 'path';
 
 // Magic strings set by webpack
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -141,7 +142,10 @@ const setupIPC = () => {
         try {
             const buffer = await fs.readFile(filePath);
             const b64Data = buffer.toString('base64');
-            return b64Data;
+            return {
+                buffer: b64Data,
+                ext: path.extname(filePath).substr(1),
+            };
         } catch (e) {
             error('An error occurred while reading a file: ', false, e);
             return undefined;
