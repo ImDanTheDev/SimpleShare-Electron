@@ -32,11 +32,23 @@ export const OutboxItem: React.FC<Props> = (props: Props) => {
                     {props.entry.share.toDisplayName}
                 </div>
 
-                <div className={styles.fileName}>{'No File'}</div>
+                <div className={styles.fileName}>
+                    {props.entry.share.fileURL ? (
+                        <a
+                            className={styles.fileLink}
+                            href={props.entry.share.fileURL}
+                        >
+                            Download File
+                        </a>
+                    ) : (
+                        'No File'
+                    )}
+                </div>
                 <div className={styles.content}>
-                    {props.entry.share.content.length > 50
-                        ? props.entry.share.content.slice(0, 50)
-                        : props.entry.share.content}
+                    {props.entry.share.textContent &&
+                    props.entry.share.textContent.length > 50
+                        ? props.entry.share.textContent.slice(0, 50)
+                        : props.entry.share.textContent || ''}
                 </div>
             </div>
         </div>

@@ -57,7 +57,7 @@ export const ViewShareModal: React.FC = () => {
             <span className={styles.header}>Text Content:</span>
             <textarea
                 className={styles.field}
-                value={currentShare?.content || ''}
+                value={currentShare?.textContent || ''}
                 readOnly={true}
                 rows={5}
             />
@@ -65,6 +65,11 @@ export const ViewShareModal: React.FC = () => {
                 <button className={styles.deleteButton} onClick={handleDelete}>
                     <MdDeleteForever />
                 </button>
+                {currentShare?.fileURL && (
+                    <a href={currentShare.fileURL}>
+                        <button className={styles.button}>Download File</button>
+                    </a>
+                )}
                 <button className={styles.button} onClick={handleClose}>
                     Close
                 </button>

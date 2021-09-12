@@ -8,6 +8,7 @@ import ElectronStore from 'electron-store';
 import MainIPC from './main-ipc';
 import { start } from './webserver';
 import path from 'path';
+import mime from 'mime-types';
 
 // Magic strings set by webpack
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -144,7 +145,9 @@ const setupIPC = () => {
             const b64Data = buffer.toString('base64');
             return {
                 buffer: b64Data,
+                fileName: path.basename(filePath),
                 ext: path.extname(filePath).substr(1),
+                mimeType: mime.lookup(filePath),
             };
         } catch (e) {
             error('An error occurred while reading a file: ', false, e);

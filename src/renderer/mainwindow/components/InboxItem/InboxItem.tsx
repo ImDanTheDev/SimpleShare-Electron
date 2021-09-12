@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './InboxItem.module.scss';
 import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
@@ -12,12 +12,14 @@ interface Props {
 export const InboxItem: React.FC<Props> = (props: Props) => {
     const dispatch = useDispatch();
 
+    const [fallback, setFallback] = useState<boolean>(false);
+
     const handleDelete = async () => {
         dispatch(deleteCloudShare(props.share));
     };
 
     const handleCopyText = async () => {
-        await navigator.clipboard.writeText(props.share.content);
+        await navigator.clipboard.writeText(props.share.textContent || '');
     };
 
     const handleView = () => {
@@ -28,7 +30,15 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
     return (
         <div className={styles.item}>
             <div className={styles.header}>
-                <div className={styles.preview}></div>
+                {props.share.fileURL && !fallback && (
+                    <div className={styles.preview}>
+                        <img
+                            className={styles.previewImage}
+                            src={props.share.fileURL}
+                            onError={() => setFallback(true)}
+                        />
+                    </div>
+                )}
                 <div className={styles.fromGroup}>
                     <div className={styles.fromUser}>
                         {props.share.fromDisplayName}
@@ -40,13 +50,22 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
             </div>
 
             <div className={styles.body}>
-                <span>{props.share.content}</span>
+                <span>{props.share.textContent || ''}</span>
             </div>
 
             <div className={styles.footer}>
                 <div className={styles.deleteButton} onClick={handleDelete}>
                     <MdDeleteForever />
                 </div>
+                {props.share.fileURL ? (
+                    <a className={styles.fileURL} href={props.share.fileURL}>
+                        <div className={styles.downloadFileButton}>
+                            Download File
+                        </div>
+                    </a>
+                ) : (
+                    <div></div>
+                )}
                 <div className={styles.copyTextButton} onClick={handleCopyText}>
                     Copy Text
                 </div>

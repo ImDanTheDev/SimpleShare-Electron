@@ -25,20 +25,24 @@
 }
 
 .preview {
-    display: flex;
     flex-direction: column;
-
-    flex: 0 0 64px;
     height: 64px;
-
     background-color: #1a2633;
     border-radius: 16px;
+    width: 64px;
+    overflow: hidden;
+    display: flex;
+    margin-right: 8px;
+}
+
+.previewImage {
+    flex: 1;
+    object-fit: cover;
 }
 
 .fromGroup {
     display: flex;
     flex-direction: column;
-    margin-left: 8px;
 }
 
 .fromUser {
@@ -76,7 +80,7 @@
 .footer {
     display: grid;
 
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: auto 1fr 1fr 1fr;
     gap: 8px;
 
     flex: 0 0 48px;
@@ -113,6 +117,37 @@
 .deleteButton:active {
     filter: drop-shadow(2px 2px 1px #1a1a1a);
     transform: scale(0.9);
+}
+
+.fileURL {
+    text-decoration: none;
+}
+
+.downloadFileButton {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 32px;
+    color: #fff;
+    background-color: #e9c46a19;
+    border-radius: 8px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    cursor: pointer;
+}
+
+.downloadFileButton:hover {
+    filter: drop-shadow(2px 2px 6px #1a1a1a);
+    transform: scale(1.05);
+}
+
+.downloadFileButton:active {
+    filter: drop-shadow(2px 2px 1px #1a1a1a);
+    transform: scale(0.95);
 }
 
 .copyTextButton {

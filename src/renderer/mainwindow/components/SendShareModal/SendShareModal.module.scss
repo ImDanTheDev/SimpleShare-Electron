@@ -54,6 +54,87 @@
     gap: 8px;
 }
 
+.selectedFileButtonGroup {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    white-space: nowrap;
+    align-items: center;
+    height: 32px;
+    border-radius: 16px;
+    border-color: #f4a26199;
+    border-width: 1px;
+    border-style: solid;
+    background-color: #0d161f;
+    filter: drop-shadow(2px 2px 4px #111111a1);
+    transition: filter 0.1s, transform 0.1s;
+}
+
+.clearFileButton {
+    color: #fff;
+    font-style: 16px;
+    border-right-style: solid;
+    border-right-width: 1px;
+    border-right-color: #f4a26199;
+    padding-left: 8px;
+    padding-right: 4px;
+    display: flex;
+}
+
+.clearFileButtonIcon {
+    font-size: 24px;
+}
+
+.clearFileButtonIcon:hover {
+    transform: scale(1.25);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.changeFileButton {
+    cursor: pointer;
+    color: #fff;
+    font-size: 20px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-overflow: ellipsis;
+    align-items: center;
+}
+
+.changeFileButton:hover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.changeFileButton:hover span {
+    display: none;
+}
+
+.changeFileButton:hover:before {
+    content: 'Change File';
+}
+
+.selectFileButton {
+    flex: 1;
+    height: 32px;
+
+    border-radius: 16px;
+    border-color: #f4a26199;
+    border-width: 1px;
+    border-style: solid;
+    background-color: #0d161f;
+    filter: drop-shadow(2px 2px 4px #111111a1);
+    transition: filter 0.1s, transform 0.1s;
+    cursor: pointer;
+    color: #fff;
+    font-size: 20px;
+}
+
 .button {
     flex: 1;
     height: 32px;

@@ -60,3 +60,13 @@
     height: 2.3em;
     overflow: hidden;
 }
+
+.fileLink {
+    text-decoration: none;
+    color: rgb(84, 163, 228);
+    font-style: italic;
+}
+
+.fileLink:hover {
+    font-weight: bold;
+}

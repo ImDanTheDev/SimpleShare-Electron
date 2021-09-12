@@ -4,6 +4,8 @@ interface CssExports {
   'body': string;
   'copyTextButton': string;
   'deleteButton': string;
+  'downloadFileButton': string;
+  'fileURL': string;
   'footer': string;
   'fromGroup': string;
   'fromProfile': string;
@@ -11,6 +13,7 @@ interface CssExports {
   'header': string;
   'item': string;
   'preview': string;
+  'previewImage': string;
   'viewButton': string;
 }
 export const cssExports: CssExports;

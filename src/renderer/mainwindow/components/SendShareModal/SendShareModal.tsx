@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { constants, IProfile, IUser, sendShare } from 'simpleshare-common';
+import { MdClose } from 'react-icons/md';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
@@ -38,6 +39,9 @@ export const SendShareModal: React.FC = () => {
     const [profileNameError, setProfileNameError] = useState<string>('');
     const [shareTextError, setShareTextError] = useState<string>('');
     const [triedSendingShare, setTriedSendingShare] = useState<boolean>(false);
+    const [fileName, setFileName] = useState<string | undefined>(undefined);
+    const [fileBlob, setFileBlob] = useState<Blob | undefined>(undefined);
+    const [fileExt, setFileExt] = useState<string | undefined>(undefined);
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
@@ -80,6 +84,32 @@ export const SendShareModal: React.FC = () => {
         }
     }, [profileName, phoneNumber, shareText]);
 
+    const handleSelectFile = async () => {
+        const { buffer, fileName, ext, mimeType } = await window.api.invoke(
+            'APP_GET_FILE',
+            {
+                filters: [
+                    {
+                        name: 'All Files',
+                        extensions: ['*'],
+                    },
+                ],
+            }
+        );
+
+        const fileData: Uint8Array = Uint8Array.from(window.atob(buffer), (c) =>
+            c.charCodeAt(0)
+        );
+
+        setFileBlob(
+            new Blob([fileData], {
+                type: mimeType || 'application/octet-stream',
+            })
+        );
+        setFileName(fileName);
+        setFileExt(ext);
+    };
+
     const handleSend = async () => {
         setTriedSendingShare(true);
         if (!user || !currentProfile || !currentProfile.id) {
@@ -109,11 +139,23 @@ export const SendShareModal: React.FC = () => {
                 toPhoneNumber: phoneNumber,
                 toProfileName: profileName,
                 share: {
-                    content: shareText,
-                    type: 'text',
+                    textContent: shareText,
+                    fileSrc:
+                        fileBlob && fileExt
+                            ? {
+                                  blob: fileBlob,
+                                  ext: fileExt,
+                              }
+                            : undefined,
                 },
             })
         );
+    };
+
+    const handleClearFile = () => {
+        setFileBlob(undefined);
+        setFileExt(undefined);
+        setFileName(undefined);
     };
 
     return (
@@ -147,10 +189,32 @@ export const SendShareModal: React.FC = () => {
                 value={shareText}
                 placeholder='Type anything you want here!'
                 maxLength={constants.MAX_SHARE_TEXT_LENGTH}
-                rows={5}
+                rows={4}
                 onChange={(e) => setShareText(e.target.value)}
             />
             <span className={styles.errorMessage}>{shareTextError}</span>
+            {fileName ? (
+                <div className={styles.selectedFileButtonGroup}>
+                    <div
+                        className={styles.clearFileButton}
+                        title='Clear file'
+                        onClick={handleClearFile}
+                    >
+                        <MdClose className={styles.clearFileButtonIcon} />
+                    </div>
+                    <div
+                        className={styles.changeFileButton}
+                        onClick={handleSelectFile}
+                    >
+                        <span>{fileName}</span>
+                    </div>
+                </div>
+            ) : (
+                <button className={styles.button} onClick={handleSelectFile}>
+                    Select File
+                </button>
+            )}
+
             {sendingShare ? (
                 <LoadingIcon />
             ) : (

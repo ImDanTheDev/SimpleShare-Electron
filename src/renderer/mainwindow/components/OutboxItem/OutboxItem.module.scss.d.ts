@@ -3,6 +3,7 @@
 interface CssExports {
   'body': string;
   'content': string;
+  'fileLink': string;
   'fileName': string;
   'item': string;
   'profileImage': string;
