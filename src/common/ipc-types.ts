@@ -49,6 +49,9 @@ export interface IPCArgs {
     APP_GET_FILE: {
         filters?: { name: string; extensions: string[] }[];
     };
+    APP_SAVE_FILE: {
+        url: string;
+    };
 }
 
 export const IPC_ARG_TEMPLATES: IPCArgs = {
@@ -99,5 +102,8 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
     },
     APP_GET_FILE: {
         filters: [{ name: '', extensions: [''] }],
+    },
+    APP_SAVE_FILE: {
+        url: '',
     },
 };

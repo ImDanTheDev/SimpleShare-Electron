@@ -64,10 +64,11 @@
         "typescript-plugin-css-modules": "^3.4.0"
     },
     "dependencies": {
-        "@omnifire/api": "^1.2.4",
-        "@omnifire/web": "^1.2.4",
+        "@omnifire/api": "^1.2.7",
+        "@omnifire/web": "^1.2.7",
         "@reduxjs/toolkit": "^1.6.1",
         "@types/mime-types": "^2.1.1",
+        "electron-dl": "^3.2.1",
         "electron-squirrel-startup": "^1.0.0",
         "electron-store": "^8.0.0",
         "express": "^4.17.1",
@@ -77,6 +78,6 @@
         "react-icons": "^4.2.0",
         "react-redux": "^7.2.4",
         "redux-persist": "^6.0.0",
-        "simpleshare-common": "^1.2.6"
+        "simpleshare-common": "^1.2.9"
     }
 }

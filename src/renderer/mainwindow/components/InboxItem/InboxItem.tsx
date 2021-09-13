@@ -58,7 +58,11 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
                     <MdDeleteForever />
                 </div>
                 {props.share.fileURL ? (
-                    <a className={styles.fileURL} href={props.share.fileURL}>
+                    <a
+                        className={styles.fileURL}
+                        href={props.share.fileURL}
+                        target='_blank'
+                    >
                         <div className={styles.downloadFileButton}>
                             Download File
                         </div>

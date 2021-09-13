@@ -66,7 +66,7 @@ export const ViewShareModal: React.FC = () => {
                     <MdDeleteForever />
                 </button>
                 {currentShare?.fileURL && (
-                    <a href={currentShare.fileURL}>
+                    <a href={currentShare.fileURL} target='_blank'>
                         <button className={styles.button}>Download File</button>
                     </a>
                 )}

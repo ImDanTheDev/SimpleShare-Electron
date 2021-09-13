@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog } from 'electron';
+import { app, BrowserWindow, dialog, shell } from 'electron';
 import installExtension, {
     REDUX_DEVTOOLS,
     REACT_DEVELOPER_TOOLS,
@@ -9,6 +9,7 @@ import MainIPC from './main-ipc';
 import { start } from './webserver';
 import path from 'path';
 import mime from 'mime-types';
+import { download } from 'electron-dl';
 
 // Magic strings set by webpack
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -40,6 +41,11 @@ const createStartupWindow = (): void => {
         show: false,
     });
 
+    currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+
     ipc.setWindow(currentWindow);
     currentWindow.loadURL('http://localhost:3090/startup_window/index.html');
     currentWindow.on('ready-to-show', () => {
@@ -60,6 +66,11 @@ const createMainWindow = (): void => {
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
         },
         show: false,
+    });
+
+    currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
     });
 
     ipc.setWindow(currentWindow);
@@ -154,6 +165,15 @@ const setupIPC = () => {
             return undefined;
         }
     });
+    // ipc.on('APP_SAVE_FILE', async (args) => {
+    //     const dialogResult = await dialog.showSaveDialog(currentWindow);
+    //     if (dialogResult.filePath) {
+    //         await download(currentWindow, args.url, {
+    //             directory: dialogResult.filePath,
+
+    //         });
+    //     }
+    // });
 };
 
 // This method will be called when Electron has finished

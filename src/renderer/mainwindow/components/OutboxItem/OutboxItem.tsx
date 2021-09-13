@@ -37,6 +37,7 @@ export const OutboxItem: React.FC<Props> = (props: Props) => {
                         <a
                             className={styles.fileLink}
                             href={props.entry.share.fileURL}
+                            target='_blank'
                         >
                             Download File
                         </a>
