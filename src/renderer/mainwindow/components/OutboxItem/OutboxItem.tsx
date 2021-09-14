@@ -11,7 +11,10 @@ export const OutboxItem: React.FC<Props> = (props: Props) => {
 
     return (
         <div className={styles.item}>
-            <div className={styles.profilePictureBox}>
+            <div
+                className={styles.profilePictureBox}
+                title={props.entry.share.toProfileName}
+            >
                 {failover || props.entry.pfpURL === constants.DEFAULT_PFP_ID ? (
                     props.entry.share.toProfileName &&
                     (props.entry.share.toProfileName.length > 2
@@ -42,14 +45,19 @@ export const OutboxItem: React.FC<Props> = (props: Props) => {
                             Download File
                         </a>
                     ) : (
-                        'No File'
+                        <span className={styles.noFile}>No File</span>
                     )}
                 </div>
                 <div className={styles.content}>
-                    {props.entry.share.textContent &&
-                    props.entry.share.textContent.length > 50
-                        ? props.entry.share.textContent.slice(0, 50)
-                        : props.entry.share.textContent || ''}
+                    {props.entry.share.textContent ? (
+                        props.entry.share.textContent.length > 50 ? (
+                            props.entry.share.textContent.slice(0, 50)
+                        ) : (
+                            props.entry.share.textContent || ''
+                        )
+                    ) : (
+                        <span className={styles.noText}>No Text</span>
+                    )}
                 </div>
             </div>
         </div>

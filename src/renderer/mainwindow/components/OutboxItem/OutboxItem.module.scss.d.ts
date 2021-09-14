@@ -6,6 +6,8 @@ interface CssExports {
   'fileLink': string;
   'fileName': string;
   'item': string;
+  'noFile': string;
+  'noText': string;
   'profileImage': string;
   'profilePictureBox': string;
   'to': string;

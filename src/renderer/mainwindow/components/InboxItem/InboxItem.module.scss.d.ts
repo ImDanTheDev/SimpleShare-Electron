@@ -12,6 +12,7 @@ interface CssExports {
   'fromUser': string;
   'header': string;
   'item': string;
+  'noText': string;
   'preview': string;
   'previewImage': string;
   'viewButton': string;

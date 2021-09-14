@@ -4,6 +4,7 @@ import styles from './CircleButton.module.scss';
 interface Props {
     style: React.CSSProperties | undefined;
     onClick?: () => void;
+    tooltip?: string;
 }
 
 export const CircleButton: React.FC<Props> = (
@@ -14,6 +15,7 @@ export const CircleButton: React.FC<Props> = (
             className={styles.button}
             style={props.style}
             onClick={props.onClick}
+            title={props.tooltip}
         >
             {props.children}
         </div>

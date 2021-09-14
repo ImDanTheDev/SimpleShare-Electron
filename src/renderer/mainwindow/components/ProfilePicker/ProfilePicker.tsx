@@ -175,6 +175,7 @@ export const ProfilePicker: React.FC = () => {
                         borderRadius:
                             profile.id === currentProfile?.id ? 16 : '50%',
                     }}
+                    tooltip={profile.name}
                     onClick={() => handleProfileClick(profile)}
                 >
                     {renderDeleteButton(profile)}
