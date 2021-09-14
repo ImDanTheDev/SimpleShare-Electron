@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { MdAddAPhoto, MdClose } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { constants, createProfile } from 'simpleshare-common';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
@@ -78,24 +79,42 @@ export const NewProfileModal: React.FC = () => {
     };
 
     const handlePFPClick = async () => {
-        const { buffer, ext } = await window.api.invoke('APP_GET_FILE', {
-            filters: [
-                {
-                    name: 'Images',
-                    extensions: ['jpg', 'jpeg', 'png'],
-                },
-            ],
-        });
+        if (pfp) {
+            setPFP(undefined);
+            return;
+        }
 
-        const imageData: Uint8Array = Uint8Array.from(
-            window.atob(buffer),
-            (c) => c.charCodeAt(0)
-        );
-        setPFP(
-            new Blob([imageData], {
-                type: `image/${ext === 'jpg' ? 'jpeg' : ext}`,
-            })
-        );
+        const selectedFile: { buffer: string; ext: string } | undefined =
+            (await window.api.invoke('APP_GET_FILE', {
+                filters: [
+                    {
+                        name: 'Images',
+                        extensions: ['jpg', 'jpeg', 'png'],
+                    },
+                ],
+            })) as { buffer: string; ext: string } | undefined;
+        if (selectedFile) {
+            // const { buffer, ext } = await window.api.invoke('APP_GET_FILE', {
+            //     filters: [
+            //         {
+            //             name: 'Images',
+            //             extensions: ['jpg', 'jpeg', 'png'],
+            //         },
+            //     ],
+            // });
+
+            const imageData: Uint8Array = Uint8Array.from(
+                window.atob(selectedFile.buffer),
+                (c) => c.charCodeAt(0)
+            );
+            setPFP(
+                new Blob([imageData], {
+                    type: `image/${
+                        selectedFile.ext === 'jpg' ? 'jpeg' : selectedFile.ext
+                    }`,
+                })
+            );
+        }
     };
 
     return (
@@ -111,8 +130,15 @@ export const NewProfileModal: React.FC = () => {
                         }
                     }
                     onClick={handlePFPClick}
+                    title={
+                        pfp ? 'Remove Profile Picture' : 'Add Profile Picture'
+                    }
                 >
-                    {!pfp && 'PFP'}
+                    {pfp ? (
+                        <MdClose className={styles.removePFPIcon} />
+                    ) : (
+                        <MdAddAPhoto className={styles.pfpIcon} />
+                    )}
                 </div>
                 <input
                     className={styles.field}

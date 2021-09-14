@@ -8,6 +8,8 @@ interface CssExports {
   'inputs': string;
   'modal': string;
   'pfp': string;
+  'pfpIcon': string;
+  'removePFPIcon': string;
   'title': string;
 }
 export const cssExports: CssExports;

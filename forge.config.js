@@ -66,6 +66,14 @@ module.exports = {
                                 js: './src/renderer/common/preload.ts',
                             },
                         },
+                        {
+                            html: './src/renderer/common/index.html',
+                            js: './src/renderer/updatewindow/renderer.tsx',
+                            name: 'update_window',
+                            preload: {
+                                js: './src/renderer/common/preload.ts',
+                            },
+                        },
                     ],
                 },
             },

@@ -49,6 +49,34 @@
     border-width: 1px;
     border-style: solid;
     cursor: pointer;
+    overflow: hidden;
+}
+
+.pfp:hover {
+    filter: drop-shadow(2px 2px 6px #1a1a1a);
+    transform: scale(1.05);
+}
+.pfp:active {
+    filter: drop-shadow(2px 2px 1px #1a1a1a);
+    transform: scale(0.95);
+}
+
+.pfpIcon {
+    font-size: 20px;
+    color: #fff;
+}
+
+.pfp:hover .removePFPIcon {
+    flex: 1 1;
+    width: 100%;
+    display: block;
+    background-color: #1a2633;
+}
+
+.removePFPIcon {
+    display: none;
+    font-size: 20px;
+    color: #e63333;
 }
 
 .field {

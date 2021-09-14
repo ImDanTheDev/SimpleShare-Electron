@@ -7,6 +7,7 @@ import {
     initFirebase,
     isAccountComplete,
     isPublicGeneralInfoComplete,
+    serviceHandler,
     startAuthStateListener,
     startProfileListener,
 } from 'simpleshare-common';
@@ -47,22 +48,33 @@ const MainWindow: React.FC = () => {
     );
 
     useEffect(() => {
-        const firebase: IFirebase = new OFFirebase();
-        firebase.initializeApp({
-            apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
-            authDomain: 'simpleshare-428bb.firebaseapp.com',
-            projectId: 'simpleshare-428bb',
-            storageBucket: 'simpleshare-428bb.appspot.com',
-            messagingSenderId: '555940005658',
-            appId: '1:555940005658:web:b00dd5f990111de83dcea3',
-            measurementId: 'G-WV37870J2G',
-        });
-        const auth: IAuth = new OFAuth();
-        auth.configureGoogle();
-        const firestore: IFirestore = new OFFirestore();
-        const storage: IStorage = new OFStorage();
-        initFirebase(firebase, firestore, auth, storage);
-        dispatch(startAuthStateListener());
+        const initializeApp = async () => {
+            const firebase: IFirebase = new OFFirebase();
+            firebase.initializeApp({
+                apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
+                authDomain: 'simpleshare-428bb.firebaseapp.com',
+                projectId: 'simpleshare-428bb',
+                storageBucket: 'simpleshare-428bb.appspot.com',
+                messagingSenderId: '555940005658',
+                appId: '1:555940005658:web:b00dd5f990111de83dcea3',
+                measurementId: 'G-WV37870J2G',
+            });
+            const auth: IAuth = new OFAuth();
+            auth.configureGoogle();
+            const firestore: IFirestore = new OFFirestore();
+            const storage: IStorage = new OFStorage();
+            initFirebase(firebase, firestore, auth, storage);
+            const servicesUpToDate =
+                await serviceHandler.isServiceHandlerUpToDate();
+
+            if (!servicesUpToDate) {
+                window.api.send('APP_SHOW_UPDATE_WINDOW', {});
+                return;
+            }
+
+            dispatch(startAuthStateListener());
+        };
+        initializeApp();
     }, []);
 
     useEffect(() => {

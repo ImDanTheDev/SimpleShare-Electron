@@ -2,7 +2,11 @@ import { IAuth, IFirebase, IFirestore, IStorage } from '@omnifire/api';
 import { OFAuth, OFFirebase, OFFirestore, OFStorage } from '@omnifire/web';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { initFirebase, startAuthStateListener } from 'simpleshare-common';
+import {
+    initFirebase,
+    serviceHandler,
+    startAuthStateListener,
+} from 'simpleshare-common';
 import { RootState } from '../../../common/redux/store';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import SignInScreen from '../SignInScreen/SignInScreen';
@@ -44,22 +48,33 @@ export const StartupWindow: React.FC = () => {
     );
 
     useEffect(() => {
-        const firebase: IFirebase = new OFFirebase();
-        firebase.initializeApp({
-            apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
-            authDomain: 'simpleshare-428bb.firebaseapp.com',
-            projectId: 'simpleshare-428bb',
-            storageBucket: 'simpleshare-428bb.appspot.com',
-            messagingSenderId: '555940005658',
-            appId: '1:555940005658:web:b00dd5f990111de83dcea3',
-            measurementId: 'G-WV37870J2G',
-        });
-        const auth: IAuth = new OFAuth();
-        auth.configureGoogle();
-        const firestore: IFirestore = new OFFirestore();
-        const storage: IStorage = new OFStorage();
-        initFirebase(firebase, firestore, auth, storage);
-        dispatch(startAuthStateListener());
+        const initializeApp = async () => {
+            const firebase: IFirebase = new OFFirebase();
+            firebase.initializeApp({
+                apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
+                authDomain: 'simpleshare-428bb.firebaseapp.com',
+                projectId: 'simpleshare-428bb',
+                storageBucket: 'simpleshare-428bb.appspot.com',
+                messagingSenderId: '555940005658',
+                appId: '1:555940005658:web:b00dd5f990111de83dcea3',
+                measurementId: 'G-WV37870J2G',
+            });
+            const auth: IAuth = new OFAuth();
+            auth.configureGoogle();
+            const firestore: IFirestore = new OFFirestore();
+            const storage: IStorage = new OFStorage();
+            initFirebase(firebase, firestore, auth, storage);
+            const servicesUpToDate =
+                await serviceHandler.isServiceHandlerUpToDate();
+
+            if (!servicesUpToDate) {
+                window.api.send('APP_SHOW_UPDATE_WINDOW', {});
+                return;
+            }
+
+            dispatch(startAuthStateListener());
+        };
+        initializeApp();
     }, []);
 
     useEffect(() => {

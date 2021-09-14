@@ -9,11 +9,11 @@ import MainIPC from './main-ipc';
 import { start } from './webserver';
 import path from 'path';
 import mime from 'mime-types';
-import { download } from 'electron-dl';
 
 // Magic strings set by webpack
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const STARTUP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+declare const UPDATE_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -75,6 +75,35 @@ const createMainWindow = (): void => {
 
     ipc.setWindow(currentWindow);
     currentWindow.loadURL('http://localhost:3090/main_window/index.html');
+    currentWindow.on('ready-to-show', () => {
+        currentWindow.show();
+    });
+};
+
+const createUpdateWindow = (): void => {
+    currentWindow = new BrowserWindow({
+        autoHideMenuBar: true,
+        transparent: false,
+        frame: false,
+        resizable: false,
+        width: 400,
+        height: 200,
+        webPreferences: {
+            nativeWindowOpen: true,
+            contextIsolation: true,
+            enableRemoteModule: false,
+            preload: UPDATE_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        },
+        show: false,
+    });
+
+    currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+
+    ipc.setWindow(currentWindow);
+    currentWindow.loadURL('http://localhost:3090/update_window/index.html');
     currentWindow.on('ready-to-show', () => {
         currentWindow.show();
     });
@@ -146,7 +175,6 @@ const setupIPC = () => {
             filters: args.filters,
         });
         if (dialogResult.filePaths.length <= 0) {
-            log('No files selected');
             return undefined;
         }
         const filePath = dialogResult.filePaths[0];
@@ -165,15 +193,11 @@ const setupIPC = () => {
             return undefined;
         }
     });
-    // ipc.on('APP_SAVE_FILE', async (args) => {
-    //     const dialogResult = await dialog.showSaveDialog(currentWindow);
-    //     if (dialogResult.filePath) {
-    //         await download(currentWindow, args.url, {
-    //             directory: dialogResult.filePath,
-
-    //         });
-    //     }
-    // });
+    ipc.on('APP_SHOW_UPDATE_WINDOW', async () => {
+        const oldWindow = currentWindow;
+        createUpdateWindow();
+        oldWindow.close();
+    });
 };
 
 // This method will be called when Electron has finished

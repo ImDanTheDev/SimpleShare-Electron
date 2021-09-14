@@ -7,6 +7,7 @@ import { RootState } from '../../../common/redux/store';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { pushToast } from '../../../common/redux/toaster-slice';
 import {
+    constants,
     deleteCloudProfile,
     IProfile,
     IUser,
@@ -179,17 +180,18 @@ export const ProfilePicker: React.FC = () => {
                     onClick={() => handleProfileClick(profile)}
                 >
                     {renderDeleteButton(profile)}
-                    {profile.pfp ? (
-                        <img
-                            className={styles.profileImage}
-                            src={profile.pfp}
-                        />
-                    ) : (
+                    {!profile.pfp ||
+                    profile.pfp === constants.DEFAULT_PFP_ID ? (
                         <span className={styles.profileLabel}>
                             {profile.name.length > 2
                                 ? profile.name.slice(0, 2)
                                 : profile.name}
                         </span>
+                    ) : (
+                        <img
+                            className={styles.profileImage}
+                            src={profile.pfp}
+                        />
                     )}
                 </CircleButton>
             );
