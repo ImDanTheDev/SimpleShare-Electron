@@ -64,8 +64,14 @@ export const StartupWindow: React.FC = () => {
             const firestore: IFirestore = new OFFirestore();
             const storage: IStorage = new OFStorage();
             initFirebase(firebase, firestore, auth, storage);
-            const servicesUpToDate =
-                await serviceHandler.isServiceHandlerUpToDate();
+            let servicesUpToDate = false;
+            try {
+                servicesUpToDate =
+                    await serviceHandler.isServiceHandlerUpToDate();
+            } catch {
+                // TODO: Show error screen with "Error communicating with network services. Please check your internet connection."
+                window.api.send('APP_SHOW_UPDATE_WINDOW', {});
+            }
 
             if (!servicesUpToDate) {
                 window.api.send('APP_SHOW_UPDATE_WINDOW', {});

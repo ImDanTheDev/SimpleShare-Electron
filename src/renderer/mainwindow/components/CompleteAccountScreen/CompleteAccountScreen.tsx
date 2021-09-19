@@ -87,52 +87,33 @@ export const CompleteAccountScreen: React.FC = () => {
                 return;
             }
 
-            if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
-                log(`'${phoneNumber}' is not a valid phone number.`);
+            if (
+                phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH ||
+                displayName.length < constants.MIN_DISPLAY_NAME_LENGTH
+            ) {
                 return;
             }
 
-            if (displayName.length < constants.MIN_DISPLAY_NAME_LENGTH) {
-                log(`'${displayName}' is not a valid display name`);
-                return;
-            }
-
-            const accountExists = accountInfo !== undefined;
-            if (accountExists) {
-                dispatch(
-                    updateAccount({
-                        accountInfo: {
-                            phoneNumber: phoneNumber,
-                            isAccountComplete: true,
-                        },
-                        publicGeneralInfo: {
-                            displayName: displayName,
-                            isComplete: true,
-                        },
-                    })
-                );
-            } else {
-                dispatch(
-                    updateAccount({
-                        accountInfo: {
-                            phoneNumber: phoneNumber,
-                            isAccountComplete: true,
-                        },
-                        publicGeneralInfo: {
-                            displayName: displayName,
-                            isComplete: true,
-                        },
-                    })
-                );
-                dispatch(
-                    createProfile({
-                        profile: {
-                            name: 'Default',
-                            id: 'default',
-                        },
-                    })
-                );
-            }
+            dispatch(
+                updateAccount({
+                    accountInfo: {
+                        phoneNumber: phoneNumber,
+                        isAccountComplete: true,
+                    },
+                    publicGeneralInfo: {
+                        displayName: displayName,
+                        isComplete: true,
+                    },
+                })
+            );
+            dispatch(
+                createProfile({
+                    profile: {
+                        name: 'Default',
+                        id: 'default',
+                    },
+                })
+            );
         };
 
         continueAuthFlow();

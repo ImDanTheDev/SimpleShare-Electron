@@ -58,18 +58,32 @@ export const ViewShareModal: React.FC = () => {
             <textarea
                 className={styles.field}
                 value={currentShare?.textContent || ''}
+                title={currentShare?.textContent ? '' : 'No Text'}
                 readOnly={true}
                 rows={5}
             />
             <div className={styles.buttons}>
-                <button className={styles.deleteButton} onClick={handleDelete}>
+                <button
+                    className={styles.deleteButton}
+                    onClick={handleDelete}
+                    title='Delete Share'
+                >
                     <MdDeleteForever />
                 </button>
-                {currentShare?.fileURL && (
-                    <a href={currentShare.fileURL} target='_blank'>
-                        <button className={styles.button}>Download File</button>
-                    </a>
-                )}
+                <button
+                    className={styles.button}
+                    disabled={!currentShare?.fileURL}
+                    title={
+                        currentShare?.fileURL ? currentShare.fileURL : 'No File'
+                    }
+                    onClick={() => {
+                        if (currentShare?.fileURL) {
+                            window.open(currentShare?.fileURL, '_blank');
+                        }
+                    }}
+                >
+                    Download File
+                </button>
                 <button className={styles.button} onClick={handleClose}>
                     Close
                 </button>

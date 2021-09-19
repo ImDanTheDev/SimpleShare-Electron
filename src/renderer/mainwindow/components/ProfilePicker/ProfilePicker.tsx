@@ -213,6 +213,7 @@ export const ProfilePicker: React.FC = () => {
                 <CircleButton
                     style={{ height: 50, width: 50 }}
                     onClick={handleNewProfile}
+                    tooltip='Create Profile'
                 >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>

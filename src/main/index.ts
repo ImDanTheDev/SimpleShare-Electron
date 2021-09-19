@@ -42,6 +42,20 @@ const createStartupWindow = (): void => {
     });
 
     currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        if (url.startsWith('about')) {
+            return {
+                action: 'allow',
+                overrideBrowserWindowOptions: {
+                    frame: true,
+                    movable: true,
+                    resizable: true,
+                    transparent: false,
+                    parent: currentWindow,
+                    modal: true,
+                },
+            };
+        }
+
         shell.openExternal(url);
         return { action: 'deny' };
     });

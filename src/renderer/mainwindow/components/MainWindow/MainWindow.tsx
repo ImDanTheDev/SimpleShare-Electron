@@ -3,6 +3,7 @@ import { OFAuth, OFFirebase, OFFirestore, OFStorage } from '@omnifire/web';
 import React, { ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    ErrorCode,
     getAllAccountInfo,
     initFirebase,
     isAccountComplete,
@@ -17,6 +18,7 @@ import {
     setCurrentScreen,
 } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
+import { pushToast } from '../../../common/redux/toaster-slice';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsScreen';
 import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';
@@ -45,6 +47,9 @@ const MainWindow: React.FC = () => {
     );
     const fetchedAccount = useSelector(
         (state: RootState) => state.user.fetchedAccount
+    );
+    const fetchAccountError = useSelector(
+        (state: RootState) => state.user.fetchAccountError
     );
 
     useEffect(() => {
@@ -114,6 +119,35 @@ const MainWindow: React.FC = () => {
             dispatch(setCurrentScreen('CompleteAccountScreen'));
         }
     }, [fetchedUser, fetchedAccount]);
+
+    useEffect(() => {
+        if (fetchAccountError) {
+            switch (fetchAccountError.code) {
+                case ErrorCode.UNEXPECTED_DATABASE_ERROR:
+                    dispatch(
+                        pushToast({
+                            duration: 15,
+                            message:
+                                'An error occurred while loading your account. Try to sign out and sign back in.',
+                            type: 'error',
+                            openToaster: true,
+                        })
+                    );
+                    break;
+                default:
+                    dispatch(
+                        pushToast({
+                            duration: 15,
+                            message:
+                                'An unexpected error occurred while loading your account. Restart Simple Share and contact support if the issue persists.',
+                            type: 'error',
+                            openToaster: true,
+                        })
+                    );
+                    break;
+            }
+        }
+    }, [fetchAccountError]);
 
     const renderScreen = (): ReactNode => {
         switch (currentScreen) {

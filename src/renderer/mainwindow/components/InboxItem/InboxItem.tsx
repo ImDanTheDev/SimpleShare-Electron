@@ -35,6 +35,7 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
                         <img
                             className={styles.previewImage}
                             src={props.share.fileURL}
+                            title='File Preview'
                             onError={() => setFallback(true)}
                         />
                     </div>
@@ -58,32 +59,39 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
             </div>
 
             <div className={styles.footer}>
-                <div className={styles.deleteButton} onClick={handleDelete}>
+                <div
+                    className={styles.deleteButton}
+                    onClick={handleDelete}
+                    title='Delete Share'
+                >
                     <MdDeleteForever />
                 </div>
-                {props.share.fileURL && (
-                    <a
-                        className={styles.fileURL}
-                        href={props.share.fileURL}
-                        target='_blank'
-                    >
-                        <div className={styles.downloadFileButton}>
-                            Download File
-                        </div>
-                    </a>
-                )}
-                {props.share.textContent && (
-                    <div
-                        className={styles.copyTextButton}
-                        onClick={handleCopyText}
-                    >
-                        Copy Text
-                    </div>
-                )}
+                <button
+                    className={styles.downloadFileButton}
+                    disabled={!props.share.fileURL}
+                    title={
+                        props.share.fileURL ? props.share.fileURL : 'No File'
+                    }
+                    onClick={() => {
+                        if (props.share.fileURL) {
+                            window.open(props.share.fileURL, '_blank');
+                        }
+                    }}
+                >
+                    Download File
+                </button>
+                <button
+                    className={styles.copyTextButton}
+                    onClick={handleCopyText}
+                    disabled={!props.share.textContent}
+                    title={props.share.textContent ? '' : 'No Text'}
+                >
+                    Copy Text
+                </button>
 
-                <div className={styles.viewButton} onClick={handleView}>
+                <button className={styles.viewButton} onClick={handleView}>
                     View
-                </div>
+                </button>
             </div>
         </div>
     );

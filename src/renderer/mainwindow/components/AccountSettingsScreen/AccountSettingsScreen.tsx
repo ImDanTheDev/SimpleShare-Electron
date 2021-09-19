@@ -101,13 +101,10 @@ export const AccountSettingsScreen: React.FC = () => {
             return;
         }
 
-        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
-            log(`'${phoneNumber}' is not a valid phone number.`);
-            return;
-        }
-
-        if (displayName.length < constants.MIN_DISPLAY_NAME_LENGTH) {
-            log(`'${displayName}' is not a valid display name`);
+        if (
+            phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH ||
+            displayName.length < constants.MIN_DISPLAY_NAME_LENGTH
+        ) {
             return;
         }
 

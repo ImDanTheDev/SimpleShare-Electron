@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { constants, IProfile, IUser, sendShare } from 'simpleshare-common';
+import {
+    constants,
+    ErrorCode,
+    IProfile,
+    IUser,
+    sendShare,
+} from 'simpleshare-common';
 import { MdClose } from 'react-icons/md';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { log } from '../../../common/log';
@@ -42,6 +48,9 @@ export const SendShareModal: React.FC = () => {
     const [fileName, setFileName] = useState<string | undefined>(undefined);
     const [fileBlob, setFileBlob] = useState<Blob | undefined>(undefined);
     const [fileExt, setFileExt] = useState<string | undefined>(undefined);
+    const [sendErrorMessage, setSendErrorMessage] = useState<
+        string | undefined
+    >(undefined);
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
@@ -49,6 +58,39 @@ export const SendShareModal: React.FC = () => {
 
     useEffect(() => {
         if (
+            triedSendingShare &&
+            !sendingShare &&
+            !sentShare &&
+            sendShareError
+        ) {
+            switch (sendShareError.code) {
+                case ErrorCode.NOT_SIGNED_IN:
+                    setSendErrorMessage(
+                        'You are not signed in. Please sign out and sign in.'
+                    );
+                    break;
+                case ErrorCode.NO_PROFILE_SELECTED:
+                    setSendErrorMessage(
+                        'No profile selected. Please switch to the profile from which to send the share from.'
+                    );
+                    break;
+                case ErrorCode.USER_DOES_NOT_EXIST:
+                    setSendErrorMessage(
+                        'The provided user does not exist. Verify that the phone number is correct.'
+                    );
+                    break;
+                case ErrorCode.PROFILE_DOES_NOT_EXIST:
+                    setSendErrorMessage(
+                        'The provided profile does not exist. Verify that the profile name is correct. Profile names are case sensitive.'
+                    );
+                    break;
+                default:
+                    setSendErrorMessage(
+                        'An unexpected error occurred while sending. Try again later.'
+                    );
+                    break;
+            }
+        } else if (
             triedSendingShare &&
             !sendingShare &&
             sentShare &&
@@ -131,6 +173,13 @@ export const SendShareModal: React.FC = () => {
             profileName.length < constants.MIN_PROFILE_NAME_LENGTH ||
             shareText.length > constants.MAX_SHARE_TEXT_LENGTH
         ) {
+            return;
+        }
+
+        if (!fileBlob && shareText.length === 0) {
+            setSendErrorMessage(
+                'You must send at least text or a file. Select a file or enter text.'
+            );
             return;
         }
 
@@ -227,12 +276,8 @@ export const SendShareModal: React.FC = () => {
                     </button>
                 </div>
             )}
-            {triedSendingShare && sendShareError && (
-                <span className={styles.errorMessage}>
-                    {
-                        'An unexpected error occurred while sending. Try again later.'
-                    }
-                </span>
+            {triedSendingShare && sendErrorMessage && (
+                <span className={styles.errorMessage}>{sendErrorMessage}</span>
             )}
         </div>
     );

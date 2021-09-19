@@ -31,15 +31,47 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
     useEffect(() => {
         if (signInError) {
             switch (signInError.code) {
+                case ErrorCode.SIGN_IN_UNEXPECTED_ERROR:
+                    setErrorMessage(
+                        'An unexpected error occurred while signing in. Try again later or contact support.'
+                    );
+                    break;
+                case ErrorCode.SIGN_IN_ACCOUNT_DISABLED:
+                    setErrorMessage(
+                        'Your account is disabled. Contact support if you believe this is a mistake.'
+                    );
+                    break;
+                case ErrorCode.SIGN_IN_BLOCKED:
+                    setErrorMessage(
+                        'The sign in popup was blocked. Please restart Simple Share and try again.'
+                    );
+                    break;
                 case ErrorCode.SIGN_IN_CANCELLED:
-                    setErrorMessage('Sign in cancelled.');
+                    setErrorMessage(
+                        'The sign in process was cancelled. Try again if this was a mistake.'
+                    );
+                    break;
+                case ErrorCode.SIGN_IN_EMAIL_UNVERIFIED:
+                    setErrorMessage(
+                        'Your email is unverified. Verify your email and try again.'
+                    );
+                    break;
+                case ErrorCode.SIGN_IN_EXPIRED_TOKEN:
+                    setErrorMessage('Sign in token expired. Try again.');
                     break;
                 case ErrorCode.SIGN_IN_INVALID_CREDENTIALS:
-                    setErrorMessage('Sign in failed with invalid credentials.');
-                    break;
-                case ErrorCode.UNEXPECTED_SIGN_IN_ERROR:
                     setErrorMessage(
-                        'An unexpected error occurred while signing in. Try again later.'
+                        'The sign in provider returned invalid credentials. Try again.'
+                    );
+                    break;
+                case ErrorCode.SIGN_IN_POPUP_ALREADY_OPENED:
+                    setErrorMessage(
+                        'The sign in popup is already open. Please close the current popup and try again.'
+                    );
+                    break;
+                case ErrorCode.SIGN_IN_USER_NOT_FOUND:
+                    setErrorMessage(
+                        'Your user could not be found. Verify your credentials and contact support if this happens again.'
                     );
                     break;
             }
@@ -82,7 +114,13 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
                     )}
                 </div>
                 <div className={styles.footer}>
-                    {/* <a className={styles.link}>Privacy Policy</a> */}
+                    <a
+                        className={styles.link}
+                        href='https://simple-share.flycricket.io/privacy.html'
+                        target='_blank'
+                    >
+                        Privacy Policy
+                    </a>
                     <div className={styles.closeButtonGroup}>
                         <button
                             className={styles.closeButton}
@@ -91,7 +129,7 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
                             <MdClose className={styles.closeButtonIcon} />
                         </button>
                     </div>
-                    {/* <a className={styles.link}>Terms of Services</a> */}
+                    <a className={styles.link}>{/*'Terms of Services'*/}</a>
                 </div>
             </div>
         </div>
