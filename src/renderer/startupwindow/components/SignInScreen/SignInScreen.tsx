@@ -74,6 +74,11 @@ const SignInScreen: React.FC<Props> = (props: Props) => {
                         'Your user could not be found. Verify your credentials and contact support if this happens again.'
                     );
                     break;
+                case ErrorCode.NO_NETWORK_CONNECTION:
+                    setErrorMessage(
+                        'Could not connect to network. Please check your internet connection.'
+                    );
+                    break;
             }
         } else {
             setErrorMessage(undefined);
