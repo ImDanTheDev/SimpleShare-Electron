@@ -52,6 +52,7 @@ export const CompleteAccountScreen: React.FC = () => {
                 'Error: User is undefined. Cannot continue account completion without a user.'
             );
             // User is undefined, but try to sign out anyways to prevent the startup window immediately redirecting to main window in a loop.
+            window.api.send('APP_CLEAR_COOKIES', {});
             dispatch(signOut());
             window.api.send('APP_SHOW_STARTUP_WINDOW', {});
 
@@ -82,6 +83,7 @@ export const CompleteAccountScreen: React.FC = () => {
             if (!user) {
                 log('User is undefined. An unexpected error occurred.');
                 // User is undefined, but try to sign out anyways to prevent the startup window immediately redirecting to main window in a loop.
+                window.api.send('APP_CLEAR_COOKIES', {});
                 dispatch(signOut());
                 window.api.send('APP_SHOW_STARTUP_WINDOW', {});
                 return;

@@ -30,6 +30,7 @@ export const AccountDropdown: React.FC = () => {
 
     const handleSignOut = () => {
         try {
+            window.api.send('APP_CLEAR_COOKIES', {});
             dispatch(signOut());
         } catch {
             dispatch(

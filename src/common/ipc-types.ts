@@ -53,6 +53,7 @@ export interface IPCArgs {
     APP_SAVE_FILE: {
         url: string;
     };
+    APP_CLEAR_COOKIES: Record<string, unknown>;
 }
 
 export const IPC_ARG_TEMPLATES: IPCArgs = {
@@ -108,4 +109,5 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
     APP_SAVE_FILE: {
         url: '',
     },
+    APP_CLEAR_COOKIES: {},
 };

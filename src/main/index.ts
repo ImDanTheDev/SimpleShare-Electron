@@ -212,6 +212,9 @@ const setupIPC = () => {
         createUpdateWindow();
         oldWindow.close();
     });
+    ipc.on('APP_CLEAR_COOKIES', async () => {
+        await currentWindow.webContents.session.clearStorageData();
+    });
 };
 
 // This method will be called when Electron has finished
