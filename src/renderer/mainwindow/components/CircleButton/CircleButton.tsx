@@ -5,6 +5,7 @@ interface Props {
     style: React.CSSProperties | undefined;
     onClick?: () => void;
     tooltip?: string;
+    disableAnimation?: boolean;
 }
 
 export const CircleButton: React.FC<Props> = (
@@ -12,7 +13,9 @@ export const CircleButton: React.FC<Props> = (
 ) => {
     return (
         <div
-            className={styles.button}
+            className={
+                props.disableAnimation ? styles.boringButton : styles.button
+            }
             style={props.style}
             onClick={props.onClick}
             title={props.tooltip}

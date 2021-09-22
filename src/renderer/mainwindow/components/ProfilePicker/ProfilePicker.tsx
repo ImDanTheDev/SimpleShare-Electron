@@ -1,25 +1,20 @@
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { CircleButton } from '../CircleButton/CircleButton';
 import styles from './ProfilePicker.module.scss';
-import { MdChevronLeft, MdChevronRight, MdAdd, MdClose } from 'react-icons/md';
+import { MdChevronLeft, MdChevronRight, MdAdd, MdEdit } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { pushToast } from '../../../common/redux/toaster-slice';
 import {
     constants,
-    deleteCloudProfile,
     IProfile,
-    IUser,
+    selectProfileForEditing,
     switchProfile,
 } from 'simpleshare-common';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
-
-    const user: IUser | undefined = useSelector(
-        (state: RootState) => state.auth.user
-    );
 
     const profiles: IProfile[] = useSelector(
         (state: RootState) => state.profiles.profiles
@@ -121,43 +116,22 @@ export const ProfilePicker: React.FC = () => {
         dispatch(setCurrentModal('NewProfileModal'));
     };
 
-    const handleDeleteProfile = async (profile: IProfile) => {
-        if (!user) {
-            dispatch(
-                pushToast({
-                    message:
-                        'You are signed out. Please sign in and try again.',
-                    type: 'error',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-            return;
-        }
-        if (!profile.id) {
-            dispatch(
-                pushToast({
-                    message: 'The selected profile does not exist.',
-                    type: 'warn',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-            return;
-        }
-
-        dispatch(deleteCloudProfile(profile));
+    const handleEditProfile = (profile: IProfile) => {
+        dispatch(selectProfileForEditing(profile));
+        dispatch(setCurrentModal('NewProfileModal'));
     };
 
-    const renderDeleteButton = (profile: IProfile) => {
+    const renderEditButton = (profile: IProfile) => {
         if (!editingProfiles || profile.id === 'default') return <></>;
 
         return (
             <div
-                className={styles.deleteProfileButton}
-                onClick={() => handleDeleteProfile(profile)}
+                className={styles.deleteProfileButtonContainer}
+                onClick={() => handleEditProfile(profile)}
             >
-                <MdClose className={styles.deleteProfileButtonIcon} />
+                <div className={styles.deleteProfileButton}>
+                    <MdEdit className={styles.deleteProfileButtonIcon} />
+                </div>
             </div>
         );
     };
@@ -175,11 +149,13 @@ export const ProfilePicker: React.FC = () => {
                         borderWidth: profile.id === currentProfile?.id ? 2 : 1,
                         borderRadius:
                             profile.id === currentProfile?.id ? 16 : '50%',
+                        overflow: 'hidden',
                     }}
                     tooltip={profile.name}
+                    disableAnimation={editingProfiles}
                     onClick={() => handleProfileClick(profile)}
                 >
-                    {renderDeleteButton(profile)}
+                    {renderEditButton(profile)}
                     {!profile.pfp ||
                     profile.pfp === constants.DEFAULT_PFP_ID ? (
                         <span className={styles.profileLabel}>
