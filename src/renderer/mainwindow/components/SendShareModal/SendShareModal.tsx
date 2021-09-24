@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-    MAX_PHONE_NUMBER_LENGTH,
-    MAX_PROFILE_NAME_LENGTH,
-    MAX_SHARE_TEXT_LENGTH,
-    MIN_PHONE_NUMBER_LENGTH,
-    MIN_PROFILE_NAME_LENGTH,
-} from '../../../common/constants';
-import { error, log } from '../../../common/log';
+    constants,
+    ErrorCode,
+    IProfile,
+    IUser,
+    sendShare,
+} from 'simpleshare-common';
+import { MdClose } from 'react-icons/md';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { addShareToOutbox } from '../../../common/redux/outbox-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
-import { databaseService } from '../../../common/services/api';
-import IProfile from '../../../common/services/IProfile';
-import IShare from '../../../common/services/IShare';
-import IUser from '../../../common/services/IUser';
 import styles from './SendShareModal.module.scss';
 
 export const SendShareModal: React.FC = () => {
@@ -32,6 +29,14 @@ export const SendShareModal: React.FC = () => {
             )
     );
 
+    const sendingShare = useSelector(
+        (state: RootState) => state.shares.sendingShare
+    );
+    const sentShare = useSelector((state: RootState) => state.shares.sentShare);
+    const sendShareError = useSelector(
+        (state: RootState) => state.shares.sendShareError
+    );
+
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [profileName, setProfileName] = useState<string>('');
     const [shareText, setShareText] = useState<string>('');
@@ -39,38 +44,116 @@ export const SendShareModal: React.FC = () => {
     const [phoneNumberError, setPhoneNumberError] = useState<string>('');
     const [profileNameError, setProfileNameError] = useState<string>('');
     const [shareTextError, setShareTextError] = useState<string>('');
+    const [triedSendingShare, setTriedSendingShare] = useState<boolean>(false);
+    const [fileName, setFileName] = useState<string | undefined>(undefined);
+    const [fileBlob, setFileBlob] = useState<Blob | undefined>(undefined);
+    const [fileExt, setFileExt] = useState<string | undefined>(undefined);
+    const [sendErrorMessage, setSendErrorMessage] = useState<
+        string | undefined
+    >(undefined);
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
     };
 
     useEffect(() => {
-        if (profileName.length < MIN_PROFILE_NAME_LENGTH) {
+        if (
+            triedSendingShare &&
+            !sendingShare &&
+            !sentShare &&
+            sendShareError
+        ) {
+            switch (sendShareError.code) {
+                case ErrorCode.NOT_SIGNED_IN:
+                    setSendErrorMessage(
+                        'You are not signed in. Please sign out and sign in.'
+                    );
+                    break;
+                case ErrorCode.NO_PROFILE_SELECTED:
+                    setSendErrorMessage(
+                        'No profile selected. Please switch to the profile from which to send the share from.'
+                    );
+                    break;
+                case ErrorCode.USER_DOES_NOT_EXIST:
+                    setSendErrorMessage(
+                        'The provided user does not exist. Verify that the phone number is correct.'
+                    );
+                    break;
+                case ErrorCode.PROFILE_DOES_NOT_EXIST:
+                    setSendErrorMessage(
+                        'The provided profile does not exist. Verify that the profile name is correct. Profile names are case sensitive.'
+                    );
+                    break;
+                default:
+                    setSendErrorMessage(
+                        'An unexpected error occurred while sending. Try again later.'
+                    );
+                    break;
+            }
+        } else if (
+            triedSendingShare &&
+            !sendingShare &&
+            sentShare &&
+            !sendShareError
+        ) {
+            dispatch(setCurrentModal('None'));
+        }
+    }, [triedSendingShare, sendingShare, sentShare, sendShareError]);
+
+    useEffect(() => {
+        if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
             setProfileNameError(
-                `Profile name must be at least ${MIN_PROFILE_NAME_LENGTH} characters long.`
+                `Profile name must be at least ${constants.MIN_PROFILE_NAME_LENGTH} characters long.`
             );
         } else {
             setProfileNameError('');
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
             setPhoneNumberError(
-                `Phone number must be at least ${MIN_PHONE_NUMBER_LENGTH} characters long.`
+                `Phone number must be at least ${constants.MIN_PHONE_NUMBER_LENGTH} characters long.`
             );
         } else {
             setPhoneNumberError('');
         }
 
-        if (shareText.length > MAX_SHARE_TEXT_LENGTH) {
+        if (shareText.length > constants.MAX_SHARE_TEXT_LENGTH) {
             setShareTextError(
-                `Share text must not exceed ${MAX_SHARE_TEXT_LENGTH} characters.`
+                `Share text must not exceed ${constants.MAX_SHARE_TEXT_LENGTH} characters.`
             );
         } else {
             setShareTextError('');
         }
     }, [profileName, phoneNumber, shareText]);
 
+    const handleSelectFile = async () => {
+        const { buffer, fileName, ext, mimeType } = await window.api.invoke(
+            'APP_GET_FILE',
+            {
+                filters: [
+                    {
+                        name: 'All Files',
+                        extensions: ['*'],
+                    },
+                ],
+            }
+        );
+
+        const fileData: Uint8Array = Uint8Array.from(window.atob(buffer), (c) =>
+            c.charCodeAt(0)
+        );
+
+        setFileBlob(
+            new Blob([fileData], {
+                type: mimeType || 'application/octet-stream',
+            })
+        );
+        setFileName(fileName);
+        setFileExt(ext);
+    };
+
     const handleSend = async () => {
+        setTriedSendingShare(true);
         if (!user || !currentProfile || !currentProfile.id) {
             log('ERROR: Not signed in!');
             dispatch(
@@ -85,59 +168,43 @@ export const SendShareModal: React.FC = () => {
             return;
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
-            log(`'${phoneNumber}' is not a valid phone number.`);
+        if (
+            phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH ||
+            profileName.length < constants.MIN_PROFILE_NAME_LENGTH ||
+            shareText.length > constants.MAX_SHARE_TEXT_LENGTH
+        ) {
             return;
         }
 
-        if (profileName.length < MIN_PROFILE_NAME_LENGTH) {
-            log(`'${profileName}' is not a valid profile name.`);
-            return;
-        }
-
-        if (shareText.length > MAX_SHARE_TEXT_LENGTH) {
-            log(
-                `Your message length must not exceed ${MAX_SHARE_TEXT_LENGTH} characters.`
+        if (!fileBlob && shareText.length === 0) {
+            setSendErrorMessage(
+                'You must send at least text or a file. Select a file or enter text.'
             );
             return;
         }
 
-        const toUid = await databaseService.getUidByPhoneNumber(phoneNumber);
-        if (!toUid) {
-            log('Could not find a user with the provided phone number.');
-            setPhoneNumberError('User does not exist.');
-            return;
-        }
-
-        const toProfileId = await databaseService.getProfileIdByName(
-            toUid,
-            profileName
+        dispatch(
+            sendShare({
+                toPhoneNumber: phoneNumber,
+                toProfileName: profileName,
+                share: {
+                    textContent: shareText,
+                    fileSrc:
+                        fileBlob && fileExt
+                            ? {
+                                  blob: fileBlob,
+                                  ext: fileExt,
+                              }
+                            : undefined,
+                },
+            })
         );
-        if (!toProfileId) {
-            log(`Profile '${profileName}' does not exist.`);
-            setProfileNameError('Profile does not exist.');
-            return;
-        }
+    };
 
-        const share: IShare = {
-            fromUid: user.uid,
-            fromProfileId: currentProfile.id,
-            toUid: toUid,
-            toProfileId: toProfileId,
-            content: shareText,
-            type: 'text',
-        };
-
-        try {
-            await databaseService.createShare(share);
-            dispatch(addShareToOutbox(share));
-            dispatch(setCurrentModal('None'));
-        } catch (e) {
-            error('Failed to send share: ', e);
-            setShareTextError(
-                'An error occurred while sending the share. Try again later.'
-            );
-        }
+    const handleClearFile = () => {
+        setFileBlob(undefined);
+        setFileExt(undefined);
+        setFileName(undefined);
     };
 
     return (
@@ -149,8 +216,8 @@ export const SendShareModal: React.FC = () => {
                 type='text'
                 value={phoneNumber}
                 placeholder='+11234567890'
-                minLength={MIN_PHONE_NUMBER_LENGTH}
-                maxLength={MAX_PHONE_NUMBER_LENGTH}
+                minLength={constants.MIN_PHONE_NUMBER_LENGTH}
+                maxLength={constants.MAX_PHONE_NUMBER_LENGTH}
                 onChange={(e) => setPhoneNumber(e.target.value)}
             />
             <span className={styles.errorMessage}>{phoneNumberError}</span>
@@ -160,8 +227,8 @@ export const SendShareModal: React.FC = () => {
                 type='text'
                 value={profileName}
                 placeholder='Laptop'
-                minLength={MIN_PROFILE_NAME_LENGTH}
-                maxLength={MAX_PROFILE_NAME_LENGTH}
+                minLength={constants.MIN_PROFILE_NAME_LENGTH}
+                maxLength={constants.MAX_PROFILE_NAME_LENGTH}
                 onChange={(e) => setProfileName(e.target.value)}
             />
             <span className={styles.errorMessage}>{profileNameError}</span>
@@ -170,19 +237,48 @@ export const SendShareModal: React.FC = () => {
                 className={styles.field}
                 value={shareText}
                 placeholder='Type anything you want here!'
-                maxLength={MAX_SHARE_TEXT_LENGTH}
-                rows={5}
+                maxLength={constants.MAX_SHARE_TEXT_LENGTH}
+                rows={4}
                 onChange={(e) => setShareText(e.target.value)}
             />
             <span className={styles.errorMessage}>{shareTextError}</span>
-            <div className={styles.buttons}>
-                <button className={styles.button} onClick={handleDismiss}>
-                    Cancel
+            {fileName ? (
+                <div className={styles.selectedFileButtonGroup}>
+                    <div
+                        className={styles.clearFileButton}
+                        title='Clear file'
+                        onClick={handleClearFile}
+                    >
+                        <MdClose className={styles.clearFileButtonIcon} />
+                    </div>
+                    <div
+                        className={styles.changeFileButton}
+                        onClick={handleSelectFile}
+                    >
+                        <span>{fileName}</span>
+                    </div>
+                </div>
+            ) : (
+                <button className={styles.button} onClick={handleSelectFile}>
+                    Select File
                 </button>
-                <button className={styles.button} onClick={handleSend}>
-                    Send
-                </button>
-            </div>
+            )}
+
+            {sendingShare ? (
+                <LoadingIcon />
+            ) : (
+                <div className={styles.buttons}>
+                    <button className={styles.button} onClick={handleDismiss}>
+                        Cancel
+                    </button>
+                    <button className={styles.button} onClick={handleSend}>
+                        Send
+                    </button>
+                </div>
+            )}
+            {triedSendingShare && sendErrorMessage && (
+                <span className={styles.errorMessage}>{sendErrorMessage}</span>
+            )}
         </div>
     );
 };

@@ -1,14 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './InboxItem.module.scss';
 import { MdDeleteForever } from 'react-icons/md';
-import IShare from '../../../common/services/IShare';
-import { databaseService } from '../../../common/services/api';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
-import IProfile from '../../../common/services/IProfile';
 import { useDispatch } from 'react-redux';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { setCurrentShare } from '../../../common/redux/shares-slice';
-import { pushToast } from '../../../common/redux/toaster-slice';
+import { deleteCloudShare, IShare, setCurrentShare } from 'simpleshare-common';
 
 interface Props {
     share: IShare;
@@ -17,56 +12,14 @@ interface Props {
 export const InboxItem: React.FC<Props> = (props: Props) => {
     const dispatch = useDispatch();
 
-    const [senderDisplayName, setSenderDisplayName] = useState<string>('');
-    const [senderProfileName, setSenderProfileName] = useState<string>('');
-
-    useEffect(() => {
-        const fetchDisplayName = async () => {
-            try {
-                const publicGeneralInfo: IPublicGeneralInfo | undefined =
-                    await databaseService.getPublicGeneralInfo(
-                        props.share.fromUid
-                    );
-                setSenderDisplayName(
-                    publicGeneralInfo?.displayName || 'Unknown User'
-                );
-            } catch {
-                setSenderDisplayName('Unknown User');
-            }
-        };
-
-        const fetchProfileName = async () => {
-            try {
-                const profile: IProfile | undefined =
-                    await databaseService.getProfile(
-                        props.share.fromUid,
-                        props.share.fromProfileId
-                    );
-                setSenderProfileName(profile?.name || 'Unknown Profile');
-            } catch {
-                setSenderProfileName('Unknown Profile');
-            }
-        };
-
-        fetchDisplayName();
-        fetchProfileName();
-    }, [props.share]);
+    const [fallback, setFallback] = useState<boolean>(false);
 
     const handleDelete = async () => {
-        if (!(await databaseService.deleteShare(props.share))) {
-            dispatch(
-                pushToast({
-                    message:
-                        'An unexpected error occurred while deleting the inbox item. Try again later.',
-                    duration: 5,
-                    type: 'error',
-                })
-            );
-        }
+        dispatch(deleteCloudShare(props.share));
     };
 
     const handleCopyText = async () => {
-        await navigator.clipboard.writeText(props.share.content);
+        await navigator.clipboard.writeText(props.share.textContent || '');
     };
 
     const handleView = () => {
@@ -77,29 +30,68 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
     return (
         <div className={styles.item}>
             <div className={styles.header}>
-                <div className={styles.preview}></div>
+                {props.share.fileURL && !fallback && (
+                    <div className={styles.preview}>
+                        <img
+                            className={styles.previewImage}
+                            src={props.share.fileURL}
+                            title='File Preview'
+                            onError={() => setFallback(true)}
+                        />
+                    </div>
+                )}
                 <div className={styles.fromGroup}>
-                    <div className={styles.fromUser}>{senderDisplayName}</div>
+                    <div className={styles.fromUser}>
+                        {props.share.fromDisplayName || 'Unknown User'}
+                    </div>
                     <div className={styles.fromProfile}>
-                        {senderProfileName}
+                        {props.share.fromProfileName || 'Unknown Profile'}
                     </div>
                 </div>
             </div>
 
             <div className={styles.body}>
-                <span>{props.share.content}</span>
+                {props.share.textContent ? (
+                    <span>{props.share.textContent}</span>
+                ) : (
+                    <span className={styles.noText}>No Text</span>
+                )}
             </div>
 
             <div className={styles.footer}>
-                <div className={styles.deleteButton} onClick={handleDelete}>
+                <div
+                    className={styles.deleteButton}
+                    onClick={handleDelete}
+                    title='Delete Share'
+                >
                     <MdDeleteForever />
                 </div>
-                <div className={styles.copyTextButton} onClick={handleCopyText}>
+                <button
+                    className={styles.downloadFileButton}
+                    disabled={!props.share.fileURL}
+                    title={
+                        props.share.fileURL ? props.share.fileURL : 'No File'
+                    }
+                    onClick={() => {
+                        if (props.share.fileURL) {
+                            window.open(props.share.fileURL, '_blank');
+                        }
+                    }}
+                >
+                    Download File
+                </button>
+                <button
+                    className={styles.copyTextButton}
+                    onClick={handleCopyText}
+                    disabled={!props.share.textContent}
+                    title={props.share.textContent ? '' : 'No Text'}
+                >
                     Copy Text
-                </div>
-                <div className={styles.viewButton} onClick={handleView}>
+                </button>
+
+                <button className={styles.viewButton} onClick={handleView}>
                     View
-                </div>
+                </button>
             </div>
         </div>
     );

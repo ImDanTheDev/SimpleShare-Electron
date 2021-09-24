@@ -1,38 +1,33 @@
 import React, { useState, useEffect, ReactNode, useRef } from 'react';
 import { CircleButton } from '../CircleButton/CircleButton';
 import styles from './ProfilePicker.module.scss';
-import { MdChevronLeft, MdChevronRight, MdAdd, MdClose } from 'react-icons/md';
-import IProfile from '../../../common/services/IProfile';
+import { MdChevronLeft, MdChevronRight, MdAdd, MdEdit } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../common/redux/store';
-import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { setShares } from '../../../common/redux/shares-slice';
-import { databaseService } from '../../../common/services/api';
-import IUser from '../../../common/services/IUser';
-import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { pushToast } from '../../../common/redux/toaster-slice';
+import {
+    constants,
+    IProfile,
+    selectProfileForEditing,
+    switchProfile,
+} from 'simpleshare-common';
 
 export const ProfilePicker: React.FC = () => {
     const dispatch = useDispatch();
-
-    const user: IUser | undefined = useSelector(
-        (state: RootState) => state.auth.user
-    );
 
     const profiles: IProfile[] = useSelector(
         (state: RootState) => state.profiles.profiles
     );
 
-    const fetchingProfiles: boolean | undefined = useSelector(
-        (state: RootState) => state.profiles.fetchingProfiles
-    );
-
-    const currentProfile: IProfile | undefined = useSelector(
+    const currentProfile = useSelector(
         (state: RootState) =>
+            // Find current profile.
+            // If current profile doesnt exist, pick the first profile.
+            // If no profiles exist, return undefined.
             state.profiles.profiles.find(
                 (profile) => profile.id === state.profiles.currentProfileId
-            )
+            ) || state.profiles.profiles[0]
     );
 
     const editingProfiles: boolean = useSelector(
@@ -103,8 +98,7 @@ export const ProfilePicker: React.FC = () => {
             );
             return;
         }
-        dispatch(setShares([]));
-        dispatch(setCurrentProfile(profile.id));
+        dispatch(switchProfile(profile));
     };
 
     const handleNewProfile = () => {
@@ -122,55 +116,22 @@ export const ProfilePicker: React.FC = () => {
         dispatch(setCurrentModal('NewProfileModal'));
     };
 
-    const handleDeleteProfile = async (profile: IProfile) => {
-        if (!user) {
-            dispatch(
-                pushToast({
-                    message:
-                        'You are signed out. Please sign in and try again.',
-                    type: 'error',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-            return;
-        }
-        if (!profile.id) {
-            dispatch(
-                pushToast({
-                    message: 'The selected profile does not exist.',
-                    type: 'warn',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-            return;
-        }
-
-        try {
-            await databaseService.deleteProfile(user.uid, profile.id);
-        } catch {
-            dispatch(
-                pushToast({
-                    message:
-                        'An unexpected error occurred while deleting the profile.',
-                    type: 'error',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-        }
+    const handleEditProfile = (profile: IProfile) => {
+        dispatch(selectProfileForEditing(profile));
+        dispatch(setCurrentModal('NewProfileModal'));
     };
 
-    const renderDeleteButton = (profile: IProfile) => {
+    const renderEditButton = (profile: IProfile) => {
         if (!editingProfiles || profile.id === 'default') return <></>;
 
         return (
             <div
-                className={styles.deleteProfileButton}
-                onClick={() => handleDeleteProfile(profile)}
+                className={styles.deleteProfileButtonContainer}
+                onClick={() => handleEditProfile(profile)}
             >
-                <MdClose className={styles.deleteProfileButtonIcon} />
+                <div className={styles.deleteProfileButton}>
+                    <MdEdit className={styles.deleteProfileButtonIcon} />
+                </div>
             </div>
         );
     };
@@ -188,15 +149,26 @@ export const ProfilePicker: React.FC = () => {
                         borderWidth: profile.id === currentProfile?.id ? 2 : 1,
                         borderRadius:
                             profile.id === currentProfile?.id ? 16 : '50%',
+                        overflow: 'hidden',
                     }}
+                    tooltip={profile.name}
+                    disableAnimation={editingProfiles}
                     onClick={() => handleProfileClick(profile)}
                 >
-                    {renderDeleteButton(profile)}
-                    <span className={styles.profileLabel}>
-                        {profile.name.length > 2
-                            ? profile.name.slice(0, 2)
-                            : profile.name}
-                    </span>
+                    {renderEditButton(profile)}
+                    {!profile.pfp ||
+                    profile.pfp === constants.DEFAULT_PFP_ID ? (
+                        <span className={styles.profileLabel}>
+                            {profile.name.length > 2
+                                ? profile.name.slice(0, 2)
+                                : profile.name}
+                        </span>
+                    ) : (
+                        <img
+                            className={styles.profileImage}
+                            src={profile.pfp}
+                        />
+                    )}
                 </CircleButton>
             );
         });
@@ -217,14 +189,11 @@ export const ProfilePicker: React.FC = () => {
                 <CircleButton
                     style={{ height: 50, width: 50 }}
                     onClick={handleNewProfile}
+                    tooltip='Create Profile'
                 >
                     <MdAdd fontSize={64} color='#FFF' />
                 </CircleButton>
-                {fetchingProfiles || fetchingProfiles === undefined ? (
-                    <LoadingIcon />
-                ) : (
-                    renderProfiles()
-                )}
+                {renderProfiles()}
             </div>
             {showRightArrow ? (
                 <button

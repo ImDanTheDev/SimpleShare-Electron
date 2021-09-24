@@ -1,44 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import { databaseService } from '../../../common/services/api';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
-import IShare from '../../../common/services/IShare';
+import React, { useState } from 'react';
+import { constants, OutboxEntry } from 'simpleshare-common';
 import styles from './OutboxItem.module.scss';
 
 interface Props {
-    share: IShare;
+    entry: OutboxEntry;
 }
 
 export const OutboxItem: React.FC<Props> = (props: Props) => {
-    const [senderDisplayName, setSenderDisplayName] = useState<string>('');
-
-    useEffect(() => {
-        const fetchDisplayName = async () => {
-            try {
-                const publicGeneralInfo: IPublicGeneralInfo | undefined =
-                    await databaseService.getPublicGeneralInfo(
-                        props.share.toUid
-                    );
-                setSenderDisplayName(
-                    publicGeneralInfo?.displayName || 'Unknown User'
-                );
-            } catch {
-                setSenderDisplayName('Unknown User');
-            }
-        };
-        fetchDisplayName();
-    });
+    const [failover, setFailover] = useState<boolean>(false);
 
     return (
         <div className={styles.item}>
-            <div className={styles.profilePicture}>PFP</div>
+            <div
+                className={styles.profilePictureBox}
+                title={props.entry.share.toProfileName}
+            >
+                {failover || props.entry.pfpURL === constants.DEFAULT_PFP_ID ? (
+                    props.entry.share.toProfileName &&
+                    (props.entry.share.toProfileName.length > 2
+                        ? props.entry.share.toProfileName.slice(0, 2)
+                        : props.entry.share.toProfileName)
+                ) : (
+                    <img
+                        className={styles.profileImage}
+                        src={props.entry.pfpURL}
+                        onError={() => {
+                            setFailover(true);
+                        }}
+                    />
+                )}
+            </div>
             <div className={styles.body}>
-                <div className={styles.to}>{senderDisplayName}</div>
+                <div className={styles.to}>
+                    {props.entry.share.toDisplayName}
+                </div>
 
-                <div className={styles.fileName}>{'No File'}</div>
+                <div className={styles.fileName}>
+                    {props.entry.share.fileURL ? (
+                        <a
+                            className={styles.fileLink}
+                            href={props.entry.share.fileURL}
+                            target='_blank'
+                        >
+                            Download File
+                        </a>
+                    ) : (
+                        <span className={styles.noFile}>No File</span>
+                    )}
+                </div>
                 <div className={styles.content}>
-                    {props.share.content.length > 50
-                        ? props.share.content.slice(0, 50)
-                        : props.share.content}
+                    {props.entry.share.textContent ? (
+                        props.entry.share.textContent.length > 50 ? (
+                            props.entry.share.textContent.slice(0, 50)
+                        ) : (
+                            props.entry.share.textContent || ''
+                        )
+                    ) : (
+                        <span className={styles.noText}>No Text</span>
+                    )}
                 </div>
             </div>
         </div>

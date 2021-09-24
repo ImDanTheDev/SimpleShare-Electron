@@ -1,8 +1,13 @@
+import { IAuth, IFirebase, IFirestore, IStorage } from '@omnifire/api';
+import { OFAuth, OFFirebase, OFFirestore, OFStorage } from '@omnifire/web';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { log } from '../../../common/log';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+    initFirebase,
+    serviceHandler,
+    startAuthStateListener,
+} from 'simpleshare-common';
 import { RootState } from '../../../common/redux/store';
-import { authService, initService } from '../../../common/services/api';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import SignInScreen from '../SignInScreen/SignInScreen';
 import SplashScreen from '../SplashScreen/SplashScreen';
@@ -10,6 +15,7 @@ import SplashScreen from '../SplashScreen/SplashScreen';
 type ScreenType = 'SplashScreen' | 'SignInScreen';
 
 export const StartupWindow: React.FC = () => {
+    const dispatch = useDispatch();
     const [currentScreen, setCurrentScreen] =
         useState<ScreenType>('SplashScreen');
 
@@ -37,17 +43,52 @@ export const StartupWindow: React.FC = () => {
         useState<NodeJS.Timer>();
 
     const user = useSelector((state: RootState) => state.auth.user);
-    const initializing = useSelector(
-        (state: RootState) => state.auth.initializing
+    const fetchedUser = useSelector(
+        (state: RootState) => state.auth.fetchedUser
     );
 
     useEffect(() => {
-        initService.initialize();
-        authService.initialize();
+        const initializeApp = async () => {
+            const firebase: IFirebase = new OFFirebase();
+            firebase.initializeApp({
+                apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
+                authDomain: 'simpleshare-428bb.firebaseapp.com',
+                projectId: 'simpleshare-428bb',
+                storageBucket: 'simpleshare-428bb.appspot.com',
+                messagingSenderId: '555940005658',
+                appId: '1:555940005658:web:b00dd5f990111de83dcea3',
+                measurementId: 'G-WV37870J2G',
+            });
+            const auth: IAuth = new OFAuth();
+            auth.configureGoogle();
+            const firestore: IFirestore = new OFFirestore();
+            const storage: IStorage = new OFStorage();
+            initFirebase(firebase, firestore, auth, storage);
+            let servicesUpToDate = false;
+            try {
+                servicesUpToDate =
+                    await serviceHandler.isServiceHandlerUpToDate();
+            } catch {
+                // TODO: Show error screen with "Error communicating with network services. Please check your internet connection."
+                window.api.send('APP_SHOW_UPDATE_WINDOW', {});
+            }
+
+            if (!servicesUpToDate) {
+                window.api.send('APP_SHOW_UPDATE_WINDOW', {});
+                return;
+            }
+
+            dispatch(startAuthStateListener());
+        };
+        initializeApp();
     }, []);
 
     useEffect(() => {
-        const showSignInScreen = () => {
+        if (!fetchedUser) return;
+
+        if (user) {
+            window.api.send('APP_SHOW_MAIN_WINDOW', {});
+        } else {
             setOpacityAnimFrame(0);
             setCurrentScreen('SignInScreen');
             setFrameRadius(signInFrameRadius);
@@ -57,23 +98,8 @@ export const StartupWindow: React.FC = () => {
                     setOpacityAnimFrame((oldFrame) => oldFrame + 1);
                 }, opacityAnimFrameTime)
             );
-        };
-
-        const startAuthFlow = async () => {
-            if (initializing) return;
-            if (!user) {
-                log('Going to Sign In Screen');
-                showSignInScreen();
-            }
-        };
-
-        startAuthFlow();
-    }, [initializing, user]);
-
-    useEffect(() => {
-        if (!user) return;
-        window.api.send('APP_SHOW_MAIN_WINDOW', {});
-    }, [user]);
+        }
+    }, [fetchedUser, user]);
 
     useEffect(() => {
         setOpacityAnimFrame(0);

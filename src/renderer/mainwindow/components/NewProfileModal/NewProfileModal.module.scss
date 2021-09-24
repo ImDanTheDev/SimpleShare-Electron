@@ -26,6 +26,59 @@
     height: 100%;
 }
 
+.inputs {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.pfp {
+    height: 100%;
+    aspect-ratio: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-color: #1a2633;
+    border-radius: 16px;
+    border-color: #f4a2617f;
+    border-width: 1px;
+    border-style: solid;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.pfp:hover {
+    filter: drop-shadow(2px 2px 6px #1a1a1a);
+    transform: scale(1.05);
+}
+.pfp:active {
+    filter: drop-shadow(2px 2px 1px #1a1a1a);
+    transform: scale(0.95);
+}
+
+.pfpIcon {
+    font-size: 20px;
+    color: #fff;
+}
+
+.pfp:hover .removePFPIcon {
+    flex: 1 1;
+    width: 100%;
+    display: block;
+    background-color: #1a2633;
+}
+
+.removePFPIcon {
+    display: none;
+    font-size: 20px;
+    color: #e63333;
+}
+
 .field {
     color: #fff;
     background-color: #1a2633;
@@ -36,12 +89,13 @@
     font-size: 18px;
     outline: none;
     height: 100%;
+    flex: 1;
 }
 
 .buttons {
     height: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto auto auto;
     gap: 8px;
 }
 

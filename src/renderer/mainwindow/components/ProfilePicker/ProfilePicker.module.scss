@@ -11,28 +11,43 @@
     border-color: #0d161f;
 }
 
+.profileImage {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: inherit;
+}
+
 .profileLabel {
     font-size: 24px;
     color: #fff;
 }
 
-.deleteProfileButton {
+.deleteProfileButtonContainer {
     position: absolute;
+    left: 0;
     right: 0;
     top: 0;
+    bottom: 0;
+    //background-color: red;
+    backdrop-filter: blur(2px);
+    background-color: rgba(0, 0, 0, 0.253);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
+.deleteProfileButton {
     display: flex;
     flex-direction: column;
 
-    width: 16px;
-    height: 16px;
+    padding: 4px;
 
     justify-content: center;
     align-items: center;
 
     background-color: #c24242;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     filter: drop-shadow(1px 1px 2px #202020);
     border-color: transparent;
     transition: filter 0.1s, transform 0.1s;
@@ -40,18 +55,13 @@
     -webkit-app-region: none;
 }
 
-.deleteProfileButton:hover {
-    filter: drop-shadow(1px 1px 2px #202020);
+.deleteProfileButtonContainer:hover > .deleteProfileButton {
     transform: scale(1.15);
-}
-
-.deleteProfileButton:active {
-    filter: drop-shadow(1px 1px 2px #202020);
 }
 
 .deleteProfileButtonIcon {
     color: #bdbdbd;
-    font-size: 14px;
+    font-size: 18px;
 }
 
 .leftArrow {

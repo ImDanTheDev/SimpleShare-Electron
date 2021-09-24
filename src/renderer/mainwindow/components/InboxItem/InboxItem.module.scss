@@ -25,20 +25,24 @@
 }
 
 .preview {
-    display: flex;
     flex-direction: column;
-
-    flex: 0 0 64px;
     height: 64px;
-
     background-color: #1a2633;
     border-radius: 16px;
+    width: 64px;
+    overflow: hidden;
+    display: flex;
+    margin-right: 8px;
+}
+
+.previewImage {
+    flex: 1;
+    object-fit: cover;
 }
 
 .fromGroup {
     display: flex;
     flex-direction: column;
-    margin-left: 8px;
 }
 
 .fromUser {
@@ -76,7 +80,8 @@
 .footer {
     display: grid;
 
-    grid-template-columns: 1fr 1fr 1fr;
+    //grid-template-columns: auto 1fr 1fr 1fr;
+    grid-template-columns: auto auto auto auto;
     gap: 8px;
 
     flex: 0 0 48px;
@@ -115,6 +120,50 @@
     transform: scale(0.9);
 }
 
+.fileURL {
+    text-decoration: none;
+}
+
+.downloadFileButton {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    height: 32px;
+    color: #fff;
+    background-color: #e9c46a19;
+    border-radius: 8px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    cursor: pointer;
+    font-size: initial;
+}
+
+.downloadFileButton:hover {
+    filter: drop-shadow(2px 2px 6px #1a1a1a);
+    transform: scale(1.05);
+}
+
+.downloadFileButton:active {
+    filter: drop-shadow(2px 2px 1px #1a1a1a);
+    transform: scale(0.95);
+}
+
+.downloadFileButton:disabled {
+    background-color: #79663619;
+    color: rgb(114, 114, 114);
+    border-color: #5036217f;
+}
+
+.downloadFileButton:disabled:hover {
+    filter: none;
+    transform: none;
+    cursor: default;
+}
+
 .copyTextButton {
     display: flex;
     flex-direction: column;
@@ -130,6 +179,7 @@
     border-style: solid;
     border-color: #f4a2617f;
     cursor: pointer;
+    font-size: initial;
 }
 
 .copyTextButton:hover {
@@ -140,6 +190,18 @@
 .copyTextButton:active {
     filter: drop-shadow(2px 2px 1px #1a1a1a);
     transform: scale(0.95);
+}
+
+.copyTextButton:disabled {
+    background-color: #79663619;
+    color: rgb(114, 114, 114);
+    border-color: #5036217f;
+}
+
+.copyTextButton:disabled:hover {
+    filter: none;
+    transform: none;
+    cursor: default;
 }
 
 .viewButton {
@@ -157,6 +219,7 @@
     border-style: solid;
     border-color: #f4a2617f;
     cursor: pointer;
+    font-size: initial;
 }
 
 .viewButton:hover {
@@ -167,4 +230,9 @@
 .viewButton:active {
     filter: drop-shadow(2px 2px 1px #1a1a1a);
     transform: scale(0.95);
+}
+
+.noText {
+    color: #c1c1c1;
+    font-style: italic;
 }

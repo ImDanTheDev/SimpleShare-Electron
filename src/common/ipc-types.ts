@@ -26,6 +26,7 @@ export interface IPCArgs {
     };
     APP_SHOW_MAIN_WINDOW: Record<string, unknown>;
     APP_SHOW_STARTUP_WINDOW: Record<string, unknown>;
+    APP_SHOW_UPDATE_WINDOW: Record<string, unknown>;
     APP_QUIT: Record<string, unknown>;
 
     APP_SET_ITEM: {
@@ -46,6 +47,13 @@ export interface IPCArgs {
         message: unknown;
         optionalParams: unknown[];
     };
+    APP_GET_FILE: {
+        filters?: { name: string; extensions: string[] }[];
+    };
+    APP_SAVE_FILE: {
+        url: string;
+    };
+    APP_CLEAR_COOKIES: Record<string, unknown>;
 }
 
 export const IPC_ARG_TEMPLATES: IPCArgs = {
@@ -75,6 +83,7 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
     },
     APP_SHOW_MAIN_WINDOW: {},
     APP_SHOW_STARTUP_WINDOW: {},
+    APP_SHOW_UPDATE_WINDOW: {},
     APP_QUIT: {},
     APP_GET_ITEM: {
         key: '',
@@ -94,4 +103,11 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
         message: '',
         optionalParams: [],
     },
+    APP_GET_FILE: {
+        filters: [{ name: '', extensions: [''] }],
+    },
+    APP_SAVE_FILE: {
+        url: '',
+    },
+    APP_CLEAR_COOKIES: {},
 };

@@ -2,9 +2,11 @@
 // Please do not change this file!
 interface CssExports {
   'deleteProfileButton': string;
+  'deleteProfileButtonContainer': string;
   'deleteProfileButtonIcon': string;
   'leftArrow': string;
   'picker': string;
+  'profileImage': string;
   'profileLabel': string;
   'profileList': string;
   'rightArrow': string;

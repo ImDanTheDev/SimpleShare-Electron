@@ -7,7 +7,6 @@ import {
     MdWarning,
 } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { log } from '../../../common/log';
 import { RootState } from '../../../common/redux/store';
 import {
     ageToast,
@@ -32,12 +31,9 @@ export const Toaster: React.FC = () => {
     useEffect(() => {
         toasts.forEach((toast) => {
             if (toast.id === undefined) {
-                log('Found invalid toast. Removing...');
                 if (toast.timer) {
                     clearInterval(toast.timer);
-                    log('Cleared timer interval.');
                 }
-                log('Dismissing toast.');
                 dispatch(dismissToast(toast));
                 return;
             }
@@ -55,12 +51,9 @@ export const Toaster: React.FC = () => {
                 if (toast.duration <= 0) {
                     // This toast has expired.
                     // Cancel timer and remove toast.
-                    log('Toast has expired, removing...');
                     if (toast.timer) {
                         clearInterval(toast.timer);
-                        log('Clearer timer interval.');
                     }
-                    log('Dismissing toast.');
                     dispatch(dismissToast(toast));
                 } else {
                     // This toast is still fresh.
@@ -97,12 +90,9 @@ export const Toaster: React.FC = () => {
     };
 
     const handleDismissToast = (toast: IToast) => {
-        log('User manually dismissed a toast.');
         if (toast.timer) {
             clearInterval(toast.timer);
-            log('Clearer timer interval.');
         }
-        log('Dismissing toast.');
         dispatch(dismissToast(toast));
     };
 
@@ -156,6 +146,7 @@ export const Toaster: React.FC = () => {
                         </div>
                         <MdClose
                             className={styles.closeButton}
+                            title='Close Notification Panel'
                             onClick={handleNotificationIconClick}
                         />
                     </div>
@@ -168,6 +159,7 @@ export const Toaster: React.FC = () => {
                 <div
                     className={styles.pullOutTab}
                     onClick={handleNotificationIconClick}
+                    title={'Open Notification Panel'}
                 >
                     <MdNotifications className={styles.notificationIcon} />
                     {toasts.length}

@@ -1,22 +1,24 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { IAuth, IFirebase, IFirestore, IStorage } from '@omnifire/api';
+import { OFAuth, OFFirebase, OFFirestore, OFStorage } from '@omnifire/web';
+import React, { ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import {
+    ErrorCode,
+    getAllAccountInfo,
+    initFirebase,
+    isAccountComplete,
+    isPublicGeneralInfoComplete,
+    serviceHandler,
+    startAuthStateListener,
+    startProfileListener,
+} from 'simpleshare-common';
 import { log } from '../../../common/log';
-import { setPublicGeneralInfo } from '../../../common/redux/account-slice';
 import {
     setCurrentModal,
     setCurrentScreen,
 } from '../../../common/redux/nav-slice';
-import { setCurrentProfile } from '../../../common/redux/profiles-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
-import {
-    authService,
-    databaseService,
-    initService,
-} from '../../../common/services/api';
-import { isAccountComplete } from '../../../common/services/IAccountInfo';
-import IProfile from '../../../common/services/IProfile';
-import { isPublicGeneralInfoComplete } from '../../../common/services/IPublicGeneralInfo';
 import WindowFrame from '../../../common/WindowFrame/WindowFrame';
 import { AccountSettingsScreen } from '../AccountSettingsScreen/AccountSettingsScreen';
 import { CompleteAccountScreen } from '../CompleteAccountScreen/CompleteAccountScreen';
@@ -33,183 +35,119 @@ const MainWindow: React.FC = () => {
     const dispatch = useDispatch();
     const currentScreen = useSelector((state: RootState) => state.nav.screen);
     const currentModal = useSelector((state: RootState) => state.nav.modal);
-    const initializing = useSelector(
-        (state: RootState) => state.auth.initializing
-    );
     const user = useSelector((state: RootState) => state.auth.user);
+    const fetchedUser = useSelector(
+        (state: RootState) => state.auth.fetchedUser
+    );
     const accountInfo = useSelector(
         (state: RootState) => state.user.accountInfo
     );
     const publicGeneralInfo = useSelector(
         (state: RootState) => state.user.publicGeneralInfo
     );
-
-    const [fetchedAccountInfo, setFetchedAccountInfo] =
-        useState<boolean>(false);
-    const [fetchedPublicGeneralInfo, setFetchedPublicGeneralInfo] =
-        useState<boolean>(false);
-    const [fetchedProfiles, setFetchedProfiles] = useState<boolean>(false);
-
-    const profiles: IProfile[] = useSelector(
-        (state: RootState) => state.profiles.profiles
+    const fetchedAccount = useSelector(
+        (state: RootState) => state.user.fetchedAccount
     );
-
-    const currentProfile: IProfile | undefined = useSelector(
-        (state: RootState) => {
-            return state.profiles.profiles.find(
-                (profile) => profile.id === state.profiles.currentProfileId
-            );
-        }
+    const fetchAccountError = useSelector(
+        (state: RootState) => state.user.fetchAccountError
     );
 
     useEffect(() => {
-        initService.initialize();
-        authService.initialize();
-        databaseService.initialize();
-    }, []);
+        const initializeApp = async () => {
+            const firebase: IFirebase = new OFFirebase();
+            firebase.initializeApp({
+                apiKey: 'AIzaSyA6zzVAR_PGih6Pe8mIrBpFV6x-tNAVCp4',
+                authDomain: 'simpleshare-428bb.firebaseapp.com',
+                projectId: 'simpleshare-428bb',
+                storageBucket: 'simpleshare-428bb.appspot.com',
+                messagingSenderId: '555940005658',
+                appId: '1:555940005658:web:b00dd5f990111de83dcea3',
+                measurementId: 'G-WV37870J2G',
+            });
+            const auth: IAuth = new OFAuth();
+            auth.configureGoogle();
+            const firestore: IFirestore = new OFFirestore();
+            const storage: IStorage = new OFStorage();
+            initFirebase(firebase, firestore, auth, storage);
+            const servicesUpToDate =
+                await serviceHandler.isServiceHandlerUpToDate();
 
-    useEffect(() => {
-        const startAuthFlow = async () => {
-            if (initializing) return;
-            if (user) {
-                log(`User is signed in as: ${user.displayName}`);
-                log('Fetching account info');
-                await databaseService.getAccountInfo(user.uid);
-                setFetchedAccountInfo(true);
-
-                log('Fetching public general info');
-                dispatch(
-                    setPublicGeneralInfo(
-                        await databaseService.getPublicGeneralInfo(user.uid)
-                    )
-                );
-                setFetchedPublicGeneralInfo(true);
-            } else {
-                log(`User is not signed in, going to sign in screen.`);
-                window.api.send('APP_SHOW_STARTUP_WINDOW', {});
-            }
-        };
-
-        startAuthFlow();
-    }, [user, initializing]);
-
-    useEffect(() => {
-        const continueAuthFlow = async () => {
-            if (!user || !fetchedAccountInfo || !fetchedPublicGeneralInfo) {
+            if (!servicesUpToDate) {
+                window.api.send('APP_SHOW_UPDATE_WINDOW', {});
                 return;
             }
 
-            if (accountInfo && publicGeneralInfo) {
-                log('Account doc and public general info does exist');
-                if (
-                    isAccountComplete(accountInfo) &&
-                    isPublicGeneralInfoComplete(publicGeneralInfo)
-                ) {
-                    log('Account doc and public general info is complete');
-                    log('Fetching profiles');
-                    await fetchProfiles();
-                } else {
-                    log('Account doc and public general info is not complete');
-                    log('Going to complete account screen');
-                    dispatch(setCurrentScreen('CompleteAccountScreen'));
-                }
+            dispatch(startAuthStateListener());
+        };
+        initializeApp();
+    }, []);
+
+    useEffect(() => {
+        if (!fetchedUser) return;
+
+        if (user) {
+            log(`User is signed in as: ${user.displayName}.`);
+            log('Started listening for profiles.');
+            dispatch(startProfileListener());
+            log('Fetching account info and general public info.');
+            dispatch(getAllAccountInfo());
+        } else {
+            // User is signed out.
+            window.api.send('APP_SHOW_STARTUP_WINDOW', {});
+        }
+    }, [user, fetchedUser]);
+
+    useEffect(() => {
+        if (!fetchedUser || !fetchedAccount) return;
+
+        if (accountInfo && publicGeneralInfo) {
+            log('Account doc and public general info does exist.');
+            if (
+                isAccountComplete(accountInfo) &&
+                isPublicGeneralInfoComplete(publicGeneralInfo)
+            ) {
+                log('Account doc and public general info is complete.');
+                dispatch(setCurrentScreen('HomeScreen'));
             } else {
-                log('Account doc and public general info does not exist');
+                log('Account doc and public general info is not complete.');
                 log('Going to complete account screen');
                 dispatch(setCurrentScreen('CompleteAccountScreen'));
             }
-        };
-
-        const fetchProfiles = async () => {
-            if (!user) return;
-            try {
-                await databaseService.getAllProfiles(user.uid);
-            } catch {
-                dispatch(
-                    pushToast({
-                        message:
-                            'An unexpected error occurred while fetching your profiles. Try again later.',
-                        duration: 5,
-                        type: 'error',
-                    })
-                );
-            }
-            setFetchedProfiles(true);
-        };
-
-        continueAuthFlow();
-    }, [
-        accountInfo,
-        publicGeneralInfo,
-        fetchedAccountInfo,
-        fetchedPublicGeneralInfo,
-        user,
-    ]);
+        } else {
+            log('Account doc and public general info does not exist.');
+            log('Going to complete account screen.');
+            dispatch(setCurrentScreen('CompleteAccountScreen'));
+        }
+    }, [fetchedUser, fetchedAccount]);
 
     useEffect(() => {
-        const ensureProfiles = async () => {
-            if (!fetchedProfiles || !user) return;
-
-            if (profiles.length > 0) {
-                if (!currentProfile) {
-                    log('A profile is not selected');
-                    if (profiles[0].id) {
-                        log(`Selected profile with id: ${profiles[0].id}`);
-                        dispatch(setCurrentProfile(profiles[0].id));
-                    } else {
-                        // TODO: Do something here.
-                        // We checked if a profile exists, and it does, but the id is blank.
-                        // This should never happen as id's are assigned by firestore. This
-                        // may happen if a profile is created by the user, but instead of
-                        // uploading to firestore, it is saved to the store.
-                        // Either way, this will no longer be as big of an issue once
-                        // logic is implemented for finding the default profile using a isDefault
-                        // field. If a profile with the default field set to true
-                        // does not exist, one will just be created.
-                        log('Account has a profile without an id.');
-                    }
-                } else {
-                    log('A profile is selected');
-                    if (
-                        profiles.findIndex(
-                            (p) => p.id === currentProfile.id
-                        ) === -1
-                    ) {
-                        log('The selected profile does not exist');
-                        log('Creating default profile');
-                        await databaseService.createDefaultProfile(user.uid);
-                        log('Fetching profiles');
-                        await databaseService.getAllProfiles(user.uid);
-                    } else {
-                        log('Selected profile exists');
-                        log('Going to home screen');
-                        dispatch(setCurrentScreen('HomeScreen'));
-                    }
-                }
-            } else {
-                log('Account has 0 profiles. Creating default profile.');
-                await databaseService.createDefaultProfile(user.uid);
-                log('Fetching profiles');
-                await databaseService.getAllProfiles(user.uid);
+        if (fetchAccountError) {
+            switch (fetchAccountError.code) {
+                case ErrorCode.UNEXPECTED_DATABASE_ERROR:
+                    dispatch(
+                        pushToast({
+                            duration: 15,
+                            message:
+                                'An error occurred while loading your account. Try to sign out and sign back in.',
+                            type: 'error',
+                            openToaster: true,
+                        })
+                    );
+                    break;
+                default:
+                    dispatch(
+                        pushToast({
+                            duration: 15,
+                            message:
+                                'An unexpected error occurred while loading your account. Restart Simple Share and contact support if the issue persists.',
+                            type: 'error',
+                            openToaster: true,
+                        })
+                    );
+                    break;
             }
-        };
-
-        ensureProfiles();
-    }, [profiles, fetchedProfiles, currentProfile, user]);
-
-    useEffect(() => {
-        if (!user) return;
-
-        const switchShareListener = async () => {
-            if (!currentProfile || !currentProfile.id) return;
-            await databaseService.switchShareListener(
-                user.uid,
-                currentProfile.id
-            );
-        };
-
-        switchShareListener();
-    }, [user, currentProfile]);
+        }
+    }, [fetchAccountError]);
 
     const renderScreen = (): ReactNode => {
         switch (currentScreen) {

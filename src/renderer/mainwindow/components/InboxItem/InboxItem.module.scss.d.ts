@@ -4,13 +4,17 @@ interface CssExports {
   'body': string;
   'copyTextButton': string;
   'deleteButton': string;
+  'downloadFileButton': string;
+  'fileURL': string;
   'footer': string;
   'fromGroup': string;
   'fromProfile': string;
   'fromUser': string;
   'header': string;
   'item': string;
+  'noText': string;
   'preview': string;
+  'previewImage': string;
   'viewButton': string;
 }
 export const cssExports: CssExports;

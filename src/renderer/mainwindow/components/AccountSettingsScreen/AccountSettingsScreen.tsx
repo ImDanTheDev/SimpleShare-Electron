@@ -5,19 +5,17 @@ import { MdChevronLeft } from 'react-icons/md';
 import styles from './AccountSettingsScreen.module.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCurrentScreen } from '../../../common/redux/nav-slice';
-import {
-    MAX_DISPLAY_NAME_LENGTH,
-    MAX_PHONE_NUMBER_LENGTH,
-    MIN_DISPLAY_NAME_LENGTH,
-    MIN_PHONE_NUMBER_LENGTH,
-} from '../../../common/constants';
-import IUser from '../../../common/services/IUser';
 import { RootState } from '../../../common/redux/store';
-import IAccountInfo from '../../../common/services/IAccountInfo';
-import IPublicGeneralInfo from '../../../common/services/IPublicGeneralInfo';
 import { log } from '../../../common/log';
-import { databaseService } from '../../../common/services/api';
 import { pushToast } from '../../../common/redux/toaster-slice';
+import {
+    constants,
+    IAccountInfo,
+    IPublicGeneralInfo,
+    IUser,
+    updateAccount,
+} from 'simpleshare-common';
+import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 
 export const AccountSettingsScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -34,6 +32,14 @@ export const AccountSettingsScreen: React.FC = () => {
         (state: RootState) => state.user.publicGeneralInfo
     );
 
+    const updatingAccount = useSelector(
+        (state: RootState) => state.user.updatingAccount
+    );
+
+    const updateAccountError = useSelector(
+        (state: RootState) => state.user.updateAccountError
+    );
+
     const [displayName, setDisplayName] = useState<string>(
         publicGeneralInfo?.displayName || ''
     );
@@ -45,22 +51,36 @@ export const AccountSettingsScreen: React.FC = () => {
     const [phoneNumberError, setPhoneNumberError] = useState<string>('');
 
     useEffect(() => {
-        if (displayName.length < MIN_DISPLAY_NAME_LENGTH) {
+        if (displayName.length < constants.MIN_DISPLAY_NAME_LENGTH) {
             setDisplayNameError(
-                `Display names must be at least ${MIN_DISPLAY_NAME_LENGTH} characters long.`
+                `Display names must be at least ${constants.MIN_DISPLAY_NAME_LENGTH} characters long.`
             );
         } else {
             setDisplayNameError('');
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
+        if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
             setPhoneNumberError(
-                `Phone numbers must be at least ${MIN_PHONE_NUMBER_LENGTH} characters long.`
+                `Phone numbers must be at least ${constants.MIN_PHONE_NUMBER_LENGTH} characters long.`
             );
         } else {
             setPhoneNumberError('');
         }
     }, [displayName, phoneNumber]);
+
+    useEffect(() => {
+        if (updateAccountError) {
+            dispatch(
+                pushToast({
+                    message:
+                        'An unexpected error occurred while updating your account. Try again later.',
+                    type: 'error',
+                    duration: 5,
+                    openToaster: true,
+                })
+            );
+        }
+    }, [updateAccountError]);
 
     const handleBack = () => {
         dispatch(setCurrentScreen('HomeScreen'));
@@ -81,38 +101,25 @@ export const AccountSettingsScreen: React.FC = () => {
             return;
         }
 
-        if (phoneNumber.length < MIN_PHONE_NUMBER_LENGTH) {
-            log(`'${phoneNumber}' is not a valid phone number.`);
+        if (
+            phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH ||
+            displayName.length < constants.MIN_DISPLAY_NAME_LENGTH
+        ) {
             return;
         }
 
-        if (displayName.length < MIN_DISPLAY_NAME_LENGTH) {
-            log(`'${displayName}' is not a valid display name`);
-            return;
-        }
-
-        try {
-            await databaseService.setAccountInfo(user.uid, {
-                phoneNumber: phoneNumber,
-                isAccountComplete: true,
-            });
-            await databaseService.setPublicGeneralInfo(user.uid, {
-                displayName: displayName,
-                isComplete: true,
-            });
-            dispatch(setCurrentScreen('HomeScreen'));
-        } catch {
-            log('Failed to save account');
-            dispatch(
-                pushToast({
-                    message:
-                        'An unexpected error occurred while updating your account. Try again later.',
-                    type: 'error',
-                    duration: 5,
-                    openToaster: true,
-                })
-            );
-        }
+        dispatch(
+            updateAccount({
+                accountInfo: {
+                    phoneNumber: phoneNumber,
+                    isAccountComplete: true,
+                },
+                publicGeneralInfo: {
+                    displayName: displayName,
+                    isComplete: true,
+                },
+            })
+        );
     };
 
     return (
@@ -136,8 +143,8 @@ export const AccountSettingsScreen: React.FC = () => {
                                 className={styles.field}
                                 type='text'
                                 spellCheck='false'
-                                minLength={MIN_DISPLAY_NAME_LENGTH}
-                                maxLength={MAX_DISPLAY_NAME_LENGTH}
+                                minLength={constants.MIN_DISPLAY_NAME_LENGTH}
+                                maxLength={constants.MAX_DISPLAY_NAME_LENGTH}
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                             />
@@ -151,8 +158,8 @@ export const AccountSettingsScreen: React.FC = () => {
                                 className={styles.field}
                                 type='tel'
                                 spellCheck='false'
-                                minLength={MIN_PHONE_NUMBER_LENGTH}
-                                maxLength={MAX_PHONE_NUMBER_LENGTH}
+                                minLength={constants.MIN_PHONE_NUMBER_LENGTH}
+                                maxLength={constants.MAX_PHONE_NUMBER_LENGTH}
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                             />
@@ -161,12 +168,16 @@ export const AccountSettingsScreen: React.FC = () => {
                             </div>
                         </div>
                         <div className={styles.itemGroup}>
-                            <button
-                                className={styles.saveButton}
-                                onClick={handleSave}
-                            >
-                                Save Account
-                            </button>
+                            {updatingAccount ? (
+                                <LoadingIcon />
+                            ) : (
+                                <button
+                                    className={styles.saveButton}
+                                    onClick={handleSave}
+                                >
+                                    Save Account
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>

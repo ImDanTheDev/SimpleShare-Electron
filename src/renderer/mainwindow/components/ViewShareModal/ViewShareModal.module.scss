@@ -13,6 +13,9 @@
     overflow: hidden;
     padding: 16px;
     align-items: center;
+    max-width: 500px;
+    width: 100%;
+    min-width: 300px;
 }
 
 .title {
@@ -45,7 +48,7 @@
 .buttons {
     height: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto auto auto;
     gap: 8px;
 }
 
@@ -63,6 +66,8 @@
     cursor: pointer;
     color: #fff;
     font-size: 20px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .button:hover {
@@ -72,6 +77,18 @@
 .button:active {
     filter: drop-shadow(2px 2px 1px #111111a1);
     transform: scale(0.9875);
+}
+
+.button:disabled {
+    background-color: #0d161f;
+    color: rgb(114, 114, 114);
+    border-color: #5036217f;
+}
+
+.button:disabled:hover {
+    filter: none;
+    transform: none;
+    cursor: default;
 }
 
 .deleteButton {

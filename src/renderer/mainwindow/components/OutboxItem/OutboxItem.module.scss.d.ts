@@ -3,9 +3,13 @@
 interface CssExports {
   'body': string;
   'content': string;
+  'fileLink': string;
   'fileName': string;
   'item': string;
-  'profilePicture': string;
+  'noFile': string;
+  'noText': string;
+  'profileImage': string;
+  'profilePictureBox': string;
   'to': string;
 }
 export const cssExports: CssExports;

@@ -5,7 +5,11 @@ interface CssExports {
   'buttons': string;
   'errorMessage': string;
   'field': string;
+  'inputs': string;
   'modal': string;
+  'pfp': string;
+  'pfpIcon': string;
+  'removePFPIcon': string;
   'title': string;
 }
 export const cssExports: CssExports;

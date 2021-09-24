@@ -1,15 +1,19 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog, shell } from 'electron';
 import installExtension, {
     REDUX_DEVTOOLS,
     REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
+import fs from 'fs/promises';
 import ElectronStore from 'electron-store';
 import MainIPC from './main-ipc';
 import { start } from './webserver';
+import path from 'path';
+import mime from 'mime-types';
 
 // Magic strings set by webpack
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const STARTUP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
+declare const UPDATE_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -37,6 +41,25 @@ const createStartupWindow = (): void => {
         show: false,
     });
 
+    currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        if (url.startsWith('about')) {
+            return {
+                action: 'allow',
+                overrideBrowserWindowOptions: {
+                    frame: true,
+                    movable: true,
+                    resizable: true,
+                    transparent: false,
+                    parent: currentWindow,
+                    modal: true,
+                },
+            };
+        }
+
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+
     ipc.setWindow(currentWindow);
     currentWindow.loadURL('http://localhost:3090/startup_window/index.html');
     currentWindow.on('ready-to-show', () => {
@@ -59,8 +82,42 @@ const createMainWindow = (): void => {
         show: false,
     });
 
+    currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+
     ipc.setWindow(currentWindow);
     currentWindow.loadURL('http://localhost:3090/main_window/index.html');
+    currentWindow.on('ready-to-show', () => {
+        currentWindow.show();
+    });
+};
+
+const createUpdateWindow = (): void => {
+    currentWindow = new BrowserWindow({
+        autoHideMenuBar: true,
+        transparent: false,
+        frame: false,
+        resizable: false,
+        width: 400,
+        height: 200,
+        webPreferences: {
+            nativeWindowOpen: true,
+            contextIsolation: true,
+            enableRemoteModule: false,
+            preload: UPDATE_WINDOW_PRELOAD_WEBPACK_ENTRY,
+        },
+        show: false,
+    });
+
+    currentWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+
+    ipc.setWindow(currentWindow);
+    currentWindow.loadURL('http://localhost:3090/update_window/index.html');
     currentWindow.on('ready-to-show', () => {
         currentWindow.show();
     });
@@ -125,6 +182,38 @@ const setupIPC = () => {
     });
     ipc.on('APP_ERROR', ({ message, optionalParams }) => {
         error(message, true, ...optionalParams);
+    });
+    ipc.handle('APP_GET_FILE', async (args) => {
+        const dialogResult = await dialog.showOpenDialog(currentWindow, {
+            properties: ['openFile'],
+            filters: args.filters,
+        });
+        if (dialogResult.filePaths.length <= 0) {
+            return undefined;
+        }
+        const filePath = dialogResult.filePaths[0];
+
+        try {
+            const buffer = await fs.readFile(filePath);
+            const b64Data = buffer.toString('base64');
+            return {
+                buffer: b64Data,
+                fileName: path.basename(filePath),
+                ext: path.extname(filePath).substr(1),
+                mimeType: mime.lookup(filePath),
+            };
+        } catch (e) {
+            error('An error occurred while reading a file: ', false, e);
+            return undefined;
+        }
+    });
+    ipc.on('APP_SHOW_UPDATE_WINDOW', async () => {
+        const oldWindow = currentWindow;
+        createUpdateWindow();
+        oldWindow.close();
+    });
+    ipc.on('APP_CLEAR_COOKIES', async () => {
+        await currentWindow.webContents.session.clearStorageData();
     });
 };
 
