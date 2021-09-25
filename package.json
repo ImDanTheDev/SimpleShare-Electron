@@ -1,7 +1,7 @@
 {
     "name": "simple-share",
     "productName": "SimpleShare",
-    "version": "1.1",
+    "version": "1.1.0",
     "description": "The desktop companion app to the Simple Share mobile app.",
     "main": ".webpack/main",
     "scripts": {
