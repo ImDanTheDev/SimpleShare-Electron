@@ -19,8 +19,9 @@
 .panelBody {
     display: flex;
     justify-content: center;
-    align-items: center;
+    //align-items: center;
     height: 100%;
+    padding-top: 8px;
 }
 
 .items {
@@ -49,6 +50,7 @@
     font-size: 18px;
     outline: none;
     width: 100%;
+    filter: drop-shadow(2px 2px 4px #111111a1);
 }
 
 .saveButton {

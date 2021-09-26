@@ -5,6 +5,7 @@ import {
     constants,
     createProfile,
     deleteCloudProfile,
+    IPublicGeneralInfo,
     selectProfileForEditing,
     updateCloudProfile,
 } from 'simpleshare-common';
@@ -38,6 +39,10 @@ export const NewProfileModal: React.FC = () => {
 
     const profileSelectedForEdit = useSelector(
         (state: RootState) => state.profiles.profileSelectedForEdit
+    );
+
+    const publicGeneralInfo: IPublicGeneralInfo | undefined = useSelector(
+        (state: RootState) => state.user.publicGeneralInfo
     );
 
     const [profileName, setProfileName] = useState<string>(
@@ -236,7 +241,9 @@ export const NewProfileModal: React.FC = () => {
                 <button className={styles.button} onClick={handleDismiss}>
                     Cancel
                 </button>
-                {profileSelectedForEdit ? (
+                {profileSelectedForEdit &&
+                profileSelectedForEdit.id !==
+                    publicGeneralInfo?.defaultProfileId ? (
                     <button className={styles.button} onClick={handleDelete}>
                         Delete
                     </button>

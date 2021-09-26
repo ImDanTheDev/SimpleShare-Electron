@@ -16,6 +16,7 @@ import {
     updateAccount,
 } from 'simpleshare-common';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { InputDropdown } from '../InputDropdown/InputDropdown';
 
 export const AccountSettingsScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -40,11 +41,18 @@ export const AccountSettingsScreen: React.FC = () => {
         (state: RootState) => state.user.updateAccountError
     );
 
+    const profiles = useSelector((state: RootState) => state.profiles);
+
     const [displayName, setDisplayName] = useState<string>(
         publicGeneralInfo?.displayName || ''
     );
     const [phoneNumber, setPhoneNumber] = useState<string>(
         accountInfo?.phoneNumber || ''
+    );
+
+    // TODO: Add dropdown to set default profile id.
+    const [defaultProfileId, setDefaultProfileId] = useState<string>(
+        publicGeneralInfo?.defaultProfileId || ''
     );
 
     const [displayNameError, setDisplayNameError] = useState<string>('');
@@ -117,6 +125,7 @@ export const AccountSettingsScreen: React.FC = () => {
                 publicGeneralInfo: {
                     displayName: displayName,
                     isComplete: true,
+                    defaultProfileId: defaultProfileId,
                 },
             })
         );
@@ -162,6 +171,32 @@ export const AccountSettingsScreen: React.FC = () => {
                                 maxLength={constants.MAX_PHONE_NUMBER_LENGTH}
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
+                            />
+                            <div className={styles.errorMessage}>
+                                {phoneNumberError}
+                            </div>
+                        </div>
+                        <div className={styles.itemGroup}>
+                            <div className={styles.label}>Default Profile:</div>
+                            <InputDropdown
+                                items={profiles.profiles.reduce(
+                                    (obj, item) => ({
+                                        ...obj,
+                                        [item.id || '']: item.name,
+                                    }),
+                                    {}
+                                )}
+                                onSelectionChanged={(key) =>
+                                    setDefaultProfileId(key)
+                                }
+                                unselectedText='Select a profile...'
+                                defaultKey={
+                                    profiles.profiles.find(
+                                        (x) =>
+                                            x.id ===
+                                            publicGeneralInfo?.defaultProfileId
+                                    )?.id
+                                }
                             />
                             <div className={styles.errorMessage}>
                                 {phoneNumberError}

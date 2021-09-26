@@ -30,6 +30,10 @@ export const ProfilePicker: React.FC = () => {
             ) || state.profiles.profiles[0]
     );
 
+    const publicGeneralInfo = useSelector(
+        (state: RootState) => state.user.publicGeneralInfo
+    );
+
     const editingProfiles: boolean = useSelector(
         (state: RootState) => state.profiles.editingProfiles
     );
@@ -122,7 +126,7 @@ export const ProfilePicker: React.FC = () => {
     };
 
     const renderEditButton = (profile: IProfile) => {
-        if (!editingProfiles || profile.id === 'default') return <></>;
+        if (!editingProfiles) return <></>;
 
         return (
             <div
@@ -146,12 +150,24 @@ export const ProfilePicker: React.FC = () => {
                     style={{
                         width: 50,
                         height: 50,
-                        borderWidth: profile.id === currentProfile?.id ? 2 : 1,
+                        borderWidth:
+                            profile.id === currentProfile?.id ||
+                            publicGeneralInfo?.defaultProfileId === profile.id
+                                ? 2
+                                : 1,
                         borderRadius:
                             profile.id === currentProfile?.id ? 16 : '50%',
                         overflow: 'hidden',
+                        borderColor:
+                            publicGeneralInfo?.defaultProfileId === profile.id
+                                ? '#ee7b1ca1'
+                                : undefined,
                     }}
-                    tooltip={profile.name}
+                    tooltip={
+                        publicGeneralInfo?.defaultProfileId === profile.id
+                            ? `(Default) ${profile.name}`
+                            : profile.name
+                    }
                     disableAnimation={editingProfiles}
                     onClick={() => handleProfileClick(profile)}
                 >

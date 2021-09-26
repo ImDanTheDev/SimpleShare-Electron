@@ -97,6 +97,14 @@ export const CompleteAccountScreen: React.FC = () => {
             }
 
             dispatch(
+                createProfile({
+                    profile: {
+                        name: 'Default',
+                        id: 'default', // TODO: let firebase autogenerate the user's starter profile.
+                    },
+                })
+            );
+            dispatch(
                 updateAccount({
                     accountInfo: {
                         phoneNumber: phoneNumber,
@@ -105,14 +113,7 @@ export const CompleteAccountScreen: React.FC = () => {
                     publicGeneralInfo: {
                         displayName: displayName,
                         isComplete: true,
-                    },
-                })
-            );
-            dispatch(
-                createProfile({
-                    profile: {
-                        name: 'Default',
-                        id: 'default',
+                        defaultProfileId: 'default', // TODO: Get the id from the profile that was just created.
                     },
                 })
             );

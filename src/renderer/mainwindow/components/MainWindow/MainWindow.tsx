@@ -11,6 +11,7 @@ import {
     serviceHandler,
     startAuthStateListener,
     startProfileListener,
+    startPublicGeneralInfoListener,
 } from 'simpleshare-common';
 import { log } from '../../../common/log';
 import {
@@ -84,6 +85,7 @@ const MainWindow: React.FC = () => {
             dispatch(startProfileListener());
             log('Fetching account info and general public info.');
             dispatch(getAllAccountInfo());
+            dispatch(startPublicGeneralInfoListener());
         } else {
             // User is signed out.
             window.api.send('APP_SHOW_STARTUP_WINDOW', {});

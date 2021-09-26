@@ -1,0 +1,146 @@
+.accountGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.picker {
+    flex: 1 1;
+    filter: drop-shadow(2px 2px 4px #111111a1);
+    transition: filter 0.1s, transform 0.1s;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.pickerContent {
+    background-color: #1a2633;
+    border-radius: 16px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    flex: 1 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+    transition: border-radius 0.05s, border-radius 0.05s;
+
+    font-size: 18px;
+}
+
+.welcomeGroup {
+    color: #fff;
+    flex: 1 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 16px;
+}
+
+.welcomeText {
+    color: #fff;
+    font-size: 14px;
+}
+
+.displayName {
+    color: #fff;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+}
+
+.arrow {
+    color: #fff;
+    font-size: 32px;
+    display: flex;
+    justify-content: center;
+    transition: transform linear 0.05s;
+}
+
+.dropdown {
+    color: #fff;
+    position: absolute;
+    margin-top: -10px;
+    padding-top: 10px;
+    left: 0;
+    right: 0;
+    background-color: #2d3341;
+    border-radius: 16px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f4a2617f;
+    border-top-width: 0px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top-style: none;
+    z-index: 0;
+    overflow-y: auto;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.25s, opacity 0.25s;
+}
+
+.expandedPicker {
+    flex: 1 1;
+
+    filter: drop-shadow(0px 2px 2px #1a1a1a);
+    transition: filter 0.1s, transform 0.1s;
+    cursor: pointer;
+    z-index: 1;
+    position: relative;
+    height: 47px;
+}
+
+.expandedPicker .dropdown {
+    opacity: 1;
+    max-height: 200px;
+}
+
+.expandedPicker .arrow {
+    transform: translateY(4px);
+}
+
+.expandedPicker .pickerContent {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    border-bottom-color: transparent;
+    filter: drop-shadow(0px 2px 2px #1a1a1a);
+}
+
+.dropdownItem {
+    color: #fff;
+    padding: 8px;
+    transition: padding linear 0.1s;
+}
+
+.dropdownItem:hover {
+    padding-left: 12px;
+    background-color: #373f50;
+}
+
+.dropdown::-webkit-scrollbar {
+    width: 16px;
+    height: 0px;
+}
+
+.dropdown::-webkit-scrollbar-button {
+    width: 12px;
+    height: 0px;
+    background-color: transparent;
+}
+
+.dropdown::-webkit-scrollbar-corner {
+    display: block;
+}
+
+.dropdown::-webkit-scrollbar-thumb {
+    background-color: #0d161f;
+    border-radius: 20px;
+}
+
+.dropdown::-webkit-scrollbar-track {
+    background-color: #1a2633;
+    border-radius: 20px;
+}
