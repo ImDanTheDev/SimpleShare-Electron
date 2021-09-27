@@ -32,6 +32,7 @@ import { Toolbar } from '../Toolbar/Toolbar';
 import { ViewShareModal } from '../ViewShareModal/ViewShareModal';
 import styles from './MainWindow.module.scss';
 import keys from '../../../keys';
+import Titlebar from '../Titlebar/Titlebar';
 
 const MainWindow: React.FC = () => {
     const dispatch = useDispatch();
@@ -192,6 +193,7 @@ const MainWindow: React.FC = () => {
     return (
         <WindowFrame borderRadius={0}>
             <div className={styles.windowContent}>
+                <Titlebar />
                 <Toolbar />
                 {renderScreen()}
             </div>

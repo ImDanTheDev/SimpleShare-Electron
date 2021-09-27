@@ -158,6 +158,16 @@ const setupIPC = () => {
     ipc.on('APP_QUIT', () => {
         app.quit();
     });
+    ipc.on('APP_MAXIMIZE_OR_RESTORE', () => {
+        if (currentWindow.isMaximized()) {
+            currentWindow.restore();
+        } else {
+            currentWindow.maximize();
+        }
+    });
+    ipc.on('APP_MINIMIZE', () => {
+        currentWindow.minimize();
+    });
     ipc.on('APP_SHOW_STARTUP_WINDOW', () => {
         const oldWindow = currentWindow;
         createStartupWindow();

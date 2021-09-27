@@ -28,7 +28,8 @@ export interface IPCArgs {
     APP_SHOW_STARTUP_WINDOW: Record<string, unknown>;
     APP_SHOW_UPDATE_WINDOW: Record<string, unknown>;
     APP_QUIT: Record<string, unknown>;
-
+    APP_MAXIMIZE_OR_RESTORE: Record<string, unknown>;
+    APP_MINIMIZE: Record<string, unknown>;
     APP_SET_ITEM: {
         key: string;
         item: string;
@@ -85,6 +86,8 @@ export const IPC_ARG_TEMPLATES: IPCArgs = {
     APP_SHOW_STARTUP_WINDOW: {},
     APP_SHOW_UPDATE_WINDOW: {},
     APP_QUIT: {},
+    APP_MAXIMIZE_OR_RESTORE: {},
+    APP_MINIMIZE: {},
     APP_GET_ITEM: {
         key: '',
     },
