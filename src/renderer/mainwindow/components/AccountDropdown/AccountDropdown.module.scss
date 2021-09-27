@@ -18,7 +18,7 @@
 }
 
 .pickerContent {
-    background-color: #3e3a3e;
+    background-color: #282a31;
     border-radius: 16px;
     border-width: 1px;
     border-style: solid;
@@ -70,7 +70,7 @@
     padding-top: 10px;
     left: 0;
     right: 0;
-    background-color: #5e595e;
+    background-color: lighten(#282a31, 10%);
     border-radius: 16px;
     border-width: 1px;
     border-style: solid;
@@ -110,5 +110,5 @@
 
 .dropdownItem:hover {
     padding-left: 12px;
-    background-color: #3e3a3e75;
+    background-color: lighten(#282a31, 20%);
 }

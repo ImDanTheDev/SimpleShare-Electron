@@ -42,21 +42,21 @@ export const ViewShareModal: React.FC = () => {
             <span className={styles.title}>Your Share</span>
             <span className={styles.header}>From User:</span>
             <input
-                className={styles.field}
+                className={styles.textField}
                 type='text'
                 value={currentShare?.fromDisplayName}
                 readOnly={true}
             />
             <span className={styles.header}>From Profile:</span>
             <input
-                className={styles.field}
+                className={styles.textField}
                 type='text'
                 value={currentShare?.fromProfileName}
                 readOnly={true}
             />
             <span className={styles.header}>Text Content:</span>
             <textarea
-                className={styles.field}
+                className={styles.textField}
                 value={currentShare?.textContent || ''}
                 title={currentShare?.textContent ? '' : 'No Text'}
                 readOnly={true}
@@ -71,7 +71,7 @@ export const ViewShareModal: React.FC = () => {
                     <MdDeleteForever />
                 </button>
                 <button
-                    className={styles.button}
+                    className={styles.secondaryButton}
                     disabled={!currentShare?.fileURL}
                     title={
                         currentShare?.fileURL ? currentShare.fileURL : 'No File'
@@ -84,7 +84,10 @@ export const ViewShareModal: React.FC = () => {
                 >
                     Download File
                 </button>
-                <button className={styles.button} onClick={handleClose}>
+                <button
+                    className={styles.secondaryButton}
+                    onClick={handleClose}
+                >
                     Close
                 </button>
             </div>

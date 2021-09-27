@@ -130,7 +130,7 @@ export const CompleteAccountScreen: React.FC = () => {
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Display Name:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='text'
                                 spellCheck='false'
                                 minLength={constants.MIN_DISPLAY_NAME_LENGTH}
@@ -138,14 +138,16 @@ export const CompleteAccountScreen: React.FC = () => {
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                             />
+                        </div>
+                        {displayNameError && (
                             <div className={styles.errorMessage}>
                                 {displayNameError}
                             </div>
-                        </div>
+                        )}
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Phone Number:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='tel'
                                 spellCheck='false'
                                 minLength={constants.MIN_PHONE_NUMBER_LENGTH}
@@ -153,26 +155,35 @@ export const CompleteAccountScreen: React.FC = () => {
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                             />
+                        </div>
+                        {phoneNumberError && (
                             <div className={styles.errorMessage}>
                                 {phoneNumberError}
                             </div>
-                        </div>
+                        )}
                         <div className={styles.itemGroup}>
-                            {updatingAccount ? (
-                                <LoadingIcon />
-                            ) : (
-                                <button
-                                    className={styles.completeButton}
-                                    onClick={handleComplete}
-                                >
-                                    Complete Account
-                                </button>
-                            )}
-
-                            <div className={styles.errorMessage}>
-                                {updateAccountError &&
-                                    'An error occurred while completing your account. Try again later.'}
+                            <div>
+                                {updatingAccount ? (
+                                    <LoadingIcon />
+                                ) : (
+                                    <button
+                                        className={styles.primaryButton}
+                                        onClick={handleComplete}
+                                    >
+                                        <span
+                                            style={{
+                                                padding: '16px',
+                                            }}
+                                        >
+                                            Complete Account
+                                        </span>
+                                    </button>
+                                )}
                             </div>
+                        </div>
+                        <div className={styles.errorMessage}>
+                            {updateAccountError &&
+                                'An error occurred while completing your account. Try again later.'}
                         </div>
                     </div>
                 </div>

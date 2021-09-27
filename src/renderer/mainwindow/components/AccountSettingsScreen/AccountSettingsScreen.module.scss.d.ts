@@ -3,13 +3,14 @@
 interface CssExports {
   'backButtonIcon': string;
   'errorMessage': string;
-  'field': string;
   'itemGroup': string;
   'items': string;
   'label': string;
   'panelBody': string;
-  'saveButton': string;
+  'primaryButton': string;
   'screen': string;
+  'secondaryButton': string;
+  'textField': string;
 }
 export const cssExports: CssExports;
 export default cssExports;

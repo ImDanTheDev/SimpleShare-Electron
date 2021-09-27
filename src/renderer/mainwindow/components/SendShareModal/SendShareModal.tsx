@@ -212,7 +212,7 @@ export const SendShareModal: React.FC = () => {
             <span className={styles.title}>Send Share</span>
             <span className={styles.fieldLabel}>Phone Number:</span>
             <input
-                className={styles.field}
+                className={styles.textField}
                 type='text'
                 value={phoneNumber}
                 placeholder='+11234567890'
@@ -223,7 +223,7 @@ export const SendShareModal: React.FC = () => {
             <span className={styles.errorMessage}>{phoneNumberError}</span>
             <span className={styles.fieldLabel}>Profile Name:</span>
             <input
-                className={styles.field}
+                className={styles.textField}
                 type='text'
                 value={profileName}
                 placeholder='Laptop'
@@ -234,7 +234,7 @@ export const SendShareModal: React.FC = () => {
             <span className={styles.errorMessage}>{profileNameError}</span>
             <span className={styles.fieldLabel}>Message:</span>
             <textarea
-                className={styles.field}
+                className={styles.textField}
                 value={shareText}
                 placeholder='Type anything you want here!'
                 maxLength={constants.MAX_SHARE_TEXT_LENGTH}
@@ -242,36 +242,53 @@ export const SendShareModal: React.FC = () => {
                 onChange={(e) => setShareText(e.target.value)}
             />
             <span className={styles.errorMessage}>{shareTextError}</span>
-            {fileName ? (
-                <div className={styles.selectedFileButtonGroup}>
-                    <div
-                        className={styles.clearFileButton}
-                        title='Clear file'
-                        onClick={handleClearFile}
-                    >
-                        <MdClose className={styles.clearFileButtonIcon} />
+            <div style={{ height: '32px', display: 'flex' }}>
+                {fileName ? (
+                    <div className={styles.selectedFileButtonGroup}>
+                        <div
+                            className={styles.clearFileButton}
+                            title='Clear file'
+                            onClick={handleClearFile}
+                        >
+                            <MdClose className={styles.clearFileButtonIcon} />
+                        </div>
+                        <div
+                            className={styles.changeFileButton}
+                            onClick={handleSelectFile}
+                        >
+                            <span>{fileName}</span>
+                        </div>
                     </div>
-                    <div
-                        className={styles.changeFileButton}
+                ) : (
+                    <button
+                        className={styles.secondaryButton}
                         onClick={handleSelectFile}
                     >
-                        <span>{fileName}</span>
-                    </div>
-                </div>
-            ) : (
-                <button className={styles.button} onClick={handleSelectFile}>
-                    Select File
-                </button>
-            )}
+                        Select File
+                    </button>
+                )}
+            </div>
 
             {sendingShare ? (
                 <LoadingIcon />
             ) : (
-                <div className={styles.buttons}>
-                    <button className={styles.button} onClick={handleDismiss}>
+                <div
+                    style={{
+                        height: '32px',
+                        display: 'flex',
+                        gap: '8px',
+                    }}
+                >
+                    <button
+                        className={styles.secondaryButton}
+                        onClick={handleDismiss}
+                    >
                         Cancel
                     </button>
-                    <button className={styles.button} onClick={handleSend}>
+                    <button
+                        className={styles.secondaryButton}
+                        onClick={handleSend}
+                    >
                         Send
                     </button>
                 </div>

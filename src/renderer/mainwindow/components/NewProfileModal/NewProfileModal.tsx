@@ -5,7 +5,6 @@ import {
     constants,
     createProfile,
     deleteCloudProfile,
-    IPublicGeneralInfo,
     selectProfileForEditing,
     updateCloudProfile,
 } from 'simpleshare-common';
@@ -39,10 +38,6 @@ export const NewProfileModal: React.FC = () => {
 
     const profileSelectedForEdit = useSelector(
         (state: RootState) => state.profiles.profileSelectedForEdit
-    );
-
-    const publicGeneralInfo: IPublicGeneralInfo | undefined = useSelector(
-        (state: RootState) => state.user.publicGeneralInfo
     );
 
     const [profileName, setProfileName] = useState<string>(
@@ -220,7 +215,7 @@ export const NewProfileModal: React.FC = () => {
                     )}
                 </div>
                 <input
-                    className={styles.field}
+                    className={styles.textField}
                     type='text'
                     value={profileName}
                     placeholder='Profile name...'
@@ -237,20 +232,30 @@ export const NewProfileModal: React.FC = () => {
                     errorMessage
                 )}
             </div>
-            <div className={styles.buttons}>
-                <button className={styles.button} onClick={handleDismiss}>
+            <div
+                className={styles.buttons}
+                style={{
+                    display: 'flex',
+                    height: '32px',
+                }}
+            >
+                <button
+                    className={styles.secondaryButton}
+                    onClick={handleDismiss}
+                >
                     Cancel
                 </button>
-                {profileSelectedForEdit &&
-                profileSelectedForEdit.id !==
-                    publicGeneralInfo?.defaultProfileId ? (
-                    <button className={styles.button} onClick={handleDelete}>
+                {profileSelectedForEdit ? (
+                    <button
+                        className={styles.secondaryButton}
+                        onClick={handleDelete}
+                    >
                         Delete
                     </button>
                 ) : (
-                    <div />
+                    <div style={{ flex: 1 }} />
                 )}
-                <button className={styles.button} onClick={handleSave}>
+                <button className={styles.secondaryButton} onClick={handleSave}>
                     Save
                 </button>
             </div>

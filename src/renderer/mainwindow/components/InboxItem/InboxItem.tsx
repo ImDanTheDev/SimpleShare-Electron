@@ -57,7 +57,6 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
                     <span className={styles.noText}>No Text</span>
                 )}
             </div>
-
             <div className={styles.footer}>
                 <div
                     className={styles.deleteButton}
@@ -67,7 +66,7 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
                     <MdDeleteForever />
                 </div>
                 <button
-                    className={styles.downloadFileButton}
+                    className={styles.secondaryButton}
                     disabled={!props.share.fileURL}
                     title={
                         props.share.fileURL ? props.share.fileURL : 'No File'
@@ -78,19 +77,24 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
                         }
                     }}
                 >
-                    Download File
+                    <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                        Download File
+                    </span>
                 </button>
                 <button
-                    className={styles.copyTextButton}
+                    className={styles.secondaryButton}
                     onClick={handleCopyText}
                     disabled={!props.share.textContent}
                     title={props.share.textContent ? '' : 'No Text'}
                 >
-                    Copy Text
+                    <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                        Copy Text
+                    </span>
                 </button>
-
-                <button className={styles.viewButton} onClick={handleView}>
-                    View
+                <button className={styles.secondaryButton} onClick={handleView}>
+                    <span style={{ paddingLeft: '8px', paddingRight: '8px' }}>
+                        View
+                    </span>
                 </button>
             </div>
         </div>

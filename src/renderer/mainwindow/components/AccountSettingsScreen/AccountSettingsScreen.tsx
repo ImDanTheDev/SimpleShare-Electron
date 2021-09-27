@@ -149,7 +149,7 @@ export const AccountSettingsScreen: React.FC = () => {
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Display Name:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='text'
                                 spellCheck='false'
                                 minLength={constants.MIN_DISPLAY_NAME_LENGTH}
@@ -164,7 +164,7 @@ export const AccountSettingsScreen: React.FC = () => {
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Phone Number:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='tel'
                                 spellCheck='false'
                                 minLength={constants.MIN_PHONE_NUMBER_LENGTH}
@@ -203,16 +203,24 @@ export const AccountSettingsScreen: React.FC = () => {
                             </div>
                         </div>
                         <div className={styles.itemGroup}>
-                            {updatingAccount ? (
-                                <LoadingIcon />
-                            ) : (
-                                <button
-                                    className={styles.saveButton}
-                                    onClick={handleSave}
-                                >
-                                    Save Account
-                                </button>
-                            )}
+                            <div>
+                                {updatingAccount ? (
+                                    <LoadingIcon />
+                                ) : (
+                                    <button
+                                        className={styles.primaryButton}
+                                        onClick={handleSave}
+                                    >
+                                        <span
+                                            style={{
+                                                padding: '16px',
+                                            }}
+                                        >
+                                            Save Account
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -2,9 +2,7 @@
 // Please do not change this file!
 interface CssExports {
   'body': string;
-  'copyTextButton': string;
   'deleteButton': string;
-  'downloadFileButton': string;
   'fileURL': string;
   'footer': string;
   'fromGroup': string;
@@ -15,7 +13,9 @@ interface CssExports {
   'noText': string;
   'preview': string;
   'previewImage': string;
-  'viewButton': string;
+  'primaryButton': string;
+  'secondaryButton': string;
+  'textField': string;
 }
 export const cssExports: CssExports;
 export default cssExports;

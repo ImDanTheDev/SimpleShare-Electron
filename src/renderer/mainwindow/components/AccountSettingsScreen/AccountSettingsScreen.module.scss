@@ -1,3 +1,5 @@
+@use '../../../common/base';
+
 .screen {
     display: flex;
     flex-direction: column;
@@ -19,7 +21,6 @@
 .panelBody {
     display: flex;
     justify-content: center;
-    //align-items: center;
     height: 100%;
     padding-top: 8px;
 }
@@ -30,6 +31,8 @@
 
 .itemGroup {
     color: #fff;
+    display: flex;
+    flex-direction: column;
 }
 
 .label {
@@ -37,46 +40,4 @@
     color: #fff;
     margin-bottom: 8px;
     width: 100%;
-}
-
-.field {
-    color: #fff;
-    background-color: #1a2633;
-    border-radius: 16px;
-    border-color: #f4a2617f;
-    border-width: 1px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    font-size: 18px;
-    outline: none;
-    width: 100%;
-    filter: drop-shadow(2px 2px 4px #111111a1);
-}
-
-.saveButton {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    border-radius: 16px;
-    border-color: #f4a26199;
-    border-width: 1px;
-    border-style: solid;
-    background-color: #0d161f;
-    padding: 16px;
-    filter: drop-shadow(2px 2px 4px #111111a1);
-    transition: filter 0.1s, transform 0.1s;
-    cursor: pointer;
-    color: #fff;
-    font-size: 20px;
-}
-
-.saveButton:hover {
-    filter: drop-shadow(2px 2px 6px #111111a1);
-    transform: scale(1.0125);
-}
-.saveButton:active {
-    filter: drop-shadow(2px 2px 1px #111111a1);
-    transform: scale(0.9875);
 }
