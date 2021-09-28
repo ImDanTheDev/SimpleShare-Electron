@@ -96,6 +96,10 @@ export const CompleteAccountScreen: React.FC = () => {
                 return;
             }
 
+            // TODO: Check if the user already has a default profile.
+            // If they do, do nothing.
+            // If they have a profile, but none are default, make the first one default.
+            // If they dont, create a default profile.
             dispatch(
                 createProfile({
                     profile: {
@@ -114,6 +118,7 @@ export const CompleteAccountScreen: React.FC = () => {
                         displayName: displayName,
                         isComplete: true,
                         defaultProfileId: 'default', // TODO: Get the id from the profile that was just created.
+                        profilePositions: ['default'], // TODO: Get the id from the profile that was just created.
                     },
                 })
             );
