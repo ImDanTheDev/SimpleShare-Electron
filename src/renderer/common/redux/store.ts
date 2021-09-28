@@ -19,6 +19,7 @@ import toasterReducer, { ToasterState } from './toaster-slice';
 import {
     AccountInfoState,
     AuthState,
+    LocalPersistState,
     OutboxState,
     ProfilesState,
     reduxReducers,
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
     profiles: reduxReducers.profilesReducer,
     shares: reduxReducers.sharesReducer,
     outbox: reduxReducers.outboxReducer,
+    localPersist: reduxReducers.localPersistReducer,
     nav: navReducer,
     toaster: toasterReducer,
 });
@@ -42,6 +44,7 @@ const persistConfig: PersistConfig<
         profiles: ProfilesState;
         shares: SharesState;
         outbox: OutboxState;
+        localPersist: LocalPersistState;
         nav: NavState;
         toaster: ToasterState;
     }>
