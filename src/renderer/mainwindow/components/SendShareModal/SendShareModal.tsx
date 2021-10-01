@@ -7,7 +7,7 @@ import {
     IUser,
     sendShare,
 } from 'simpleshare-common';
-import { MdClose } from 'react-icons/md';
+import { MdClose, MdError } from 'react-icons/md';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
 import { log } from '../../../common/log';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
@@ -51,6 +51,20 @@ export const SendShareModal: React.FC = () => {
     const [sendErrorMessage, setSendErrorMessage] = useState<
         string | undefined
     >(undefined);
+    const [showPhoneNumberError, setShowPhoneNumberError] =
+        useState<boolean>(false);
+    const [showProfileNameError, setShowProfileNameError] =
+        useState<boolean>(false);
+    const [showSendError, setShowSendError] = useState<boolean>(false);
+    const [showShareTextError, setShowShareTextError] =
+        useState<boolean>(false);
+
+    const [recipients, setRecipients] = useState<
+        {
+            phoneNumber: string;
+            profileName: string;
+        }[]
+    >([]);
 
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
@@ -169,8 +183,7 @@ export const SendShareModal: React.FC = () => {
         }
 
         if (
-            phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH ||
-            profileName.length < constants.MIN_PROFILE_NAME_LENGTH ||
+            recipients.length === 0 ||
             shareText.length > constants.MAX_SHARE_TEXT_LENGTH
         ) {
             return;
@@ -183,22 +196,24 @@ export const SendShareModal: React.FC = () => {
             return;
         }
 
-        dispatch(
-            sendShare({
-                toPhoneNumber: phoneNumber,
-                toProfileName: profileName,
-                share: {
-                    textContent: shareText,
-                    fileSrc:
-                        fileBlob && fileExt
-                            ? {
-                                  blob: fileBlob,
-                                  ext: fileExt,
-                              }
-                            : undefined,
-                },
-            })
-        );
+        recipients.forEach((recipient) => {
+            dispatch(
+                sendShare({
+                    toPhoneNumber: recipient.phoneNumber,
+                    toProfileName: recipient.profileName,
+                    share: {
+                        textContent: shareText,
+                        fileSrc:
+                            fileBlob && fileExt
+                                ? {
+                                      blob: fileBlob,
+                                      ext: fileExt,
+                                  }
+                                : undefined,
+                    },
+                })
+            );
+        });
     };
 
     const handleClearFile = () => {
@@ -207,95 +222,349 @@ export const SendShareModal: React.FC = () => {
         setFileName(undefined);
     };
 
-    return (
-        <div className={styles.modal}>
-            <span className={styles.title}>Send Share</span>
-            <span className={styles.fieldLabel}>Phone Number:</span>
-            <input
-                className={styles.textField}
-                type='text'
-                value={phoneNumber}
-                placeholder='+11234567890'
-                minLength={constants.MIN_PHONE_NUMBER_LENGTH}
-                maxLength={constants.MAX_PHONE_NUMBER_LENGTH}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-            <span className={styles.errorMessage}>{phoneNumberError}</span>
-            <span className={styles.fieldLabel}>Profile Name:</span>
-            <input
-                className={styles.textField}
-                type='text'
-                value={profileName}
-                placeholder='Laptop'
-                minLength={constants.MIN_PROFILE_NAME_LENGTH}
-                maxLength={constants.MAX_PROFILE_NAME_LENGTH}
-                onChange={(e) => setProfileName(e.target.value)}
-            />
-            <span className={styles.errorMessage}>{profileNameError}</span>
-            <span className={styles.fieldLabel}>Message:</span>
-            <textarea
-                className={styles.textField}
-                value={shareText}
-                placeholder='Type anything you want here!'
-                maxLength={constants.MAX_SHARE_TEXT_LENGTH}
-                rows={4}
-                onChange={(e) => setShareText(e.target.value)}
-            />
-            <span className={styles.errorMessage}>{shareTextError}</span>
-            <div style={{ height: '32px', display: 'flex' }}>
-                {fileName ? (
-                    <div className={styles.selectedFileButtonGroup}>
+    const handleAddRecipient = () => {
+        if (phoneNumber.length === 0 || profileName.length === 0) return;
+        if (
+            recipients.findIndex(
+                (x) => x.phoneNumber === '' && profileName === ''
+            ) !== -1
+        ) {
+            // TODO: Notify the user that the recipient is already added.
+            return;
+        }
+
+        setRecipients([
+            ...recipients,
+            {
+                phoneNumber: phoneNumber,
+                profileName: profileName,
+            },
+        ]);
+
+        setPhoneNumber(''), setProfileName('');
+    };
+
+    const renderRecipients = () => {
+        const recipientEntries: {
+            [index: string]: { profiles: string[] };
+        } = {};
+
+        recipients.forEach((recipient) => {
+            if (recipientEntries[recipient.phoneNumber]) {
+                recipientEntries[recipient.phoneNumber].profiles.push(
+                    recipient.profileName
+                );
+            } else {
+                recipientEntries[recipient.phoneNumber] = {
+                    profiles: [recipient.profileName],
+                };
+            }
+        });
+
+        return Object.entries(recipientEntries).map((entry) => {
+            return (
+                <div className={styles.userGroup}>
+                    <div className={styles.user}>
+                        <div className={styles.userDisplayName}>{entry[0]}</div>
                         <div
-                            className={styles.clearFileButton}
-                            title='Clear file'
-                            onClick={handleClearFile}
+                            className={styles.userDeleteButton}
+                            onClick={() => handleRemoveUser(entry[0])}
                         >
-                            <MdClose className={styles.clearFileButtonIcon} />
-                        </div>
-                        <div
-                            className={styles.changeFileButton}
-                            onClick={handleSelectFile}
-                        >
-                            <span>{fileName}</span>
+                            <MdClose />
                         </div>
                     </div>
-                ) : (
-                    <button
-                        className={styles.secondaryButton}
-                        onClick={handleSelectFile}
-                    >
-                        Select File
-                    </button>
-                )}
-            </div>
-
-            {sendingShare ? (
-                <LoadingIcon />
-            ) : (
-                <div
-                    style={{
-                        height: '32px',
-                        display: 'flex',
-                        gap: '8px',
-                    }}
-                >
-                    <button
-                        className={styles.secondaryButton}
-                        onClick={handleDismiss}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        className={styles.secondaryButton}
-                        onClick={handleSend}
-                    >
-                        Send
-                    </button>
+                    <div className={styles.profilesGroup}>
+                        {entry[1].profiles.map((profile) => {
+                            return (
+                                <div className={styles.profile}>
+                                    <div className={styles.profileName}>
+                                        {profile}
+                                    </div>
+                                    <div
+                                        className={styles.profileDeleteButton}
+                                        onClick={() =>
+                                            handleRemoveProfile(
+                                                entry[0],
+                                                profile
+                                            )
+                                        }
+                                    >
+                                        <MdClose />
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-            )}
-            {triedSendingShare && sendErrorMessage && (
-                <span className={styles.errorMessage}>{sendErrorMessage}</span>
-            )}
+            );
+        });
+    };
+
+    const handleRemoveProfile = (phoneNumber: string, profileName: string) => {
+        setRecipients(
+            recipients.filter((x) => {
+                return !(
+                    x.phoneNumber === phoneNumber &&
+                    x.profileName === profileName
+                );
+            })
+        );
+    };
+
+    const handleRemoveUser = (phoneNumber: string) => {
+        setRecipients(
+            recipients.filter((x) => {
+                return x.phoneNumber !== phoneNumber;
+            })
+        );
+    };
+
+    const handlePhoneNumberChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setPhoneNumber(e.target.value);
+    };
+
+    const handleProfileNameChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setProfileName(e.target.value);
+    };
+
+    const handleShareTextChange = (
+        e: React.ChangeEvent<HTMLTextAreaElement>
+    ) => {
+        setShareText(e.target.value);
+    };
+
+    return (
+        <div className={styles.modal}>
+            <div className={styles.title}>Send Share</div>
+            <div className={styles.columns}>
+                <div className={styles.inputColumn}>
+                    <div className={styles.addRecipientRow}>
+                        <div className={styles.phoneNumberContainer}>
+                            <div className={styles.phoneNumberLabel}>
+                                Phone Number:
+                            </div>
+                            <div className={styles.phoneNumberInput}>
+                                <input
+                                    className={styles.textField}
+                                    placeholder='+11234567890'
+                                    minLength={
+                                        constants.MIN_PHONE_NUMBER_LENGTH
+                                    }
+                                    maxLength={
+                                        constants.MAX_PHONE_NUMBER_LENGTH
+                                    }
+                                    value={phoneNumber}
+                                    onChange={handlePhoneNumberChange}
+                                />
+                                {phoneNumberError && (
+                                    <MdError
+                                        className={styles.phoneNumberErrorIcon}
+                                        onMouseEnter={() =>
+                                            setShowPhoneNumberError(true)
+                                        }
+                                        onMouseLeave={() =>
+                                            setShowPhoneNumberError(false)
+                                        }
+                                    />
+                                )}
+
+                                {showPhoneNumberError && (
+                                    <div
+                                        className={
+                                            styles.phoneNumberErrorTooltip
+                                        }
+                                    >
+                                        <div
+                                            className={styles.tooltipArrow}
+                                        ></div>
+                                        {phoneNumberError}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className={styles.profileNameContainer}>
+                            <div className={styles.profileNameLabel}>
+                                Profile Name:
+                            </div>
+                            <div className={styles.profileNameInput}>
+                                <input
+                                    className={styles.textField}
+                                    placeholder='Laptop'
+                                    minLength={
+                                        constants.MIN_PROFILE_NAME_LENGTH
+                                    }
+                                    maxLength={
+                                        constants.MAX_PROFILE_NAME_LENGTH
+                                    }
+                                    value={profileName}
+                                    onChange={handleProfileNameChange}
+                                />
+                                {profileNameError && (
+                                    <MdError
+                                        className={styles.profileNameErrorIcon}
+                                        onMouseEnter={() =>
+                                            setShowProfileNameError(true)
+                                        }
+                                        onMouseLeave={() =>
+                                            setShowProfileNameError(false)
+                                        }
+                                    />
+                                )}
+
+                                {showProfileNameError && (
+                                    <div
+                                        className={
+                                            styles.profileNameErrorTooltip
+                                        }
+                                    >
+                                        <div
+                                            className={styles.tooltipArrow}
+                                        ></div>
+                                        {profileNameError}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className={styles.addRecipientButton}>
+                            <button
+                                className={styles.secondaryButton}
+                                onClick={handleAddRecipient}
+                            >
+                                Add Recipient
+                            </button>
+                        </div>
+                    </div>
+                    <div className={styles.divider}></div>
+                    <div className={styles.shareRow}>
+                        <div className={styles.messageContainer}>
+                            <div className={styles.messageLabel}>Message:</div>
+                            <div className={styles.messageInput}>
+                                <textarea
+                                    className={styles.textField}
+                                    placeholder='Type anything you want here!'
+                                    maxLength={constants.MAX_SHARE_TEXT_LENGTH}
+                                    value={shareText}
+                                    onChange={handleShareTextChange}
+                                    rows={4}
+                                />
+                                {shareTextError && (
+                                    <MdError
+                                        className={styles.shareTextErrorIcon}
+                                        onMouseEnter={() =>
+                                            setShowShareTextError(true)
+                                        }
+                                        onMouseLeave={() =>
+                                            setShowShareTextError(false)
+                                        }
+                                    />
+                                )}
+
+                                {showShareTextError && (
+                                    <div
+                                        className={styles.shareTextErrorTooltip}
+                                    >
+                                        <div
+                                            className={styles.tooltipArrow}
+                                        ></div>
+                                        {shareTextError}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className={styles.selectFileButtonContainer}>
+                            {fileName ? (
+                                <div className={styles.changeFileButtonGroup}>
+                                    <div
+                                        className={styles.changeFileButton}
+                                        onClick={handleSelectFile}
+                                    >
+                                        <span>{fileName}</span>
+                                    </div>
+                                    <div
+                                        className={styles.clearFileButton}
+                                        onClick={handleClearFile}
+                                    >
+                                        <MdClose />
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    className={styles.secondaryButton}
+                                    onClick={handleSelectFile}
+                                >
+                                    Select File
+                                </button>
+                            )}
+                        </div>
+                        <div className={styles.finalButtons}>
+                            {sendingShare ? (
+                                <LoadingIcon style={{ flex: 1 }} />
+                            ) : (
+                                <>
+                                    <div className={styles.cancelButton}>
+                                        <button
+                                            className={styles.secondaryButton}
+                                            onClick={handleDismiss}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                    <div className={styles.sendButton}>
+                                        <button
+                                            className={styles.secondaryButton}
+                                            onClick={handleSend}
+                                        >
+                                            Send
+                                        </button>
+                                        {sendErrorMessage && (
+                                            <MdError
+                                                className={styles.sendErrorIcon}
+                                                onMouseEnter={() =>
+                                                    setShowSendError(true)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setShowSendError(false)
+                                                }
+                                            />
+                                        )}
+                                    </div>
+                                    {showSendError && (
+                                        <div
+                                            className={styles.sendErrorTooltip}
+                                        >
+                                            <div
+                                                className={styles.tooltipArrow}
+                                            ></div>
+                                            {sendErrorMessage}
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className={styles.recipientsColumn}>
+                    <div className={styles.recipientsLabel}>Recipients:</div>
+                    <div className={styles.recipientsScrollContainer}>
+                        <div className={styles.recipientsList}>
+                            {recipients.length === 0 ? (
+                                <span
+                                    className={styles.noRecipientsText}
+                                    style={{ alignSelf: 'center' }}
+                                >
+                                    No Recipients
+                                </span>
+                            ) : (
+                                renderRecipients()
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

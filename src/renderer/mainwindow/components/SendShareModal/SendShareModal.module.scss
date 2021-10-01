@@ -3,97 +3,495 @@
 .modal {
     display: flex;
     flex-direction: column;
-    gap: 8px;
     background-color: #0d161f;
     border-radius: 16px;
     border-width: 1px;
     border-style: solid;
     border-color: #f4a2617f;
-    overflow: hidden;
-    padding: 16px;
-    width: 400px;
+    width: 700px;
+    height: 500px;
+    gap: 8px;
 }
 
 .title {
-    font-size: 20px;
-    color: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-}
-
-.fieldLabel {
     color: #fff;
+    font-size: 20px;
+    padding-top: 16px;
 }
 
-.errorMessage {
-    color: #e63333;
-    font-weight: bold;
-}
-
-.selectedFileButtonGroup {
+.columns {
+    flex: 1;
     display: flex;
     flex-direction: row;
-    overflow: hidden;
-    white-space: nowrap;
-    align-items: center;
-    border-radius: 16px;
-    border-color: #f4a26199;
-    border-width: 1px;
-    border-style: solid;
-    background-color: #282a31;
-    filter: drop-shadow(2px 2px 4px #111111a1);
-    transition: filter 0.1s, transform 0.1s;
-    flex: 1;
-}
 
-.clearFileButton {
-    color: #fff;
-    font-style: 16px;
-    border-right-style: solid;
-    border-right-width: 1px;
-    border-right-color: #f4a26199;
-    padding-left: 8px;
-    padding-right: 4px;
-    display: flex;
-}
+    .inputColumn {
+        padding-left: 16px;
+        padding-bottom: 16px;
+        padding-right: 4px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        gap: 8px;
 
-.clearFileButtonIcon {
-    font-size: 24px;
-}
+        .addRecipientRow {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
 
-.clearFileButtonIcon:hover {
-    transform: scale(1.25);
-    font-weight: bold;
-    cursor: pointer;
-}
+            .phoneNumberContainer {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
 
-.changeFileButton {
-    cursor: pointer;
-    color: #fff;
-    font-size: 16px;
+                .phoneNumberLabel {
+                    font-size: 16px;
+                    color: #fff;
+                }
 
-    overflow: hidden;
-    white-space: nowrap;
-    padding-left: 8px;
-    padding-right: 8px;
-    text-overflow: ellipsis;
-    align-items: center;
-    flex: 1;
-}
+                .phoneNumberInput {
+                    display: flex;
+                    position: relative;
 
-.changeFileButton:hover {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-}
+                    .phoneNumberErrorIcon {
+                        position: absolute;
+                        right: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 32px;
+                        height: 32px;
+                        margin: 8px;
+                        color: #e63333;
+                    }
 
-.changeFileButton:hover span {
-    display: none;
-}
+                    .phoneNumberErrorTooltip {
+                        position: absolute;
+                        top: 50px;
+                        right: 0;
+                        background-color: cadetblue;
+                        border-width: 2px;
+                        border-style: solid;
+                        border-color: #e63333;
+                        border-radius: 8px;
+                        padding: 8px;
+                        z-index: 100;
+                        background-color: #324050;
+                        color: #fff;
+                        filter: drop-shadow(2px 2px 4px #111111);
+                        min-width: 100px;
 
-.changeFileButton:hover:before {
-    content: 'Change File';
+                        .tooltipArrow {
+                            width: 0px;
+                            height: 0px;
+                            position: absolute;
+                            right: 12px;
+                            top: -12px;
+
+                            border-bottom: 10px solid #e63333;
+                            border-left: 10px solid transparent;
+                            border-right: 10px solid transparent;
+                        }
+                    }
+                }
+            }
+
+            .profileNameContainer {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .profileNameLabel {
+                    font-size: 16px;
+                    color: #fff;
+                }
+
+                .profileNameInput {
+                    display: flex;
+                    position: relative;
+
+                    .profileNameErrorIcon {
+                        position: absolute;
+                        right: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 32px;
+                        height: 32px;
+                        margin: 8px;
+                        color: #e63333;
+                    }
+
+                    .profileNameErrorTooltip {
+                        position: absolute;
+                        top: 50px;
+                        right: 0;
+                        background-color: cadetblue;
+                        border-width: 2px;
+                        border-style: solid;
+                        border-color: #e63333;
+                        border-radius: 8px;
+                        padding: 8px;
+                        z-index: 100;
+                        background-color: #324050;
+                        color: #fff;
+                        filter: drop-shadow(2px 2px 4px #111111);
+                        min-width: 100px;
+
+                        .tooltipArrow {
+                            width: 0px;
+                            height: 0px;
+                            position: absolute;
+                            right: 12px;
+                            top: -12px;
+
+                            border-bottom: 10px solid #e63333;
+                            border-left: 10px solid transparent;
+                            border-right: 10px solid transparent;
+                        }
+                    }
+                }
+            }
+
+            .addRecipientButton {
+                display: flex;
+                flex-direction: row;
+                justify-content: flex-end;
+            }
+        }
+
+        .divider {
+            background-color: #5a5a5a;
+            height: 2px;
+        }
+
+        .shareRow {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            .messageContainer {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                .messageLabel {
+                    font-size: 16px;
+                    color: #fff;
+                }
+
+                .messageInput {
+                    display: flex;
+                    position: relative;
+
+                    .shareTextErrorIcon {
+                        position: absolute;
+                        right: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 32px;
+                        height: 32px;
+                        margin: 8px;
+                        color: #e63333;
+                    }
+
+                    .shareTextErrorTooltip {
+                        position: absolute;
+                        top: 50px;
+                        right: 0;
+                        background-color: cadetblue;
+                        border-width: 2px;
+                        border-style: solid;
+                        border-color: #e63333;
+                        border-radius: 8px;
+                        padding: 8px;
+                        z-index: 100;
+                        background-color: #324050;
+                        color: #fff;
+                        filter: drop-shadow(2px 2px 4px #111111);
+                        min-width: 100px;
+
+                        .tooltipArrow {
+                            width: 0px;
+                            height: 0px;
+                            position: absolute;
+                            right: 12px;
+                            top: -12px;
+
+                            border-bottom: 10px solid #e63333;
+                            border-left: 10px solid transparent;
+                            border-right: 10px solid transparent;
+                        }
+                    }
+                }
+            }
+
+            .selectFileButtonContainer {
+                display: flex;
+                flex-direction: column;
+
+                .selectFileButton {
+                    display: flex;
+                    flex-direction: row;
+                }
+
+                .changeFileButtonGroup {
+                    display: flex;
+                    flex-direction: row;
+
+                    justify-content: center;
+                    align-items: center;
+
+                    border-radius: 16px;
+                    border-color: #f4a2617f;
+                    border-width: 1px;
+                    border-style: solid;
+                    background-color: #282a31;
+                    filter: drop-shadow(2px 2px 4px #111111a1);
+                    transition: filter 0.1s, transform 0.1s;
+                    cursor: pointer;
+                    color: #fff;
+                    font-size: 16px;
+                    padding: 4px;
+
+                    .clearFileButton {
+                        display: flex;
+                        padding: 4px;
+
+                        cursor: pointer;
+
+                        &:hover {
+                            transform: scale(1.2);
+                        }
+
+                        &:active {
+                            transform: scale(1);
+                        }
+                    }
+
+                    .changeFileButton {
+                        display: flex;
+                        flex: 1;
+                        padding: 4px;
+                        overflow: hidden;
+
+                        span {
+                            overflow: hidden;
+                            white-space: nowrap;
+                            text-overflow: ellipsis;
+                        }
+
+                        &:hover span {
+                            display: none;
+                        }
+
+                        &:hover:before {
+                            content: 'Change File';
+                        }
+                    }
+                }
+            }
+
+            .finalButtons {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                position: relative;
+
+                .cancelButton {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .sendButton {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    position: relative;
+
+                    .sendErrorIcon {
+                        position: absolute;
+                        right: 0;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 32px;
+                        height: 32px;
+                        margin: 2px;
+                        color: #e63333;
+                    }
+                }
+
+                .sendErrorTooltip {
+                    position: absolute;
+                    bottom: 50px;
+                    right: 0;
+                    background-color: cadetblue;
+                    border-width: 2px;
+                    border-style: solid;
+                    border-color: #e63333;
+                    border-radius: 8px;
+                    padding: 8px;
+                    z-index: 100;
+                    background-color: #324050;
+                    color: #fff;
+                    filter: drop-shadow(2px 2px 4px #111111);
+                    min-width: 100px;
+
+                    .tooltipArrow {
+                        width: 0px;
+                        height: 0px;
+                        position: absolute;
+                        right: 6px;
+                        bottom: -12px;
+
+                        border-top: 10px solid #e63333;
+                        border-left: 10px solid transparent;
+                        border-right: 10px solid transparent;
+                    }
+                }
+            }
+        }
+    }
+    .recipientsColumn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-right: 16px;
+        padding-bottom: 16px;
+        padding-left: 4px;
+
+        .recipientsLabel {
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .recipientsScrollContainer {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1 0 0;
+            background-color: #0d161f;
+            border-radius: 16px;
+            border-width: 1px;
+            border-style: solid;
+            border-color: #f4a2617f;
+            padding: 8px 4px 8px 8px;
+
+            .recipientsList {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                overflow-y: auto;
+                padding-right: 4px;
+
+                &::-webkit-scrollbar-track {
+                    background-color: #1a2633;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                    background-color: #3c3e44;
+                }
+
+                .noRecipientsText {
+                    align-self: center;
+                    color: #ababab;
+                }
+
+                .userGroup {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+
+                    .user {
+                        display: flex;
+                        flex-direction: row;
+                        background-color: #0d161f;
+                        border-radius: 16px;
+                        border-width: 1px;
+                        border-style: solid;
+                        border-color: #f4a2617f;
+                        padding: 4px;
+                        justify-content: space-between;
+
+                        .userDisplayName {
+                            color: #fff;
+                            font-size: 16px;
+                            padding: 4px;
+                        }
+
+                        .userDeleteButton {
+                            color: #fff;
+                            align-items: center;
+                            display: flex;
+                            padding: 4px;
+                            cursor: pointer;
+
+                            &:hover {
+                                transform: scale(1.2);
+                            }
+
+                            &:active {
+                                transform: scale(1);
+                            }
+                        }
+                    }
+
+                    .profilesGroup {
+                        display: flex;
+                        padding-left: 24px;
+                        flex-direction: column;
+                        gap: 4px;
+                        border-left-style: solid;
+                        border-left-width: 2px;
+                        border-left-color: #5a5a5a;
+                        border-bottom-style: solid;
+                        border-bottom-width: 2px;
+                        border-bottom-color: #5a5a5a;
+                        padding-bottom: 4px;
+
+                        .profile {
+                            display: flex;
+                            flex-direction: row;
+                            background-color: #0d161f;
+                            border-radius: 16px;
+                            border-width: 1px;
+                            border-style: solid;
+                            border-color: #f4a2617f;
+                            padding: 4px;
+                            justify-content: space-between;
+                            .profileName {
+                                color: #fff;
+                                font-size: 16px;
+                                padding: 4px;
+                            }
+                            .profileDeleteButton {
+                                color: #fff;
+                                align-items: center;
+                                display: flex;
+                                padding: 4px;
+                                cursor: pointer;
+
+                                &:hover {
+                                    transform: scale(1.2);
+                                }
+
+                                &:active {
+                                    transform: scale(1);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
