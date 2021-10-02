@@ -2,6 +2,9 @@
 // Please do not change this file!
 interface CssExports {
   'addRecipientButton': string;
+  'addRecipientButtonContainer': string;
+  'addRecipientErrorTooltip': string;
+  'addRecipientIcon': string;
   'addRecipientRow': string;
   'cancelButton': string;
   'changeFileButton': string;

@@ -14,6 +14,10 @@ import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
 import styles from './SendShareModal.module.scss';
+import {
+    MIN_PHONE_NUMBER_LENGTH,
+    MIN_PROFILE_NAME_LENGTH,
+} from 'simpleshare-common/dist/constants';
 
 export const SendShareModal: React.FC = () => {
     const dispatch = useDispatch();
@@ -58,6 +62,11 @@ export const SendShareModal: React.FC = () => {
     const [showSendError, setShowSendError] = useState<boolean>(false);
     const [showShareTextError, setShowShareTextError] =
         useState<boolean>(false);
+    const [showAddRecipientError, setShowAddRecipientError] =
+        useState<boolean>(false);
+    const [addRecipientErrorMessage, setAddRecipientErrorMessage] = useState<
+        string | undefined
+    >(undefined);
 
     const [recipients, setRecipients] = useState<
         {
@@ -117,7 +126,7 @@ export const SendShareModal: React.FC = () => {
     useEffect(() => {
         if (profileName.length < constants.MIN_PROFILE_NAME_LENGTH) {
             setProfileNameError(
-                `Profile name must be at least ${constants.MIN_PROFILE_NAME_LENGTH} characters long.`
+                `The profile name must be at least ${constants.MIN_PROFILE_NAME_LENGTH} characters long.`
             );
         } else {
             setProfileNameError('');
@@ -125,10 +134,22 @@ export const SendShareModal: React.FC = () => {
 
         if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
             setPhoneNumberError(
-                `Phone number must be at least ${constants.MIN_PHONE_NUMBER_LENGTH} characters long.`
+                `The phone number must be at least ${constants.MIN_PHONE_NUMBER_LENGTH} characters long.`
             );
         } else {
             setPhoneNumberError('');
+        }
+
+        if (
+            recipients.findIndex(
+                (x) =>
+                    x.phoneNumber === phoneNumber &&
+                    x.profileName === profileName
+            ) !== -1
+        ) {
+            setAddRecipientErrorMessage('You already added this recipient.');
+        } else {
+            setAddRecipientErrorMessage(undefined);
         }
 
         if (shareText.length > constants.MAX_SHARE_TEXT_LENGTH) {
@@ -139,6 +160,14 @@ export const SendShareModal: React.FC = () => {
             setShareTextError('');
         }
     }, [profileName, phoneNumber, shareText]);
+
+    useEffect(() => {
+        if (recipients.length === 0) {
+            setSendErrorMessage('You must add at least one recipient');
+        } else {
+            setSendErrorMessage(undefined);
+        }
+    }, [recipients]);
 
     const handleSelectFile = async () => {
         const { buffer, fileName, ext, mimeType } = await window.api.invoke(
@@ -181,11 +210,9 @@ export const SendShareModal: React.FC = () => {
             );
             return;
         }
-
-        if (
-            recipients.length === 0 ||
-            shareText.length > constants.MAX_SHARE_TEXT_LENGTH
-        ) {
+        //shareText.length > constants.MAX_SHARE_TEXT_LENGTH
+        if (recipients.length === 0) {
+            setSendErrorMessage('You must add at least one recipient');
             return;
         }
 
@@ -226,10 +253,18 @@ export const SendShareModal: React.FC = () => {
         if (phoneNumber.length === 0 || profileName.length === 0) return;
         if (
             recipients.findIndex(
-                (x) => x.phoneNumber === '' && profileName === ''
+                (x) =>
+                    x.phoneNumber === phoneNumber &&
+                    x.profileName === profileName
             ) !== -1
         ) {
-            // TODO: Notify the user that the recipient is already added.
+            return;
+        }
+
+        if (
+            phoneNumber.length < MIN_PHONE_NUMBER_LENGTH ||
+            profileName.length < MIN_PROFILE_NAME_LENGTH
+        ) {
             return;
         }
 
@@ -241,7 +276,8 @@ export const SendShareModal: React.FC = () => {
             },
         ]);
 
-        setPhoneNumber(''), setProfileName('');
+        setPhoneNumber('');
+        setProfileName('');
     };
 
     const renderRecipients = () => {
@@ -263,7 +299,7 @@ export const SendShareModal: React.FC = () => {
 
         return Object.entries(recipientEntries).map((entry) => {
             return (
-                <div className={styles.userGroup}>
+                <div key={entry[0]} className={styles.userGroup}>
                     <div className={styles.user}>
                         <div className={styles.userDisplayName}>{entry[0]}</div>
                         <div
@@ -276,7 +312,7 @@ export const SendShareModal: React.FC = () => {
                     <div className={styles.profilesGroup}>
                         {entry[1].profiles.map((profile) => {
                             return (
-                                <div className={styles.profile}>
+                                <div key={profile} className={styles.profile}>
                                     <div className={styles.profileName}>
                                         {profile}
                                     </div>
@@ -429,13 +465,39 @@ export const SendShareModal: React.FC = () => {
                                 )}
                             </div>
                         </div>
-                        <div className={styles.addRecipientButton}>
-                            <button
-                                className={styles.secondaryButton}
-                                onClick={handleAddRecipient}
-                            >
-                                Add Recipient
-                            </button>
+                        <div className={styles.addRecipientButtonContainer}>
+                            <div className={styles.addRecipientButton}>
+                                <button
+                                    className={styles.secondaryButton}
+                                    style={
+                                        addRecipientErrorMessage
+                                            ? { paddingRight: '36px' }
+                                            : {}
+                                    }
+                                    onClick={handleAddRecipient}
+                                >
+                                    Add Recipient
+                                </button>
+                                {addRecipientErrorMessage && (
+                                    <MdError
+                                        className={styles.addRecipientIcon}
+                                        onMouseEnter={() =>
+                                            setShowAddRecipientError(true)
+                                        }
+                                        onMouseLeave={() =>
+                                            setShowAddRecipientError(false)
+                                        }
+                                    />
+                                )}
+                            </div>
+                            {showAddRecipientError && (
+                                <div
+                                    className={styles.addRecipientErrorTooltip}
+                                >
+                                    <div className={styles.tooltipArrow}></div>
+                                    {addRecipientErrorMessage}
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className={styles.divider}></div>
