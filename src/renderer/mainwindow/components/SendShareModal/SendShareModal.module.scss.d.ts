@@ -27,8 +27,10 @@ interface CssExports {
   'primaryButton': string;
   'profile': string;
   'profileDeleteButton': string;
+  'profileItem': string;
   'profileName': string;
   'profileNameContainer': string;
+  'profileNameDropdown': string;
   'profileNameErrorIcon': string;
   'profileNameErrorTooltip': string;
   'profileNameInput': string;

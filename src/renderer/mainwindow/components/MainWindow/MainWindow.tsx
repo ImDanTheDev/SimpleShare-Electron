@@ -3,6 +3,7 @@ import { OFAuth, OFFirebase, OFFirestore, OFStorage } from '@omnifire/web';
 import React, { ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    clearProfiles,
     ErrorCode,
     getAllAccountInfo,
     initFirebase,
@@ -159,6 +160,9 @@ const MainWindow: React.FC = () => {
     };
 
     const handleDismissModalOverlay = () => {
+        if (currentModal === 'SendShareModal') {
+            dispatch(clearProfiles());
+        }
         dispatch(setCurrentModal('None'));
     };
 

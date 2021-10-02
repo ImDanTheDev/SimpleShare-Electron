@@ -153,6 +153,46 @@
                             border-right: 10px solid transparent;
                         }
                     }
+
+                    .profileNameDropdown {
+                        color: #fff;
+                        margin-top: -10px;
+                        padding-top: 10px;
+                        background-color: #2d3341;
+                        border-radius: 16px;
+                        border-width: 1px;
+                        border-style: solid;
+                        border-color: #f4a2617f;
+                        border-top-width: 0px;
+                        border-top-left-radius: 0;
+                        border-top-right-radius: 0;
+                        border-top-style: none;
+                        overflow-y: auto;
+
+                        position: absolute;
+                        width: 100%;
+                        top: 45px;
+                        background-color: 'red';
+                        z-index: 101;
+                        filter: drop-shadow(0px 2px 2px #1a1a1a);
+
+                        .profileItem {
+                            color: #fff;
+                            padding: 8px;
+                            transition: padding linear 0.1s;
+                            cursor: pointer;
+
+                            &:hover {
+                                padding-left: 12px;
+                                background-color: #373f50;
+                            }
+
+                            &:last-child {
+                                border-bottom-left-radius: 16px;
+                                border-bottom-right-radius: 16px;
+                            }
+                        }
+                    }
                 }
             }
 

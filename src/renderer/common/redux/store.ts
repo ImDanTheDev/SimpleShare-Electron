@@ -23,6 +23,7 @@ import {
     OutboxState,
     ProfilesState,
     reduxReducers,
+    SearchState,
     SharesState,
 } from 'simpleshare-common';
 
@@ -33,6 +34,7 @@ const rootReducer = combineReducers({
     shares: reduxReducers.sharesReducer,
     outbox: reduxReducers.outboxReducer,
     localPersist: reduxReducers.localPersistReducer,
+    search: reduxReducers.searchReducer,
     nav: navReducer,
     toaster: toasterReducer,
 });
@@ -47,11 +49,20 @@ const persistConfig: PersistConfig<
         localPersist: LocalPersistState;
         nav: NavState;
         toaster: ToasterState;
+        search: SearchState;
     }>
 > = {
     key: 'root',
     storage: electronStorage(),
-    blacklist: ['user', 'auth', 'profiles', 'shares', 'nav', 'toaster'],
+    blacklist: [
+        'user',
+        'auth',
+        'profiles',
+        'shares',
+        'nav',
+        'toaster',
+        'search',
+    ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

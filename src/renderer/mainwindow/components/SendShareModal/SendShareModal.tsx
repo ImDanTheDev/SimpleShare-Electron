@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    clearProfiles,
     constants,
     ErrorCode,
     IProfile,
     IUser,
+    searchProfiles,
     sendShare,
 } from 'simpleshare-common';
 import { MdClose, MdError } from 'react-icons/md';
@@ -40,6 +42,9 @@ export const SendShareModal: React.FC = () => {
     const sendShareError = useSelector(
         (state: RootState) => state.shares.sendShareError
     );
+    const searchedProfiles = useSelector(
+        (state: RootState) => state.search.profiles
+    );
 
     const [phoneNumber, setPhoneNumber] = useState<string>('');
     const [profileName, setProfileName] = useState<string>('');
@@ -67,6 +72,9 @@ export const SendShareModal: React.FC = () => {
     const [addRecipientErrorMessage, setAddRecipientErrorMessage] = useState<
         string | undefined
     >(undefined);
+    const [showProfileNameSuggestions, setShowProfileNameSuggestions] =
+        useState<boolean>(false);
+    const [pickingSuggestion, setPickingSuggestion] = useState<boolean>(false);
 
     const [recipients, setRecipients] = useState<
         {
@@ -75,8 +83,11 @@ export const SendShareModal: React.FC = () => {
         }[]
     >([]);
 
+    const [filteredProfiles, setFilteredProfiles] = useState<IProfile[]>([]);
+
     const handleDismiss = () => {
         dispatch(setCurrentModal('None'));
+        dispatch(clearProfiles());
     };
 
     useEffect(() => {
@@ -120,6 +131,7 @@ export const SendShareModal: React.FC = () => {
             !sendShareError
         ) {
             dispatch(setCurrentModal('None'));
+            dispatch(clearProfiles());
         }
     }, [triedSendingShare, sendingShare, sentShare, sendShareError]);
 
@@ -168,6 +180,21 @@ export const SendShareModal: React.FC = () => {
             setSendErrorMessage(undefined);
         }
     }, [recipients]);
+
+    useEffect(() => {
+        if (profileName.length === 0) {
+            setFilteredProfiles(searchedProfiles);
+            return;
+        }
+
+        setFilteredProfiles(
+            searchedProfiles.filter((profile) =>
+                profile.name
+                    .toLocaleLowerCase()
+                    .startsWith(profileName.toLowerCase())
+            )
+        );
+    }, [profileName, searchedProfiles]);
 
     const handleSelectFile = async () => {
         const { buffer, fileName, ext, mimeType } = await window.api.invoke(
@@ -373,6 +400,37 @@ export const SendShareModal: React.FC = () => {
         setShareText(e.target.value);
     };
 
+    const handleProfileNameFocus = () => {
+        dispatch(searchProfiles(phoneNumber));
+        setShowProfileNameSuggestions(true);
+    };
+
+    const renderProfiles = () => {
+        if (!showProfileNameSuggestions) return;
+        if (filteredProfiles.length === 0) return;
+        return (
+            <div className={styles.profileNameDropdown}>
+                {filteredProfiles.map((profile) => {
+                    return (
+                        <div
+                            className={styles.profileItem}
+                            key={profile.id}
+                            onClick={() => {
+                                setProfileName(profile.name);
+                                setPickingSuggestion(false);
+                                setShowProfileNameSuggestions(false);
+                            }}
+                            onMouseEnter={() => setPickingSuggestion(true)}
+                            onMouseLeave={() => setPickingSuggestion(false)}
+                        >
+                            {profile.name}
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    };
+
     return (
         <div className={styles.modal}>
             <div className={styles.title}>Send Share</div>
@@ -438,7 +496,28 @@ export const SendShareModal: React.FC = () => {
                                     }
                                     value={profileName}
                                     onChange={handleProfileNameChange}
+                                    onFocus={handleProfileNameFocus}
+                                    onBlur={() => {
+                                        if (!pickingSuggestion) {
+                                            setShowProfileNameSuggestions(
+                                                false
+                                            );
+                                        }
+                                    }}
+                                    style={
+                                        showProfileNameSuggestions &&
+                                        filteredProfiles.length > 0
+                                            ? {
+                                                  borderBottomLeftRadius: 0,
+                                                  borderBottomRightRadius: 0,
+                                                  borderBottomStyle: 'none',
+                                                  zIndex: 102,
+                                                  marginBottom: 1,
+                                              }
+                                            : {}
+                                    }
                                 />
+                                {renderProfiles()}
                                 {profileNameError && (
                                     <MdError
                                         className={styles.profileNameErrorIcon}
