@@ -142,6 +142,7 @@ export const SendShareModal: React.FC = () => {
             );
         } else {
             setProfileNameError('');
+            setShowProfileNameError(false);
         }
 
         if (phoneNumber.length < constants.MIN_PHONE_NUMBER_LENGTH) {
@@ -150,6 +151,7 @@ export const SendShareModal: React.FC = () => {
             );
         } else {
             setPhoneNumberError('');
+            setShowPhoneNumberError(false);
         }
 
         if (
@@ -161,7 +163,8 @@ export const SendShareModal: React.FC = () => {
         ) {
             setAddRecipientErrorMessage('You already added this recipient.');
         } else {
-            setAddRecipientErrorMessage(undefined);
+            setAddRecipientErrorMessage('');
+            setShowAddRecipientError(false);
         }
 
         if (shareText.length > constants.MAX_SHARE_TEXT_LENGTH) {
@@ -170,6 +173,7 @@ export const SendShareModal: React.FC = () => {
             );
         } else {
             setShareTextError('');
+            setShowShareTextError(false);
         }
     }, [profileName, phoneNumber, shareText]);
 
@@ -189,9 +193,7 @@ export const SendShareModal: React.FC = () => {
 
         setFilteredProfiles(
             searchedProfiles.filter((profile) =>
-                profile.name
-                    .toLocaleLowerCase()
-                    .startsWith(profileName.toLowerCase())
+                profile.name.startsWith(profileName)
             )
         );
     }, [profileName, searchedProfiles]);
@@ -517,7 +519,6 @@ export const SendShareModal: React.FC = () => {
                                             : {}
                                     }
                                 />
-                                {renderProfiles()}
                                 {profileNameError && (
                                     <MdError
                                         className={styles.profileNameErrorIcon}
@@ -529,6 +530,7 @@ export const SendShareModal: React.FC = () => {
                                         }
                                     />
                                 )}
+                                {renderProfiles()}
 
                                 {showProfileNameError && (
                                     <div
