@@ -79,6 +79,6 @@
         "react-icons": "^4.2.0",
         "react-redux": "^7.2.4",
         "redux-persist": "^6.0.0",
-        "simpleshare-common": "^1.2.20"
+        "simpleshare-common": "^1.2.21"
     }
 }

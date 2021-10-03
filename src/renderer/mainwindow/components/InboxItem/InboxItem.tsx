@@ -3,7 +3,12 @@ import styles from './InboxItem.module.scss';
 import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch } from 'react-redux';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
-import { deleteCloudShare, IShare, setCurrentShare } from 'simpleshare-common';
+import {
+    deleteCloudShare,
+    IShare,
+    removeNotificationForShare,
+    setCurrentShare,
+} from 'simpleshare-common';
 
 interface Props {
     share: IShare;
@@ -16,6 +21,8 @@ export const InboxItem: React.FC<Props> = (props: Props) => {
 
     const handleDelete = async () => {
         dispatch(deleteCloudShare(props.share));
+        if (props.share.id)
+            dispatch(removeNotificationForShare(props.share.id));
     };
 
     const handleCopyText = async () => {

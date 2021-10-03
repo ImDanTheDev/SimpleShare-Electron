@@ -1,7 +1,11 @@
 import React, { useEffect } from 'react';
 import { MdDeleteForever } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCloudShare, IShare } from 'simpleshare-common';
+import {
+    deleteCloudShare,
+    IShare,
+    removeNotificationForShare,
+} from 'simpleshare-common';
 import { setCurrentModal } from '../../../common/redux/nav-slice';
 import { RootState } from '../../../common/redux/store';
 import { pushToast } from '../../../common/redux/toaster-slice';
@@ -29,7 +33,12 @@ export const ViewShareModal: React.FC = () => {
     }, [currentShare]);
 
     const handleDelete = async () => {
-        if (currentShare) dispatch(deleteCloudShare(currentShare));
+        if (currentShare) {
+            dispatch(deleteCloudShare(currentShare));
+            if (currentShare.id) {
+                dispatch(removeNotificationForShare(currentShare.id));
+            }
+        }
         dispatch(setCurrentModal('None'));
     };
 

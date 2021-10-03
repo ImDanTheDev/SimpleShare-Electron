@@ -3,6 +3,7 @@ import { OFAuth, OFFirebase, OFFirestore, OFStorage } from '@omnifire/web';
 import React, { ReactNode, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+    clearNotifications,
     clearProfiles,
     ErrorCode,
     getAllAccountInfo,
@@ -10,9 +11,12 @@ import {
     isAccountComplete,
     isPublicGeneralInfoComplete,
     serviceHandler,
+    setCurrentShare,
     startAuthStateListener,
+    startNotificationListener,
     startProfileListener,
     startPublicGeneralInfoListener,
+    switchProfile,
 } from 'simpleshare-common';
 import { log } from '../../../common/log';
 import {
@@ -56,6 +60,12 @@ const MainWindow: React.FC = () => {
         (state: RootState) => state.user.fetchAccountError
     );
 
+    const notifications = useSelector(
+        (state: RootState) => state.notifications.notifications
+    );
+
+    const profiles = useSelector((state: RootState) => state.profiles.profiles);
+
     useEffect(() => {
         const initializeApp = async () => {
             const firebase: IFirebase = new OFFirebase();
@@ -88,6 +98,7 @@ const MainWindow: React.FC = () => {
             log('Fetching account info and general public info.');
             dispatch(getAllAccountInfo());
             dispatch(startPublicGeneralInfoListener());
+            dispatch(startNotificationListener());
         } else {
             // User is signed out.
             window.api.send('APP_SHOW_STARTUP_WINDOW', {});
@@ -145,6 +156,36 @@ const MainWindow: React.FC = () => {
             }
         }
     }, [fetchAccountError]);
+
+    useEffect(() => {
+        if (notifications.length > 0) {
+            notifications.forEach((noti) => {
+                const notification = new Notification(
+                    `${noti.share?.fromDisplayName}(${noti.share?.fromProfileName}) sent you a share!`,
+                    {
+                        body: noti.share
+                            ? noti.share.textContent || 'No Text'
+                            : '',
+                    }
+                );
+
+                // OnClick will not be called on Windows 10 if the notification is clicked
+                // from within the Action Center.
+                // Known Issue: https://github.com/electron/electron/issues/29461
+                // Clicking the notification popup outside of the Action center does work.
+                notification.onclick = () => {
+                    const profile = profiles.find(
+                        (x) => x.id === noti.share?.toProfileId
+                    );
+                    if (profile) dispatch(switchProfile(profile));
+                    if (noti.share) dispatch(setCurrentShare(noti.share));
+                    dispatch(setCurrentModal('ViewShareModal'));
+                    window.api.send('APP_RESTORE', {});
+                };
+            });
+            dispatch(clearNotifications());
+        }
+    }, [notifications]);
 
     const renderScreen = (): ReactNode => {
         switch (currentScreen) {

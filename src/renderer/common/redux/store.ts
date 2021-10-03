@@ -25,6 +25,7 @@ import {
     reduxReducers,
     SearchState,
     SharesState,
+    NotificationsState,
 } from 'simpleshare-common';
 
 const rootReducer = combineReducers({
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
     outbox: reduxReducers.outboxReducer,
     localPersist: reduxReducers.localPersistReducer,
     search: reduxReducers.searchReducer,
+    notifications: reduxReducers.notificationsReducer,
     nav: navReducer,
     toaster: toasterReducer,
 });
@@ -50,6 +52,7 @@ const persistConfig: PersistConfig<
         nav: NavState;
         toaster: ToasterState;
         search: SearchState;
+        notifications: NotificationsState;
     }>
 > = {
     key: 'root',
@@ -62,6 +65,7 @@ const persistConfig: PersistConfig<
         'nav',
         'toaster',
         'search',
+        'notifications',
     ],
 };
 

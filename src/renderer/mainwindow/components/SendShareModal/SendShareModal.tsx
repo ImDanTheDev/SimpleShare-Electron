@@ -225,7 +225,6 @@ export const SendShareModal: React.FC = () => {
     };
 
     const handleSend = async () => {
-        setTriedSendingShare(true);
         if (!user || !currentProfile || !currentProfile.id) {
             log('ERROR: Not signed in!');
             dispatch(
@@ -239,7 +238,7 @@ export const SendShareModal: React.FC = () => {
             );
             return;
         }
-        //shareText.length > constants.MAX_SHARE_TEXT_LENGTH
+
         if (recipients.length === 0) {
             setSendErrorMessage('You must add at least one recipient');
             return;
@@ -270,6 +269,8 @@ export const SendShareModal: React.FC = () => {
                 })
             );
         });
+
+        setTriedSendingShare(true);
     };
 
     const handleClearFile = () => {
