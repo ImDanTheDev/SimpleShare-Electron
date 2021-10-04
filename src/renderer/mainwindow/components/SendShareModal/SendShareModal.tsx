@@ -4,7 +4,9 @@ import {
     clearProfiles,
     constants,
     ErrorCode,
+    IAccountInfo,
     IProfile,
+    IPublicGeneralInfo,
     IUser,
     searchProfiles,
     sendShare,
@@ -20,6 +22,7 @@ import {
     MIN_PHONE_NUMBER_LENGTH,
     MIN_PROFILE_NAME_LENGTH,
 } from 'simpleshare-common/dist/constants';
+import { stat } from 'fs';
 
 export const SendShareModal: React.FC = () => {
     const dispatch = useDispatch();
@@ -28,11 +31,23 @@ export const SendShareModal: React.FC = () => {
         (state: RootState) => state.auth.user
     );
 
+    const accountInfo: IAccountInfo | undefined = useSelector(
+        (state: RootState) => state.user.accountInfo
+    );
+
     const currentProfile: IProfile | undefined = useSelector(
         (state: RootState) =>
             state.profiles.profiles.find(
                 (profile) => profile.id === state.profiles.currentProfileId
             )
+    );
+
+    const publicGeneralInfo: IPublicGeneralInfo | undefined = useSelector(
+        (state: RootState) => state.user.publicGeneralInfo
+    );
+
+    const profiles: IProfile[] = useSelector(
+        (state: RootState) => state.profiles.profiles
     );
 
     const sendingShare = useSelector(
@@ -46,8 +61,13 @@ export const SendShareModal: React.FC = () => {
         (state: RootState) => state.search.profiles
     );
 
-    const [phoneNumber, setPhoneNumber] = useState<string>('');
-    const [profileName, setProfileName] = useState<string>('');
+    const [phoneNumber, setPhoneNumber] = useState<string>(
+        accountInfo?.phoneNumber || ''
+    );
+    const [profileName, setProfileName] = useState<string>(
+        profiles.find((x) => x.id === publicGeneralInfo?.defaultProfileId)
+            ?.name || ''
+    );
     const [shareText, setShareText] = useState<string>('');
 
     const [phoneNumberError, setPhoneNumberError] = useState<string>('');
@@ -404,6 +424,13 @@ export const SendShareModal: React.FC = () => {
     };
 
     const handleProfileNameFocus = () => {
+        if (
+            profileName ===
+            profiles.find((x) => x.id === publicGeneralInfo?.defaultProfileId)
+                ?.name
+        ) {
+            setProfileName('');
+        }
         dispatch(searchProfiles(phoneNumber));
         setShowProfileNameSuggestions(true);
     };
@@ -434,6 +461,20 @@ export const SendShareModal: React.FC = () => {
         );
     };
 
+    const clearAutoFilled = () => {
+        if (phoneNumber === accountInfo?.phoneNumber) {
+            setPhoneNumber('');
+            if (
+                profileName ===
+                profiles.find(
+                    (x) => x.id === publicGeneralInfo?.defaultProfileId
+                )?.name
+            ) {
+                setProfileName('');
+            }
+        }
+    };
+
     return (
         <div className={styles.modal}>
             <div className={styles.title}>Send Share</div>
@@ -455,6 +496,7 @@ export const SendShareModal: React.FC = () => {
                                         constants.MAX_PHONE_NUMBER_LENGTH
                                     }
                                     value={phoneNumber}
+                                    onFocus={clearAutoFilled}
                                     onChange={handlePhoneNumberChange}
                                 />
                                 {phoneNumberError && (
