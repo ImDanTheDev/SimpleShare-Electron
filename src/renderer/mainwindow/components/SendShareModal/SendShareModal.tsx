@@ -22,7 +22,6 @@ import {
     MIN_PHONE_NUMBER_LENGTH,
     MIN_PROFILE_NAME_LENGTH,
 } from 'simpleshare-common/dist/constants';
-import { stat } from 'fs';
 
 export const SendShareModal: React.FC = () => {
     const dispatch = useDispatch();
