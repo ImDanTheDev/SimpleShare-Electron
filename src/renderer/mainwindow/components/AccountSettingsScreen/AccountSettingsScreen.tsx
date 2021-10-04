@@ -16,6 +16,7 @@ import {
     updateAccount,
 } from 'simpleshare-common';
 import { LoadingIcon } from '../../../common/LoadingIcon/LoadingIcon';
+import { InputDropdown } from '../InputDropdown/InputDropdown';
 
 export const AccountSettingsScreen: React.FC = () => {
     const dispatch = useDispatch();
@@ -40,11 +41,18 @@ export const AccountSettingsScreen: React.FC = () => {
         (state: RootState) => state.user.updateAccountError
     );
 
+    const profiles = useSelector((state: RootState) => state.profiles);
+
     const [displayName, setDisplayName] = useState<string>(
         publicGeneralInfo?.displayName || ''
     );
     const [phoneNumber, setPhoneNumber] = useState<string>(
         accountInfo?.phoneNumber || ''
+    );
+
+    // TODO: Add dropdown to set default profile id.
+    const [defaultProfileId, setDefaultProfileId] = useState<string>(
+        publicGeneralInfo?.defaultProfileId || ''
     );
 
     const [displayNameError, setDisplayNameError] = useState<string>('');
@@ -117,6 +125,10 @@ export const AccountSettingsScreen: React.FC = () => {
                 publicGeneralInfo: {
                     displayName: displayName,
                     isComplete: true,
+                    defaultProfileId: defaultProfileId,
+                    profilePositions:
+                        publicGeneralInfo?.profilePositions ||
+                        profiles.profiles.map((p) => p.id || ''),
                 },
             })
         );
@@ -140,7 +152,7 @@ export const AccountSettingsScreen: React.FC = () => {
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Display Name:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='text'
                                 spellCheck='false'
                                 minLength={constants.MIN_DISPLAY_NAME_LENGTH}
@@ -155,7 +167,7 @@ export const AccountSettingsScreen: React.FC = () => {
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Phone Number:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='tel'
                                 spellCheck='false'
                                 minLength={constants.MIN_PHONE_NUMBER_LENGTH}
@@ -168,16 +180,50 @@ export const AccountSettingsScreen: React.FC = () => {
                             </div>
                         </div>
                         <div className={styles.itemGroup}>
-                            {updatingAccount ? (
-                                <LoadingIcon />
-                            ) : (
-                                <button
-                                    className={styles.saveButton}
-                                    onClick={handleSave}
-                                >
-                                    Save Account
-                                </button>
-                            )}
+                            <div className={styles.label}>Default Profile:</div>
+                            <InputDropdown
+                                items={profiles.profiles.reduce(
+                                    (obj, item) => ({
+                                        ...obj,
+                                        [item.id || '']: item.name,
+                                    }),
+                                    {}
+                                )}
+                                onSelectionChanged={(key) =>
+                                    setDefaultProfileId(key)
+                                }
+                                unselectedText='Select a profile...'
+                                defaultKey={
+                                    profiles.profiles.find(
+                                        (x) =>
+                                            x.id ===
+                                            publicGeneralInfo?.defaultProfileId
+                                    )?.id
+                                }
+                            />
+                            <div className={styles.errorMessage}>
+                                {phoneNumberError}
+                            </div>
+                        </div>
+                        <div className={styles.itemGroup}>
+                            <div>
+                                {updatingAccount ? (
+                                    <LoadingIcon />
+                                ) : (
+                                    <button
+                                        className={styles.primaryButton}
+                                        onClick={handleSave}
+                                    >
+                                        <span
+                                            style={{
+                                                padding: '16px',
+                                            }}
+                                        >
+                                            Save Account
+                                        </span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

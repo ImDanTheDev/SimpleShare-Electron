@@ -11,6 +11,7 @@ import {
     IProfile,
     selectProfileForEditing,
     switchProfile,
+    updateAccount,
 } from 'simpleshare-common';
 
 export const ProfilePicker: React.FC = () => {
@@ -30,12 +31,18 @@ export const ProfilePicker: React.FC = () => {
             ) || state.profiles.profiles[0]
     );
 
+    const publicGeneralInfo = useSelector(
+        (state: RootState) => state.user.publicGeneralInfo
+    );
+
     const editingProfiles: boolean = useSelector(
         (state: RootState) => state.profiles.editingProfiles
     );
 
     const [showLeftArrow, setShowLeftArrow] = useState<boolean>(false);
     const [showRightArrow, setShowRightArrow] = useState<boolean>(false);
+    const [dragging, setDragging] = useState<boolean>(false);
+    const [previewX, setPreviewX] = useState<number>(0);
 
     // eslint-disable-next-line @typescript-eslint/ban-types
     const profileListRef = useRef<HTMLDivElement | null>(null);
@@ -122,7 +129,7 @@ export const ProfilePicker: React.FC = () => {
     };
 
     const renderEditButton = (profile: IProfile) => {
-        if (!editingProfiles || profile.id === 'default') return <></>;
+        if (!editingProfiles) return <></>;
 
         return (
             <div
@@ -136,40 +143,147 @@ export const ProfilePicker: React.FC = () => {
         );
     };
 
+    const handleDropOnList = (e: React.DragEvent<HTMLDivElement>) => {
+        setDragging(false);
+
+        const profile: IProfile | undefined = profiles.find(
+            (x) => x.id === e.dataTransfer.getData('profileId')
+        );
+        if (!profile) return;
+        e.preventDefault();
+
+        const gapBetweenProfiles = 8;
+        const profileWidth = 50;
+        let newIndex =
+            e.clientX -
+            e.currentTarget.getBoundingClientRect().left -
+            gapBetweenProfiles -
+            profileWidth / 2;
+        newIndex = Math.floor(newIndex / (profileWidth + gapBetweenProfiles));
+        newIndex = Math.max(0, Math.min(profiles.length, newIndex));
+
+        const tmpProfiles = [...profiles];
+        const oldIndex = tmpProfiles.findIndex((i) => i.id === profile.id);
+
+        if (oldIndex !== newIndex && oldIndex + 1 !== newIndex) {
+            if (newIndex > oldIndex) {
+                tmpProfiles.splice(
+                    newIndex - 1,
+                    0,
+                    tmpProfiles.splice(oldIndex, 1)[0]
+                );
+            } else {
+                tmpProfiles.splice(
+                    newIndex,
+                    0,
+                    tmpProfiles.splice(oldIndex, 1)[0]
+                );
+            }
+        }
+
+        if (!publicGeneralInfo) return;
+        dispatch(
+            updateAccount({
+                publicGeneralInfo: {
+                    ...publicGeneralInfo,
+                    profilePositions: tmpProfiles.map(
+                        (profile) => profile.id || ''
+                    ),
+                },
+            })
+        );
+    };
+
+    const handleDragOverList = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const gapBetweenProfiles = 8;
+        const profileWidth = 50;
+        let x =
+            e.clientX -
+            e.currentTarget.getBoundingClientRect().left -
+            gapBetweenProfiles -
+            profileWidth / 2;
+        x = Math.floor(x / (profileWidth + gapBetweenProfiles));
+        x = Math.max(0, Math.min(profiles.length, x));
+
+        setPreviewX((x + 1) * (profileWidth + gapBetweenProfiles));
+        setDragging(true);
+    };
+
+    const handleDragStart = (
+        e: React.DragEvent<HTMLDivElement>,
+        profile: IProfile
+    ) => {
+        if (!profile.id) {
+            e.preventDefault();
+            return;
+        }
+        e.dataTransfer.setData('profileId', profile.id);
+        e.dataTransfer.setDragImage(e.currentTarget, 25, 25);
+    };
+
+    const handleDragEnd = () => {
+        setDragging(false);
+    };
+
     const renderProfiles = (): ReactNode[] => {
         const profileButtons: ReactNode[] = [];
 
         profiles.forEach((profile) => {
             profileButtons.push(
-                <CircleButton
+                <div
                     key={profile.id}
                     style={{
-                        width: 50,
-                        height: 50,
-                        borderWidth: profile.id === currentProfile?.id ? 2 : 1,
-                        borderRadius:
-                            profile.id === currentProfile?.id ? 16 : '50%',
-                        overflow: 'hidden',
+                        transform: 'translate(0,0)',
                     }}
-                    tooltip={profile.name}
-                    disableAnimation={editingProfiles}
-                    onClick={() => handleProfileClick(profile)}
+                    draggable={true}
+                    onDragStart={(e) => handleDragStart(e, profile)}
+                    onDragEnd={handleDragEnd}
                 >
-                    {renderEditButton(profile)}
-                    {!profile.pfp ||
-                    profile.pfp === constants.DEFAULT_PFP_ID ? (
-                        <span className={styles.profileLabel}>
-                            {profile.name.length > 2
-                                ? profile.name.slice(0, 2)
-                                : profile.name}
-                        </span>
-                    ) : (
-                        <img
-                            className={styles.profileImage}
-                            src={profile.pfp}
-                        />
-                    )}
-                </CircleButton>
+                    <CircleButton
+                        key={profile.id}
+                        style={{
+                            width: 50,
+                            height: 50,
+                            borderWidth:
+                                profile.id === currentProfile?.id ||
+                                publicGeneralInfo?.defaultProfileId ===
+                                    profile.id
+                                    ? 2
+                                    : 1,
+                            borderRadius:
+                                profile.id === currentProfile?.id ? 16 : '50%',
+                            overflow: 'hidden',
+                            borderColor:
+                                publicGeneralInfo?.defaultProfileId ===
+                                profile.id
+                                    ? '#ee7b1ca1'
+                                    : undefined,
+                        }}
+                        tooltip={
+                            publicGeneralInfo?.defaultProfileId === profile.id
+                                ? `(Default) ${profile.name}`
+                                : profile.name
+                        }
+                        disableAnimation={editingProfiles}
+                        onClick={() => handleProfileClick(profile)}
+                    >
+                        {renderEditButton(profile)}
+                        {!profile.pfp ||
+                        profile.pfp === constants.DEFAULT_PFP_ID ? (
+                            <span className={styles.profileLabel}>
+                                {profile.name.length > 2
+                                    ? profile.name.slice(0, 2)
+                                    : profile.name}
+                            </span>
+                        ) : (
+                            <img
+                                className={styles.profileImage}
+                                src={profile.pfp}
+                            />
+                        )}
+                    </CircleButton>
+                </div>
             );
         });
 
@@ -185,7 +299,12 @@ export const ProfilePicker: React.FC = () => {
             ) : (
                 <></>
             )}
-            <div className={styles.profileList} ref={profileListRef}>
+            <div
+                className={styles.profileList}
+                ref={profileListRef}
+                onDrop={handleDropOnList}
+                onDragOver={handleDragOverList}
+            >
                 <CircleButton
                     style={{ height: 50, width: 50 }}
                     onClick={handleNewProfile}
@@ -204,6 +323,14 @@ export const ProfilePicker: React.FC = () => {
                 </button>
             ) : (
                 <></>
+            )}
+            {dragging && (
+                <div
+                    className={styles.dragPreview}
+                    style={{
+                        left: previewX + 2,
+                    }}
+                />
             )}
         </div>
     );

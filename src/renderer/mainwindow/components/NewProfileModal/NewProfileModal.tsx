@@ -215,7 +215,7 @@ export const NewProfileModal: React.FC = () => {
                     )}
                 </div>
                 <input
-                    className={styles.field}
+                    className={styles.textField}
                     type='text'
                     value={profileName}
                     placeholder='Profile name...'
@@ -232,18 +232,30 @@ export const NewProfileModal: React.FC = () => {
                     errorMessage
                 )}
             </div>
-            <div className={styles.buttons}>
-                <button className={styles.button} onClick={handleDismiss}>
+            <div
+                className={styles.buttons}
+                style={{
+                    display: 'flex',
+                    height: '32px',
+                }}
+            >
+                <button
+                    className={styles.secondaryButton}
+                    onClick={handleDismiss}
+                >
                     Cancel
                 </button>
                 {profileSelectedForEdit ? (
-                    <button className={styles.button} onClick={handleDelete}>
+                    <button
+                        className={styles.secondaryButton}
+                        onClick={handleDelete}
+                    >
                         Delete
                     </button>
                 ) : (
-                    <div />
+                    <div style={{ flex: 1 }} />
                 )}
-                <button className={styles.button} onClick={handleSave}>
+                <button className={styles.secondaryButton} onClick={handleSave}>
                     Save
                 </button>
             </div>

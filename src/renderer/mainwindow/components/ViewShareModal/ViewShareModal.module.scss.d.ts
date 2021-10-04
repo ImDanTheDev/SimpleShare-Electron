@@ -4,9 +4,11 @@ interface CssExports {
   'button': string;
   'buttons': string;
   'deleteButton': string;
-  'field': string;
   'header': string;
   'modal': string;
+  'primaryButton': string;
+  'secondaryButton': string;
+  'textField': string;
   'title': string;
 }
 export const cssExports: CssExports;

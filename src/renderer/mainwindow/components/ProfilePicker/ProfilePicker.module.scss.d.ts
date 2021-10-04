@@ -4,11 +4,13 @@ interface CssExports {
   'deleteProfileButton': string;
   'deleteProfileButtonContainer': string;
   'deleteProfileButtonIcon': string;
+  'dragPreview': string;
   'leftArrow': string;
   'picker': string;
   'profileImage': string;
   'profileLabel': string;
   'profileList': string;
+  'pulse-white': string;
   'rightArrow': string;
 }
 export const cssExports: CssExports;

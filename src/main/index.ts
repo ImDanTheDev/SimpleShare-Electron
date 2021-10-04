@@ -9,16 +9,75 @@ import MainIPC from './main-ipc';
 import { start } from './webserver';
 import path from 'path';
 import mime from 'mime-types';
+import childprocess from 'child_process';
 
 // Magic strings set by webpack
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const STARTUP_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 declare const UPDATE_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
-    app.quit();
+app.setAppUserModelId('com.squirrel.simple-share.SimpleShare');
+
+const handleSquirrelEvent = (): boolean => {
+    if (process.argv.length === 1) {
+        return false;
+    }
+
+    const appFolder = path.resolve(process.execPath, '..');
+    const rootAtomFolder = path.resolve(appFolder, '..');
+    const updateDotExe = path.resolve(path.join(rootAtomFolder, 'Update.exe'));
+    const exeName = path.basename(process.execPath);
+
+    const spawn = (command: string, args: string[] | undefined) => {
+        let spawnedProcess;
+
+        try {
+            spawnedProcess = childprocess.spawn(command, args, {
+                detached: true,
+            });
+        } catch (error) {
+            // Ignore error
+        }
+
+        return spawnedProcess;
+    };
+
+    const spawnUpdate = function (args: string[] | undefined) {
+        return spawn(updateDotExe, args);
+    };
+
+    const squirrelEvent = process.argv[1];
+    switch (squirrelEvent) {
+        case '--squirrel-install':
+        case '--squirrel-updated':
+            // Install desktop and start menu shortcuts
+            spawnUpdate(['--createShortcut', exeName]);
+
+            setTimeout(app.quit, 1000);
+            return true;
+
+        case '--squirrel-uninstall':
+            // Remove desktop and start menu shortcuts
+            spawnUpdate(['--removeShortcut', exeName]);
+
+            setTimeout(app.quit, 1000);
+            return true;
+
+        case '--squirrel-obsolete':
+            app.quit();
+            return true;
+    }
+    return true;
+};
+
+if (!process.env.INIT_CWD && handleSquirrelEvent()) {
+    setTimeout(app.quit, 1000);
 }
+
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+// if (require('electron-squirrel-startup')) {
+//     app.quit();
+// }
 
 let electronStore: ElectronStore;
 let currentWindow: BrowserWindow;
@@ -158,6 +217,16 @@ const setupIPC = () => {
     ipc.on('APP_QUIT', () => {
         app.quit();
     });
+    ipc.on('APP_MAXIMIZE_OR_RESTORE', () => {
+        if (currentWindow.isMaximized()) {
+            currentWindow.restore();
+        } else {
+            currentWindow.maximize();
+        }
+    });
+    ipc.on('APP_MINIMIZE', () => {
+        currentWindow.minimize();
+    });
     ipc.on('APP_SHOW_STARTUP_WINDOW', () => {
         const oldWindow = currentWindow;
         createStartupWindow();
@@ -214,6 +283,9 @@ const setupIPC = () => {
     });
     ipc.on('APP_CLEAR_COOKIES', async () => {
         await currentWindow.webContents.session.clearStorageData();
+    });
+    ipc.on('APP_RESTORE', () => {
+        currentWindow.restore();
     });
 };
 

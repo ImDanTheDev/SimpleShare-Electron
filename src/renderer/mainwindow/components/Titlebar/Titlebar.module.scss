@@ -1,0 +1,31 @@
+.titlebar {
+    flex: 0 0 20px;
+    background-color: #0d161f;
+    -webkit-app-region: drag;
+    display: flex;
+    flex-direction: row;
+}
+
+.title {
+    color: #d29260;
+    font-size: 12px;
+    font-weight: bold;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+}
+
+.utilityButton {
+    -webkit-app-region: none;
+    display: flex;
+    color: #d29260;
+    width: 40px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.utilityButton:hover {
+    background-color: lighten(#0d161f, 5%);
+}

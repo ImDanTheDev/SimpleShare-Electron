@@ -1,0 +1,82 @@
+$gradient-pink: #7f5a83;
+$gradient-blue: #0d324d;
+
+$primary-border: #946c4b;
+
+$primary-input-background: #1a2633;
+$primary-button-background: #0d161f;
+
+$secondary-button-background: #353839;
+
+$primary-text-color: #fff;
+$error-text-color: #e63333;
+
+$panel-background: #1c1c1c8c;
+$popup-background: #0d161f;
+
+$default-profile-circle-border: #a75f20;
+
+.textField {
+    color: #fff;
+    background-color: #1a2633;
+    border-radius: 16px;
+    border-color: #f4a2617f;
+    border-width: 1px;
+    padding: 12px 16px;
+    font-size: 18px;
+    outline: none;
+    flex: 1;
+    filter: drop-shadow(2px 2px 4px #111111a1);
+}
+
+@mixin basicButton($background, $borderRadius, $fontSize) {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    border-radius: $borderRadius;
+    border-color: #f4a2617f;
+    border-width: 1px;
+    border-style: solid;
+    background-color: $background;
+    filter: drop-shadow(2px 2px 4px #111111a1);
+    transition: filter 0.1s, transform 0.1s;
+    cursor: pointer;
+    color: #fff;
+    font-size: $fontSize;
+    //flex: 1;
+
+    &:hover {
+        filter: drop-shadow(2px 2px 6px #111111a1);
+        transform: scale(1.0125);
+    }
+
+    &:active {
+        filter: drop-shadow(2px 2px 1px #111111a1);
+        transform: scale(0.9875);
+    }
+
+    &:disabled:hover {
+        filter: none;
+        transform: none;
+        cursor: default;
+    }
+}
+
+.primaryButton {
+    @include basicButton(#0d161f, 16px, 20px);
+}
+
+.secondaryButton {
+    @include basicButton(#282a31, 16px, 16px);
+
+    padding: 8px;
+
+    &:disabled {
+        background-color: darken(#282a31, 5);
+        color: rgb(114, 114, 114);
+        border-color: #5036217f;
+    }
+}

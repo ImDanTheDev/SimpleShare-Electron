@@ -96,6 +96,18 @@ export const CompleteAccountScreen: React.FC = () => {
                 return;
             }
 
+            // TODO: Check if the user already has a default profile.
+            // If they do, do nothing.
+            // If they have a profile, but none are default, make the first one default.
+            // If they dont, create a default profile.
+            dispatch(
+                createProfile({
+                    profile: {
+                        name: 'Default',
+                        id: 'default', // TODO: let firebase autogenerate the user's starter profile.
+                    },
+                })
+            );
             dispatch(
                 updateAccount({
                     accountInfo: {
@@ -105,14 +117,8 @@ export const CompleteAccountScreen: React.FC = () => {
                     publicGeneralInfo: {
                         displayName: displayName,
                         isComplete: true,
-                    },
-                })
-            );
-            dispatch(
-                createProfile({
-                    profile: {
-                        name: 'Default',
-                        id: 'default',
+                        defaultProfileId: 'default', // TODO: Get the id from the profile that was just created.
+                        profilePositions: ['default'], // TODO: Get the id from the profile that was just created.
                     },
                 })
             );
@@ -129,7 +135,7 @@ export const CompleteAccountScreen: React.FC = () => {
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Display Name:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='text'
                                 spellCheck='false'
                                 minLength={constants.MIN_DISPLAY_NAME_LENGTH}
@@ -137,14 +143,16 @@ export const CompleteAccountScreen: React.FC = () => {
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                             />
+                        </div>
+                        {displayNameError && (
                             <div className={styles.errorMessage}>
                                 {displayNameError}
                             </div>
-                        </div>
+                        )}
                         <div className={styles.itemGroup}>
                             <div className={styles.label}>Phone Number:</div>
                             <input
-                                className={styles.field}
+                                className={styles.textField}
                                 type='tel'
                                 spellCheck='false'
                                 minLength={constants.MIN_PHONE_NUMBER_LENGTH}
@@ -152,26 +160,35 @@ export const CompleteAccountScreen: React.FC = () => {
                                 value={phoneNumber}
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                             />
+                        </div>
+                        {phoneNumberError && (
                             <div className={styles.errorMessage}>
                                 {phoneNumberError}
                             </div>
-                        </div>
+                        )}
                         <div className={styles.itemGroup}>
-                            {updatingAccount ? (
-                                <LoadingIcon />
-                            ) : (
-                                <button
-                                    className={styles.completeButton}
-                                    onClick={handleComplete}
-                                >
-                                    Complete Account
-                                </button>
-                            )}
-
-                            <div className={styles.errorMessage}>
-                                {updateAccountError &&
-                                    'An error occurred while completing your account. Try again later.'}
+                            <div>
+                                {updatingAccount ? (
+                                    <LoadingIcon />
+                                ) : (
+                                    <button
+                                        className={styles.primaryButton}
+                                        onClick={handleComplete}
+                                    >
+                                        <span
+                                            style={{
+                                                padding: '16px',
+                                            }}
+                                        >
+                                            Complete Account
+                                        </span>
+                                    </button>
+                                )}
                             </div>
+                        </div>
+                        <div className={styles.errorMessage}>
+                            {updateAccountError &&
+                                'An error occurred while completing your account. Try again later.'}
                         </div>
                     </div>
                 </div>

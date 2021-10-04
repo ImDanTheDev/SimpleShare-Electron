@@ -19,10 +19,13 @@ import toasterReducer, { ToasterState } from './toaster-slice';
 import {
     AccountInfoState,
     AuthState,
+    LocalPersistState,
     OutboxState,
     ProfilesState,
     reduxReducers,
+    SearchState,
     SharesState,
+    NotificationsState,
 } from 'simpleshare-common';
 
 const rootReducer = combineReducers({
@@ -31,6 +34,9 @@ const rootReducer = combineReducers({
     profiles: reduxReducers.profilesReducer,
     shares: reduxReducers.sharesReducer,
     outbox: reduxReducers.outboxReducer,
+    localPersist: reduxReducers.localPersistReducer,
+    search: reduxReducers.searchReducer,
+    notifications: reduxReducers.notificationsReducer,
     nav: navReducer,
     toaster: toasterReducer,
 });
@@ -42,13 +48,25 @@ const persistConfig: PersistConfig<
         profiles: ProfilesState;
         shares: SharesState;
         outbox: OutboxState;
+        localPersist: LocalPersistState;
         nav: NavState;
         toaster: ToasterState;
+        search: SearchState;
+        notifications: NotificationsState;
     }>
 > = {
     key: 'root',
     storage: electronStorage(),
-    blacklist: ['user', 'auth', 'profiles', 'shares', 'nav', 'toaster'],
+    blacklist: [
+        'user',
+        'auth',
+        'profiles',
+        'shares',
+        'nav',
+        'toaster',
+        'search',
+        'notifications',
+    ],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

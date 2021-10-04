@@ -27,12 +27,26 @@ export const HomeScreen: React.FC = () => {
         <div className={styles.body}>
             <div className={styles.sideBar}>
                 <Outbox />
-                <button
-                    className={styles.sendShareButton}
-                    onClick={handleSendShare}
+                <div
+                    style={{
+                        padding: '4px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                    }}
                 >
-                    Send a new Share
-                </button>
+                    <button
+                        className={styles.primaryButton}
+                        onClick={handleSendShare}
+                    >
+                        <span
+                            style={{
+                                padding: '16px',
+                            }}
+                        >
+                            Send a new Share
+                        </span>
+                    </button>
+                </div>
             </div>
             <Inbox />
         </div>
