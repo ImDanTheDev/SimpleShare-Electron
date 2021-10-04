@@ -1,7 +1,7 @@
 {
     "name": "simple-share",
     "productName": "SimpleShare",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "The desktop companion app to the Simple Share mobile app.",
     "main": ".webpack/main",
     "scripts": {
@@ -79,6 +79,6 @@
         "react-icons": "^4.2.0",
         "react-redux": "^7.2.4",
         "redux-persist": "^6.0.0",
-        "simpleshare-common": "^1.2.21"
+        "simpleshare-common": "^1.2.22"
     }
 }
